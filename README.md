@@ -1,6 +1,6 @@
 # Authorship
 
-Authorship is modern approach to attribution of authorship in WordPress. It supports multiple authors and guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
+Authorship is modern approach to author attribution in WordPress. It supports multiple authors and guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
 
 Authorship is currently geared toward developers who are implementing custom solutions on WordPress. For example, it doesn't provide an option to automatically display author profiles at the bottom of a post. In the future it will include wider support for existing themes and useful features for implementors and site builders.
 
@@ -9,12 +9,11 @@ Authorship is currently geared toward developers who are implementing custom sol
 * Multiple authors per post
 * Guest authors (that can be created in place on the post editing screen)
 * A convenient and user-friendly UI that feels like a part of WordPress
-* Clear distinction between attributed authors and editorial users
 * Works great with the block editor and the classic editor
 * Full CRUD support in the REST API
-* Full support for RSS and Atom feeds
+* Full support in RSS and Atom feeds
 * Fine-grained user permission controls
-* Lots of filters and actions
+* Plenty of filters and actions
 
 ## Design decisions
 
@@ -49,13 +48,14 @@ We'd love it if you activated Authorship and then forgot that its features are p
 
 ### User design decisions
 
-Existing plugins that provide guest author functionality make a distinction between a guest author and a real WordPress user. A guest author exists only as a taxonomy term, which complicates the UX and creates inconsistencies in the data structure.
+Existing plugins that provide guest author functionality make a distinction between a guest author and a real WordPress user. A guest author exists only as a taxonomy term, which complicates the UX and creates inconsistencies and duplication in the data.
 
 Authorship creates a real WordPress user account for each guest author, and this provides several advantages:
 
 * Familiar UI and UX - no custom administration screens for managing the details of a guest author differently from a regular user
 * Third party plugins that customise user profile functionality just work
 * Consistent data structure - you only ever deal with `WP_User` objects
+* No need to keep data in sync between a user and their "author" profile
 * Promoting a guest author to a functional user is done just by changing their user role
 
 ## Team
