@@ -1,6 +1,6 @@
 # Authorship
 
-Authorship is modern approach to author attribution in WordPress. It supports multiple authors and guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
+Authorship is a modern approach to author attribution in WordPress. It supports multiple authors and guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
 
 Authorship is currently geared toward developers who are implementing custom solutions on WordPress. For example, it doesn't provide an option to automatically display author profiles at the bottom of a post. In the future it will include wider support for existing themes and useful features for implementors and site builders.
 
