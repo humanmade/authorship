@@ -19,7 +19,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 * Guest authors (that can be created in place on the post editing screen)
 * A convenient and user-friendly UI that feels like a part of WordPress
 * Works great with the block editor and the classic editor
-* Full CRUD support in the REST API
+* Full CRUD support in the REST API and WP-CLI
 * Full support in RSS and Atom feeds
 * Fine-grained user permission controls
 * Plenty of filters and actions
@@ -42,6 +42,7 @@ There's a lot more to a WordPress website than just its theme. Services can both
 
 Authorship provides:
 
+* Full CRUD support via WP-CLI
 * Full CRUD support for guest authors via a custom REST API endpoint
 * Full CRUD support for author association via a property on the default post endpoints
 * Full support for RSS and Atom feed output
