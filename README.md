@@ -60,8 +60,20 @@ Authorship creates a real WordPress user account for each guest author, and this
 
 ## Team
 
-Authorship is developed and maintained by [Human Made](https://humanmade.com) and [Altis](https://www.altis-dxp.com). Its initial development was funded by [Siemens AG](https://www.siemens.com).
+Authorship is developed and maintained by [Human Made](https://humanmade.com) and [Altis](https://www.altis-dxp.com). Its initial development was funded by [Siemens](https://www.siemens.com).
 
 [<img src="assets/images/hm-logo.png" width="207" height="86" alt="">](https://humanmade.com)
 [<img src="assets/images/altis-logo.png" width="207" height="86" alt="">](https://www.altis-dxp.com)
 [<img src="assets/images/siemens-logo.png" width="215" height="86" alt="">](https://www.siemens.com)
+
+## License
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
