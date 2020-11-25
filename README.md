@@ -4,6 +4,15 @@ Authorship is modern approach to author attribution in WordPress. It supports mu
 
 Authorship is currently geared toward developers who are implementing custom solutions on WordPress. For example, it doesn't provide an option to automatically display author profiles at the bottom of a post. In the future it will include wider support for existing themes and useful features for implementors and site builders.
 
+---
+
+ * [Features](#features)
+ * [Design decisions](#design-decisions)
+ * [Team](#team)
+ * [License](#license)
+
+---
+
 ## Features
 
 * Multiple authors per post
