@@ -10,6 +10,7 @@ Authorship is currently geared toward developers who are implementing custom sol
  * [Design decisions](#design-decisions)
  * [Team](#team)
  * [License](#license)
+ * [Alternatives](#alternatives)
 
 ---
 
@@ -87,3 +88,10 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
+
+## Alternatives
+
+If the Authorship plugin doesn't suit your needs, try these alternatives:
+
+* [PublishPress Authors](https://wordpress.org/plugins/publishpress-authors/)
+* [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
