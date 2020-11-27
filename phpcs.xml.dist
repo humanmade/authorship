@@ -9,7 +9,16 @@
 	<exclude-pattern>/tests/wp-tests-config.php</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 
-	<rule ref="HM"/>
+	<rule ref="HM">
+		<!-- Exclude filename related sniffs -->
+		<exclude name="HM.Files" />
+		<exclude name="WordPress.Files" />
+	</rule>
+
+	<rule ref="Squiz.Commenting">
+		<!-- Exclude the tests from commenting sniffs -->
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
