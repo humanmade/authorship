@@ -5,6 +5,3 @@ parameters:
   paths:
     - plugin.php
     - inc
-    - tests/phpunit
-  scanDirectories:
-    - vendor/wp-phpunit/wp-phpunit/includes
