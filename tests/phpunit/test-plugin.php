@@ -11,7 +11,7 @@ namespace Authorship\Tests;
 
 class TestPlugin extends TestCase {
 	public function testReadmeIsUpToDate() {
-		$file = dirname( dirname( __DIR__ ) ) . '/readme.md';
+		$file = dirname( dirname( __DIR__ ) ) . '/README.md';
 
 		if ( ! is_file( $file ) ) {
 			$this->fail( 'No readme file present.' );
