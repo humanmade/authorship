@@ -4,4 +4,3 @@ parameters:
   level: max
   paths:
     - plugin.php
-    - inc
