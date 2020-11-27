@@ -1,5 +1,16 @@
 # Authorship
 
+Stable tag: 0.1.0  
+Requires at least: 5.4  
+Tested up to: 5.6  
+Requires PHP: 7.2  
+License: GPL v3 or later  
+Contributors: johnbillion, humanmade  
+
+A modern approach to author attribution in WordPress.
+
+## Description
+
 Authorship is a modern approach to author attribution in WordPress. It supports multiple authors and guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
 
 Authorship is currently geared toward developers who are implementing custom solutions on WordPress. For example, it doesn't provide an option to automatically display author profiles at the bottom of a post. In the future it will include wider support for existing themes and useful features for implementors and site builders.
