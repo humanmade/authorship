@@ -7,16 +7,28 @@
     "sort-packages": true,
     "preferred-install": "dist"
   },
+  "extra": {
+    "wordpress-install-dir": "tests/wordpress"
+  },
   "scripts": {
+    "post-update-cmd": [
+      "@php -r \"! file_exists( 'tests/.env' ) && copy( 'tests/.env.dist', 'tests/.env' );\""
+    ],
     "test": [
       "@test:phpcs",
-      "@test:phpstan"
+      "@test:phpstan",
+      "@test:ut"
     ],
     "test:phpstan": [
       "phpstan analyze"
     ],
     "test:phpcs": [
       "phpcs -ps ."
+    ],
+    "test:ut": [
+      "wp db reset --yes --path=$(npm run --silent jq '.extra .\"wordpress-install-dir\"' composer.json -- -r) #",
+      "export WP_MULTISITE=0 && phpunit --verbose --colors=always --exclude-group=ms-required",
+      "export WP_MULTISITE=1 && phpunit --verbose --colors=always --exclude-group=ms-excluded"
     ]
   },
   "require": {
@@ -29,7 +41,12 @@
     "php-stubs/wordpress-stubs": "^5.5",
     "phpcompatibility/phpcompatibility-wp": "2.1.0",
     "phpstan/phpstan": "0.12.57",
+    "phpunit/phpunit": "^7",
+    "roots/wordpress": "*",
     "squizlabs/php_codesniffer": "3.5.8",
-    "szepeviktor/phpstan-wordpress": "0.7.1"
+    "szepeviktor/phpstan-wordpress": "0.7.1",
+    "vlucas/phpdotenv": "^3",
+    "wp-cli/db-command": "^2",
+    "wp-phpunit/wp-phpunit": "*"
   }
 }

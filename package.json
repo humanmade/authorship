@@ -1,0 +1,13 @@
+{
+  "name": "@humanmade/authorship",
+  "version": "0.1.0",
+  "description": "Authorship",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "jq": "jq"
+  },
+  "devDependencies": {
+    "node-jq": "^1.11.3"
+  }
+}

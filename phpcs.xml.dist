@@ -4,6 +4,9 @@
 	<arg name="extensions" value="php"/>
 
 	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/tests/wordpress/*</exclude-pattern>
+	<exclude-pattern>/tests/wp-config.php</exclude-pattern>
+	<exclude-pattern>/tests/wp-tests-config.php</exclude-pattern>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 
 	<rule ref="HM"/>
