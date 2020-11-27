@@ -1,0 +1,34 @@
+{
+  "name": "humanmade/authorship",
+  "description": "Authorship",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "config": {
+    "sort-packages": true,
+    "preferred-install": "dist"
+  },
+  "scripts": {
+    "test": [
+      "@test:phpcs",
+      "@test:phpstan"
+    ],
+    "test:phpstan": [
+      "phpstan analyze"
+    ],
+    "test:phpcs": [
+      "phpcs -ps ."
+    ]
+  },
+  "require": {
+    "php": "~7.2",
+    "composer/installers": "~1.0"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "0.7.0",
+    "humanmade/coding-standards": "1.1.1",
+    "php-stubs/wordpress-stubs": "^5.5",
+    "phpcompatibility/phpcompatibility-wp": "2.1.0",
+    "phpstan/phpstan": "0.12.57",
+    "szepeviktor/phpstan-wordpress": "0.7.1"
+  }
+}
