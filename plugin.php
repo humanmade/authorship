@@ -34,3 +34,5 @@ namespace Authorship;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+echo $foo;
