@@ -23,7 +23,7 @@
       "phpstan analyze"
     ],
     "test:phpcs": [
-      "phpcs -ps ."
+      "phpcs -ps --cache=tests/cache/phpcs ."
     ],
     "test:ut": [
       "wp db reset --yes --path=$(npm run --silent jq '.extra .\"wordpress-install-dir\"' composer.json -- -r) #",
