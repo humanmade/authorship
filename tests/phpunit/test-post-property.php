@@ -11,7 +11,6 @@ namespace Authorship\Tests;
 
 use WP_Http;
 use WP_REST_Request;
-use WP_REST_Server;
 
 class TestPostProperty extends TestCase {
 	/**
