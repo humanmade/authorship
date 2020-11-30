@@ -240,7 +240,14 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		return null;
 	}
 
-	if ( ! current_user_can( $post_type_object->cap->edit_others_posts ) ) {
+	/**
+	 * Post type capabilities.
+	 *
+	 * @var \stdClass
+	 */
+	$caps = $post_type_object->cap;
+
+	if ( ! current_user_can( $caps->edit_others_posts ) ) {
 		return new WP_Error( 'authorship', __( 'You are not allowed to set the authors for this post.', 'authorship' ) );
 	}
 
