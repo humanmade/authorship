@@ -29,6 +29,7 @@ function bootstrap() : void {
 	add_action( 'init', __NAMESPACE__ . '\\init_taxonomy', 99 );
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
 	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
+	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
 
 	// Filters.
 	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
@@ -361,6 +362,28 @@ function init_taxonomy() : void {
 				'items_list'                 => __( 'Authors list', 'authorship' ),
 				'most_used'                  => _x( 'Most Used', 'author', 'authorship' ),
 				'back_to_items'              => __( '&larr; Back to authors', 'authorship' ),
+			],
+		]
+	);
+}
+
+/**
+ * Fires after block assets have been enqueued for the editing interface.
+ */
+function enqueue_assets() : void {
+	\Asset_Loader\enqueue_asset(
+		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
+		'main.js',
+		[
+			'handle'       => 'authorship-js',
+			'dependencies' => [ // @TODO check:
+				'react',
+				'wp-block-editor',
+				'wp-blocks',
+				'wp-components',
+				'wp-element',
+				'wp-i18n',
+				'wp-polyfill',
 			],
 		]
 	);
