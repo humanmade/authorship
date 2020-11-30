@@ -77,10 +77,15 @@ const AuthorsSelect = () => {
 					marginRight: '5px',
 					alignContent: 'center',
 				} }>
-					<img alt="" src={ option.avatar } />
+					<img alt="" src={ option.avatar } style={ {
+						width: '24px',
+						height: '24px',
+					} } />
 				</div>
 			) }
-			<div>{ option.label }</div>
+			<div style={ {
+				alignContent: 'center',
+			} }>{ option.label }</div>
 		</div>
 	);
 
