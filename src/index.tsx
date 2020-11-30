@@ -79,12 +79,14 @@ const AuthorsSelect = args => {
 	 * @returns {JSX.Element} The element.
 	 */
 	const formatOptionLabel = ( option: Option ) => (
-		<div style={ { display: 'flex' } }>
+		<div style={ {
+			display: 'flex',
+			alignItems: 'center',
+		} }>
 			{ option.avatar && (
 				<div style={ {
 					flex: '0 0 24px',
 					marginRight: '5px',
-					alignContent: 'center',
 				} }>
 					<img alt="" src={ option.avatar } style={ {
 						width: '24px',
@@ -92,9 +94,7 @@ const AuthorsSelect = args => {
 					} } />
 				</div>
 			) }
-			<div style={ {
-				alignContent: 'center',
-			} }>{ option.label }</div>
+			<div>{ option.label }</div>
 		</div>
 	);
 

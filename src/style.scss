@@ -5,30 +5,36 @@
 		&__control {
 			&,
 			&:hover {
-				border-color: #757575;
+				border: none;
 				border-radius: 2px;
 			}
 
 			&--is-focused,
 			&--is-focused:hover {
-				border-color: #007cba;
-				box-shadow: 0 0 0 1px #007cba;
+				box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var( --wp-admin-theme-color );
 			}
 		}
 
 		&__value-container {
-			padding: 1px;
+			padding: 0;
 		}
 
 		&__multi-value {
 			width: 100%;
-			background: #f6f6f6;
+			background: #eaeaea;
+			border-radius: 2px;
+			margin: 2px 0 4px;
 
 			&__label {
 				font-size: 14px;
 				flex-grow: 1;
 				white-space: initial;
-				color: #016087;
+				color: #1e1e1e;
+				padding: 7px;
+
+				img {
+					display: block;
+				}
 			}
 		}
 
