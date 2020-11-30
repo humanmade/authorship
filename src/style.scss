@@ -2,6 +2,14 @@
 	width: 100%;
 
 	.authorship-select {
+		&__control {
+			&,
+			&:hover {
+				border-color: #7e8993;
+				border-radius: 3px;
+			}
+		}
+
 		&__value-container {
 			padding: 1px;
 		}
@@ -23,6 +31,7 @@
 		}
 
 		&__indicator {
+			color: #666;
 			padding: 2px;
 		}
 	}
