@@ -375,15 +375,14 @@ function enqueue_assets() : void {
 	 */
 	$post = get_post();
 
-	enqueue_assets_for_post( $post );
+	enqueue_assets_for_post();
+	preload_author_data( $post );
 }
 
 /**
  * Enqueues the JS and CSS assets for the author selection control.
- *
- * @param WP_Post $post The post being edited.
  */
-function enqueue_assets_for_post( WP_Post $post ) : void {
+function enqueue_assets_for_post() : void {
 	\Asset_Loader\enqueue_asset(
 		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
 		'main.js',
@@ -407,7 +406,14 @@ function enqueue_assets_for_post( WP_Post $post ) : void {
 			'handle' => 'authorship-css',
 		]
 	);
+}
 
+/**
+ * Preloads author data for the post editing screen.
+ *
+ * @param WP_Post $post The post being edited.
+ */
+function preload_author_data( WP_Post $post ) : void {
 	$authors = get_authors( $post );
 
 	if ( empty( $authors ) ) {
