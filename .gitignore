@@ -1,6 +1,7 @@
 /build
 /composer.lock
 /node_modules
+/package-lock.json
 /tests/.env
 /tests/cache
 /tests/wordpress
