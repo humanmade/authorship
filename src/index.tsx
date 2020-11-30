@@ -67,6 +67,8 @@ const AuthorsSelect = () => {
 		<PluginPostStatusInfo>
 			<AsyncCreatableSelect
 				cacheOptions
+				className="authorship-select-container"
+				classNamePrefix="authorship-select"
 				defaultOptions={ currentAuthors }
 				isClearable={ false }
 				isMulti
