@@ -8,6 +8,12 @@
 				border-color: #7e8993;
 				border-radius: 3px;
 			}
+
+			&--is-focused,
+			&--is-focused:hover {
+				border-color: #007cba;
+				box-shadow: 0 0 0 1px #007cba;
+			}
 		}
 
 		&__value-container {
@@ -33,6 +39,10 @@
 		&__indicator {
 			color: #666;
 			padding: 2px;
+		}
+
+		&__input input[type="text"]:focus {
+			box-shadow: none;
 		}
 	}
 }
