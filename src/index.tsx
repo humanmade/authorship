@@ -1,5 +1,8 @@
+import * as React from 'react';
+
 import { compose } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
+import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 import AuthorsSelect from './components/authors-select';
 
@@ -7,7 +10,7 @@ declare const wp;
 
 const registerPlugin = wp.plugins.registerPlugin;
 
-const render = compose( [
+const Select = compose( [
 	withDispatch( dispatch => ( {
 		onUpdate( value: number[] ) {
 			dispatch( 'core/editor' ).editPost( {
@@ -16,5 +19,11 @@ const render = compose( [
 		},
 	} ) ),
 ] )( AuthorsSelect );
+
+const render = () => (
+	<PluginPostStatusInfo>
+		<Select/>
+	</PluginPostStatusInfo>
+);
 
 registerPlugin( 'authorship', { render } );

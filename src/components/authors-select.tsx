@@ -3,7 +3,6 @@ import { ActionMeta } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { WP_REST_API_User as User } from 'wp-types';
 
-import { PluginPostStatusInfo } from '@wordpress/edit-post';
 import { addQueryArgs } from '@wordpress/url';
 
 interface Option {
@@ -105,20 +104,18 @@ const AuthorsSelect = args => {
 	};
 
 	return (
-		<PluginPostStatusInfo>
-			<AsyncCreatableSelect
-				cacheOptions
-				className="authorship-select-container"
-				classNamePrefix="authorship-select"
-				defaultValue={ currentAuthors }
-				formatOptionLabel={ formatOptionLabel }
-				isClearable={ false }
-				isMulti
-				isValidNewOption={ ( value: string ) => value.length >= 2 }
-				loadOptions={ loadOptions }
-				onChange={ changeValue }
-			/>
-		</PluginPostStatusInfo>
+		<AsyncCreatableSelect
+			cacheOptions
+			className="authorship-select-container"
+			classNamePrefix="authorship-select"
+			defaultValue={ currentAuthors }
+			formatOptionLabel={ formatOptionLabel }
+			isClearable={ false }
+			isMulti
+			isValidNewOption={ ( value: string ) => value.length >= 2 }
+			loadOptions={ loadOptions }
+			onChange={ changeValue }
+		/>
 	);
 };
 
