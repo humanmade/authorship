@@ -236,6 +236,11 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	return null;
 }
 
+/**
+ * Register the Authorship REST API field for the given post type.
+ *
+ * @param string $post_type The post type name.
+ */
 function register_rest_api_field( string $post_type ) : void {
 	$validate_callback = function( $authors, WP_REST_Request $request, string $param ) use ( $post_type ) :? WP_Error {
 		return validate_authors( $authors, $request, $param, $post_type );
