@@ -32,13 +32,9 @@
 			}
 		}
 
+		&__indicators,
 		&__indicator-separator {
 			display: none;
-		}
-
-		&__indicator {
-			color: #666;
-			padding: 2px;
 		}
 
 		&__input input[type="text"]:focus {
