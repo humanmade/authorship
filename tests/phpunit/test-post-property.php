@@ -11,6 +11,7 @@ namespace Authorship\Tests;
 
 use WP_Http;
 use WP_REST_Request;
+use WP_REST_Response;
 
 class TestPostProperty extends TestCase {
 	/**
@@ -46,9 +47,16 @@ class TestPostProperty extends TestCase {
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 	}
 
+	protected static function do_request( WP_REST_Request $request ) : WP_REST_Response {
+		$response = rest_do_request( $request );
+		$response = apply_filters( 'rest_post_dispatch', $response, rest_get_server(), $request );
+
+		return $response;
+	}
+
 	// public function testPropertyIsDeclaredOnRoute() {
 	// 	$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts' );
-	// 	$response = rest_do_request( $request );
+	// 	$response = self::do_request( $request );
 	// 	$data     = $response->get_data();
 
 	// 	$args = array_filter( $data['endpoints'], function( array $endpoint ) {
@@ -70,7 +78,7 @@ class TestPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( 'authorship', $authors );
 
-		$response = rest_do_request( $request );
+		$response = self::do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::CREATED, $response->get_status() );
@@ -85,7 +93,7 @@ class TestPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( 'authorship', '123' );
 
-		$response = rest_do_request( $request );
+		$response = self::do_request( $request );
 
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
@@ -101,7 +109,7 @@ class TestPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( 'authorship', $authors );
 
-		$response = rest_do_request( $request );
+		$response = self::do_request( $request );
 
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
@@ -123,7 +131,7 @@ class TestPostProperty extends TestCase {
 			self::$users['author']->ID,
 		] );
 
-		$response = rest_do_request( $request );
+		$response = self::do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
@@ -143,7 +151,7 @@ class TestPostProperty extends TestCase {
 			$post->ID
 		) );
 
-		$response = rest_do_request( $request );
+		$response = self::do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( 'authorship', $data );
