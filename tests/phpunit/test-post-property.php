@@ -157,4 +157,32 @@ class TestPostProperty extends TestCase {
 		$this->assertArrayHasKey( 'authorship', $data );
 		$this->assertSame( [ self::$users['editor']->ID ], $data['authorship'] );
 	}
+
+	public function testREST_API_Response_Contains_Links() {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$authors = [
+			self::$users['author']->ID,
+			self::$users['editor']->ID,
+		];
+
+		$post = self::factory()->post->create_and_get( [
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			'authorship'  => $authors,
+		] );
+
+		wp_set_post_tags( $post->ID, 'testing1,testing2,testing3' );
+
+		$request = new WP_REST_Request( 'GET', sprintf(
+			'/wp/v2/posts/%d',
+			$post->ID
+		) );
+
+		$response = self::do_request( $request );
+		$links    = $response->get_links();
+
+		$this->assertArrayHasKey( 'wp:authorship', $links );
+		$this->assertCount( 2, $links['wp:authorship'] );
+	}
 }

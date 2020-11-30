@@ -10,9 +10,11 @@ declare( strict_types=1 );
 namespace Authorship;
 
 use WP_Error;
+use WP_HTTP_Response;
 use WP_Http;
 use WP_Post;
 use WP_REST_Request;
+use WP_REST_Response;
 use WP_REST_Server;
 use WP_Term;
 use WP_User;
@@ -31,6 +33,34 @@ function bootstrap() : void {
 	// Filters.
 	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
+	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
+}
+
+/**
+ * Filters the REST API response.
+ *
+ * @param WP_HTTP_Response $result Result to send to the client. Usually a `WP_REST_Response`.
+ * @return WP_HTTP_Response Result to send to the client. Usually a `WP_REST_Response`.
+ */
+function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Response {
+	if ( ! ( $result instanceof WP_REST_Response ) ) {
+		return $result;
+	}
+
+	$data = $result->get_data();
+
+	if ( ! isset( $data['authorship'] ) ) {
+		return $result;
+	}
+
+	foreach ( $data['authorship'] as $author ) {
+		$result->add_link( 'wp:authorship', sprintf(
+			rest_url( 'wp/v2/users/%d' ),
+			$author
+		) );
+	}
+
+	return $result;
 }
 
 /**
