@@ -171,8 +171,7 @@ function get_authors( WP_Post $post ) : array {
 		'include' => array_map( function( WP_Term $term ) : int {
 			return intval( $term->name );
 		}, $authors ),
-		'orderby' => 'ID',
-		'order'   => 'ASC',
+		'orderby' => 'include',
 	] );
 
 	return $users;
@@ -201,8 +200,7 @@ function set_authors( WP_Post $post, array $authors ) : array {
 	 */
 	$users = get_users( [
 		'include' => $authors,
-		'orderby' => 'ID',
-		'order'   => 'ASC',
+		'orderby' => 'include',
 	] );
 
 	if ( count( $users ) !== count( $authors ) ) {
@@ -263,8 +261,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	 */
 	$users = get_users( [
 		'include' => $authors,
-		'orderby' => 'ID',
-		'order'   => 'ASC',
+		'orderby' => 'include',
 	] );
 
 	if ( count( $users ) !== count( $authors ) ) {
