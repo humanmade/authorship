@@ -34,3 +34,7 @@ namespace Authorship;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+require_once __DIR__ . '/inc/namespace.php';
+
+bootstrap();
