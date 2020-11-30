@@ -403,6 +403,13 @@ function enqueue_assets() : void {
 	$post = get_post();
 
 	$authors = get_authors( $post );
+
+	if ( empty( $authors ) ) {
+		$authors = [
+			wp_get_current_user(),
+		];
+	}
+
 	$authors = array_map( function( WP_User $user ) {
 		return [
 			'value'  => $user->ID,
