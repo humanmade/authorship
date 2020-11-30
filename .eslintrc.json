@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "@humanmade/eslint-config"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "ignorePatterns": [
+    "build/**",
+    "node_modules/**",
+    "tests/wordpress/**",
+    "vendor/**"
+  ]
+}
