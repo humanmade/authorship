@@ -21,6 +21,60 @@ const TAXONOMY = 'authorship';
 function bootstrap() : void {
 	// Actions.
 	add_action( 'init', __NAMESPACE__ . '\\init_taxonomy', 99 );
+	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
+
+	// Filters.
+	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
+}
+
+/**
+ * Filters slashed post data just before it is inserted into the database.
+ *
+ * @param mixed[] $data                An array of slashed, sanitized, and processed post data.
+ * @param mixed[] $postarr             An array of sanitized (and slashed) but otherwise unmodified post data.
+ * @param mixed[] $unsanitized_postarr An array of slashed yet _unsanitized_ and unprocessed post data as
+ *                                     originally passed to wp_insert_post().
+ * @return mixed[] An array of slashed, sanitized, and processed post data.
+ */
+function filter_wp_insert_post_data( array $data, array $postarr, array $unsanitized_postarr ) : array {
+	global $authorship_postarr;
+
+	$authorship_postarr = $unsanitized_postarr;
+
+	return $data;
+}
+
+/**
+ * Fires once a post has been saved.
+ *
+ * @param int     $post_ID Post ID.
+ * @param WP_Post $post    Post object.
+ * @param bool    $update  Whether this is an existing post being updated.
+ */
+function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
+	global $authorship_postarr;
+
+	if ( isset( $authorship_postarr['tax_input'] ) && ! empty( $authorship_postarr['tax_input']['authorship'] ) ) {
+		return;
+	}
+
+	if ( isset( $authorship_postarr['authorship'] ) ) {
+		$authors = $authorship_postarr['authorship'];
+	} elseif ( ! empty( $authorship_postarr['post_author'] ) ) {
+		$authors = [
+			$authorship_postarr['post_author'],
+		];
+	}
+
+	if ( ! isset( $authors ) ) {
+		return;
+	}
+
+	try {
+		set_authors( $post, $authors );
+	} catch ( \Exception $e ) {
+		// Nothing at the moment.
+	}
 }
 
 /**
