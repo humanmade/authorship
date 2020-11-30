@@ -13,6 +13,9 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 
+use const Authorship\POSTS_PARAM;
+use const Authorship\REST_PARAM;
+
 class TestPostProperty extends TestCase {
 	/**
 	 * Users.
@@ -76,14 +79,14 @@ class TestPostProperty extends TestCase {
 		];
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$request->set_param( 'title', 'Test Post' );
-		$request->set_param( 'authorship', $authors );
+		$request->set_param( REST_PARAM, $authors );
 
 		$response = self::do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::CREATED, $response->get_status() );
-		$this->assertArrayHasKey( 'authorship', $data );
-		$this->assertSame( $authors, $data['authorship'] );
+		$this->assertArrayHasKey( REST_PARAM, $data );
+		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
 	public function testREST_API_Post_Property_Only_Accepts_Array() {
@@ -91,7 +94,7 @@ class TestPostProperty extends TestCase {
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$request->set_param( 'title', 'Test Post' );
-		$request->set_param( 'authorship', '123' );
+		$request->set_param( REST_PARAM, '123' );
 
 		$response = self::do_request( $request );
 
@@ -107,7 +110,7 @@ class TestPostProperty extends TestCase {
 		];
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
 		$request->set_param( 'title', 'Test Post' );
-		$request->set_param( 'authorship', $authors );
+		$request->set_param( REST_PARAM, $authors );
 
 		$response = self::do_request( $request );
 
@@ -127,7 +130,7 @@ class TestPostProperty extends TestCase {
 			$post->ID
 		) );
 		$request->set_param( 'title', 'Test Post' );
-		$request->set_param( 'authorship', [
+		$request->set_param( REST_PARAM, [
 			self::$users['author']->ID,
 		] );
 
@@ -136,7 +139,7 @@ class TestPostProperty extends TestCase {
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
 		$this->assertSame( 'Test Post', $data['title']['rendered'] );
-		$this->assertArrayHasKey( 'authorship', $data );
+		$this->assertArrayHasKey( REST_PARAM, $data );
 	}
 
 	public function testREST_API_Post_Property_Exists() {
@@ -154,8 +157,8 @@ class TestPostProperty extends TestCase {
 		$response = self::do_request( $request );
 		$data     = $response->get_data();
 
-		$this->assertArrayHasKey( 'authorship', $data );
-		$this->assertSame( [ self::$users['editor']->ID ], $data['authorship'] );
+		$this->assertArrayHasKey( REST_PARAM, $data );
+		$this->assertSame( [ self::$users['editor']->ID ], $data[ REST_PARAM ] );
 	}
 
 	public function testREST_API_Response_Contains_Links() {
@@ -169,7 +172,7 @@ class TestPostProperty extends TestCase {
 		$post = self::factory()->post->create_and_get( [
 			'post_type'   => 'post',
 			'post_status' => 'publish',
-			'authorship'  => $authors,
+			POSTS_PARAM   => $authors,
 		] );
 
 		wp_set_post_tags( $post->ID, 'testing1,testing2,testing3' );

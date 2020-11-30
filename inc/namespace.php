@@ -19,6 +19,10 @@ use WP_REST_Server;
 use WP_Term;
 use WP_User;
 
+const POSTS_PARAM = 'authorship';
+const REST_PARAM = 'authorship';
+const SCRIPT_HANDLE = 'authorship-js';
+const STYLE_HANDLE = 'authorship-css';
 const TAXONOMY = 'authorship';
 
 /**
@@ -50,11 +54,11 @@ function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Respons
 
 	$data = $result->get_data();
 
-	if ( ! isset( $data['authorship'] ) ) {
+	if ( ! isset( $data[ REST_PARAM ] ) ) {
 		return $result;
 	}
 
-	foreach ( $data['authorship'] as $author ) {
+	foreach ( $data[ REST_PARAM ] as $author ) {
 		$result->add_link( 'wp:authorship', sprintf(
 			rest_url( 'wp/v2/users/%d' ),
 			$author
@@ -91,12 +95,12 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
 	global $authorship_postarr;
 
-	if ( isset( $authorship_postarr['tax_input'] ) && ! empty( $authorship_postarr['tax_input']['authorship'] ) ) {
+	if ( isset( $authorship_postarr['tax_input'] ) && ! empty( $authorship_postarr['tax_input'][ TAXONOMY ] ) ) {
 		return;
 	}
 
-	if ( isset( $authorship_postarr['authorship'] ) ) {
-		$authors = $authorship_postarr['authorship'];
+	if ( isset( $authorship_postarr[ POSTS_PARAM ] ) ) {
+		$authors = $authorship_postarr[ POSTS_PARAM ];
 	} elseif ( ! empty( $authorship_postarr['post_author'] ) ) {
 		$authors = [
 			$authorship_postarr['post_author'],
@@ -124,10 +128,10 @@ function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : vo
  */
 function filter_rest_pre_dispatch( $result, WP_REST_Server $server, WP_REST_Request $request ) {
 	$author     = $request->get_param( 'author' );
-	$authorship = $request->get_param( 'authorship' );
+	$authorship = $request->get_param( REST_PARAM );
 
 	if ( ( null === $authorship ) && ! empty( $author ) ) {
-		$request->set_param( 'authorship', [ intval( $author ) ] );
+		$request->set_param( REST_PARAM, [ intval( $author ) ] );
 	}
 
 	return $result;
@@ -281,7 +285,7 @@ function register_rest_api_field( string $post_type ) : void {
 		return validate_authors( $authors, $request, $param, $post_type );
 	};
 
-	register_rest_field( $post_type, 'authorship', [
+	register_rest_field( $post_type, REST_PARAM, [
 		'get_callback' => function( array $post ) : array {
 			$post = get_post( $post['id'] );
 
@@ -387,7 +391,7 @@ function enqueue_assets_for_post() : void {
 		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
 		'main.js',
 		[
-			'handle'       => 'authorship-js',
+			'handle'       => SCRIPT_HANDLE,
 			'dependencies' => [ // @TODO check:
 				'react',
 				'wp-block-editor',
@@ -403,7 +407,7 @@ function enqueue_assets_for_post() : void {
 		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
 		'style.css',
 		[
-			'handle' => 'authorship-css',
+			'handle' => STYLE_HANDLE,
 		]
 	);
 }
@@ -434,7 +438,7 @@ function preload_author_data( WP_Post $post ) : void {
 	// that's included on the post editing screen. Need to enable the user objects to
 	// be embedded for that, we've only got the list of user IDs at the moment.
 	wp_localize_script(
-		'authorship-js',
+		SCRIPT_HANDLE,
 		'authorshipData',
 		[
 			'authors' => $authors,
