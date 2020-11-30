@@ -21,6 +21,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@typescript-eslint/parser": "^4.8.2",
+    "@wordpress/edit-post": "^3.25.4",
     "babel-eslint": "^10.1.0",
     "bell-on-bundler-error-plugin": "^2.0.0",
     "eslint": "^5.16.0",
