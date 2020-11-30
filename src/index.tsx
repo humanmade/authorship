@@ -72,6 +72,7 @@ const AuthorsSelect = () => {
 				defaultOptions={ currentAuthors }
 				isClearable={ false }
 				isMulti
+				isValidNewOption={ value => value.length >= 2 }
 				loadOptions={ loadOptions }
 			/>
 		</PluginPostStatusInfo>
