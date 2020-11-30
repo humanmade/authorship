@@ -387,8 +387,10 @@ function enqueue_assets() : void {
  * Enqueues the JS and CSS assets for the author selection control.
  */
 function enqueue_assets_for_post() : void {
+	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
+
 	\Asset_Loader\enqueue_asset(
-		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
+		$manifest,
 		'main.js',
 		[
 			'handle'       => SCRIPT_HANDLE,
@@ -404,7 +406,7 @@ function enqueue_assets_for_post() : void {
 		]
 	);
 	\Asset_Loader\enqueue_asset(
-		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
+		$manifest,
 		'style.css',
 		[
 			'handle' => STYLE_HANDLE,
