@@ -29,6 +29,7 @@ function bootstrap() : void {
 	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
 
 	// Filters.
+	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 }
 
@@ -80,6 +81,25 @@ function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : vo
 	} catch ( \Exception $e ) {
 		// Nothing at the moment.
 	}
+}
+
+/**
+ * Allows the `author` field to be used in the REST API in place of `authorship` for compatibility.
+ *
+ * @param mixed           $result  Response to replace the requested version with.
+ * @param WP_REST_Server  $server  Server instance.
+ * @param WP_REST_Request $request Request used to generate the response.
+ * @return mixed Response to replace the requested version with.
+ */
+function filter_rest_pre_dispatch( $result, WP_REST_Server $server, WP_REST_Request $request ) {
+	$author     = $request->get_param( 'author' );
+	$authorship = $request->get_param( 'authorship' );
+
+	if ( ( null === $authorship ) && ! empty( $author ) ) {
+		$request->set_param( 'authorship', [ intval( $author ) ] );
+	}
+
+	return $result;
 }
 
 /**
