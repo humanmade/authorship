@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "outDir": "./build/",
+    "sourceMap": true,
+    "target": "es2017"
+  },
+  "exclude": [
+    "build",
+    "node_modules",
+    "tests",
+    "vendor"
+  ]
+}
