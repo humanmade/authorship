@@ -1,3 +1,18 @@
 .authorship-select-container {
 	width: 100%;
+
+	.authorship-select {
+		&__multi-value {
+			width: 100%;
+			background: #f6f6f6;
+
+			&__label {
+				font-size: 14px;
+				flex-grow: 1;
+				white-space: initial;
+				color: #016087;
+			}
+		}
+
+	}
 }
