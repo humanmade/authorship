@@ -368,6 +368,22 @@ function init_taxonomy() : void {
  * Fires after block assets have been enqueued for the editing interface.
  */
 function enqueue_assets() : void {
+	/**
+	 * The post being edited.
+	 *
+	 * @var \WP_Post
+	 */
+	$post = get_post();
+
+	enqueue_assets_for_post( $post );
+}
+
+/**
+ * Enqueues the JS and CSS assets for the author selection control.
+ *
+ * @param WP_Post $post The post being edited.
+ */
+function enqueue_assets_for_post( WP_Post $post ) : void {
 	\Asset_Loader\enqueue_asset(
 		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
 		'main.js',
@@ -391,13 +407,6 @@ function enqueue_assets() : void {
 			'handle' => 'authorship-css',
 		]
 	);
-
-	/**
-	 * The post being edited.
-	 *
-	 * @var \WP_Post
-	 */
-	$post = get_post();
 
 	$authors = get_authors( $post );
 
