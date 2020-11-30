@@ -58,19 +58,6 @@ class TestPostProperty extends TestCase {
 		return $response;
 	}
 
-	// public function testPropertyIsDeclaredOnRoute() {
-	// 	$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts' );
-	// 	$response = self::do_request( $request );
-	// 	$data     = $response->get_data();
-
-	// 	$args = array_filter( $data['endpoints'], function( array $endpoint ) {
-	// 		return in_array( 'GET', $endpoint['methods'], true );
-	// 	} )[0]['args'];
-
-	// 	$this->assertArrayHasKey( 'authorship', $args );
-	// 	$this->assertArrayHasKey( 'authorship', $data['schema']['properties'] );
-	// }
-
 	public function testREST_API_Post_Property_Can_Be_Specified_When_Creating() {
 		wp_set_current_user( self::$users['admin']->ID );
 
