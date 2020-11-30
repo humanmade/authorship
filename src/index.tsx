@@ -5,10 +5,6 @@ import type { WP_REST_API_User as User } from 'wp-types';
 import { PluginPostStatusInfo } from '@wordpress/edit-post';
 import { addQueryArgs } from '@wordpress/url';
 
-declare const wp;
-
-const registerPlugin = wp.plugins.registerPlugin;
-
 interface Option {
 	/**
 	 * The option value.
@@ -24,14 +20,22 @@ interface Option {
 	avatar: string;
 }
 
+interface authorshipDataFromWP {
+	authors: Option[];
+}
+
+declare const authorshipData: authorshipDataFromWP;
+declare const wp;
+
+const registerPlugin = wp.plugins.registerPlugin;
+
 /**
  * Renders the author selector control.
  *
  * @returns {JSX.Element} An element.
  */
 const AuthorsSelect = () => {
-	const currentAuthors: Option[] = [
-	];
+	const currentAuthors = authorshipData.authors;
 
 	/**
 	 * Asynchronously loads the options for the control based on the search paramter.
@@ -95,7 +99,7 @@ const AuthorsSelect = () => {
 				cacheOptions
 				className="authorship-select-container"
 				classNamePrefix="authorship-select"
-				defaultOptions={ currentAuthors }
+				defaultValue={ currentAuthors }
 				formatOptionLabel={ formatOptionLabel }
 				isClearable={ false }
 				isMulti
