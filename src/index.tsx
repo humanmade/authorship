@@ -63,6 +63,25 @@ const AuthorsSelect = () => {
 		);
 	};
 
+	/**
+	 * Overrides the default option display with our custom one.
+	 *
+	 * @param {Option} option The option data.
+	 * @returns {JSX.Element} The element.
+	 */
+	const formatOptionLabel = ( option: Option ) => (
+		<div style={ { display: 'flex' } }>
+			{ option.avatar && (
+				<div style={ {
+					flex: '0 0 24px',
+				} }>
+					<img alt="" src={ option.avatar } />
+				</div>
+			) }
+			<div>{ option.label }</div>
+		</div>
+	);
+
 	return (
 		<PluginPostStatusInfo>
 			<AsyncCreatableSelect
@@ -70,6 +89,7 @@ const AuthorsSelect = () => {
 				className="authorship-select-container"
 				classNamePrefix="authorship-select"
 				defaultOptions={ currentAuthors }
+				formatOptionLabel={ formatOptionLabel }
 				isClearable={ false }
 				isMulti
 				isValidNewOption={ ( value: string ) => value.length >= 2 }
