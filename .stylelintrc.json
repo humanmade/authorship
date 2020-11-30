@@ -2,6 +2,7 @@
   "extends": "@humanmade/stylelint-config",
   "ignoreFiles": [
     "build/**",
+    "lib/**",
     "node_modules/**",
     "tests/wordpress/**",
     "vendor/**"

@@ -5,6 +5,7 @@
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": [
     "build/**",
+    "lib/**",
     "node_modules/**",
     "tests/wordpress/**",
     "vendor/**"

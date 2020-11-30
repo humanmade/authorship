@@ -5,7 +5,8 @@
   "license": "GPL-3.0-or-later",
   "require": {
     "php": "~7.2",
-    "composer/installers": "~1.0"
+    "composer/installers": "~1.0",
+    "humanmade/asset-loader": "0.4.1"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "0.7.0",
@@ -27,6 +28,11 @@
     "sort-packages": true
   },
   "extra": {
+    "installer-paths": {
+      "lib/{$name}/": [
+        "humanmade/asset-loader"
+      ]
+    },
     "wordpress-install-dir": "tests/wordpress"
   },
   "scripts": {
