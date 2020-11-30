@@ -1,7 +1,10 @@
 import * as React from 'react';
+import { ActionMeta } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { WP_REST_API_User as User } from 'wp-types';
 
+import { compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 import { PluginPostStatusInfo } from '@wordpress/edit-post';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -32,10 +35,12 @@ const registerPlugin = wp.plugins.registerPlugin;
 /**
  * Renders the author selector control.
  *
+ * @param {object} args Arguments.
  * @returns {JSX.Element} An element.
  */
-const AuthorsSelect = () => {
+const AuthorsSelect = args => {
 	const currentAuthors = authorshipData.authors;
+	const { onUpdate } = args;
 
 	/**
 	 * Asynchronously loads the options for the control based on the search paramter.
@@ -93,6 +98,16 @@ const AuthorsSelect = () => {
 		</div>
 	);
 
+	/**
+	 * Handles changes to the selected authors.
+	 *
+	 * @param {Option[]|null} options The selected options.
+	 * @param {ActionMeta}    action  The action performed that triggered the value change.
+	 */
+	const changeValue = ( options: Option[]|null, action: ActionMeta<any> ) => {
+		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
+	};
+
 	return (
 		<PluginPostStatusInfo>
 			<AsyncCreatableSelect
@@ -105,11 +120,20 @@ const AuthorsSelect = () => {
 				isMulti
 				isValidNewOption={ ( value: string ) => value.length >= 2 }
 				loadOptions={ loadOptions }
+				onChange={ changeValue }
 			/>
 		</PluginPostStatusInfo>
 	);
 };
 
-registerPlugin( 'authorship', {
-	render: AuthorsSelect,
-} );
+const render = compose( [
+	withDispatch( dispatch => ( {
+		onUpdate( value: number[] ) {
+			dispatch( 'core/editor' ).editPost( {
+				authorship: value,
+			} );
+		},
+	} ) ),
+] )( AuthorsSelect );
+
+registerPlugin( 'authorship', { render } );
