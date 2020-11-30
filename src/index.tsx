@@ -1,4 +1,5 @@
 import * as React from 'react';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import type { WP_REST_API_User as User } from 'wp-types';
 
 import { PluginPostStatusInfo } from '@wordpress/edit-post';
@@ -29,6 +30,9 @@ interface Option {
  * @returns {JSX.Element} An element.
  */
 const AuthorsSelect = () => {
+	const currentAuthors: Option[] = [
+	];
+
 	/**
 	 * Asynchronously loads the options for the control based on the search paramter.
 	 *
@@ -61,7 +65,13 @@ const AuthorsSelect = () => {
 
 	return (
 		<PluginPostStatusInfo>
-			<p>Hello, World!</p>
+			<AsyncCreatableSelect
+				cacheOptions
+				defaultOptions={ currentAuthors }
+				isClearable={ false }
+				isMulti
+				loadOptions={ loadOptions }
+			/>
 		</PluginPostStatusInfo>
 	);
 };
