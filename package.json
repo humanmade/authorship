@@ -48,6 +48,7 @@
     "typescript": "^3.9.2",
     "webpack": "^4",
     "webpack-cli": "^4.2.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "wp-types": "^1.2.0"
   }
 }
