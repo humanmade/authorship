@@ -9,7 +9,11 @@ declare( strict_types=1 );
 
 namespace Authorship;
 
+use WP_Error;
+use WP_Http;
 use WP_Post;
+use WP_REST_Request;
+use WP_REST_Server;
 use WP_Term;
 use WP_User;
 
@@ -21,6 +25,7 @@ const TAXONOMY = 'authorship';
 function bootstrap() : void {
 	// Actions.
 	add_action( 'init', __NAMESPACE__ . '\\init_taxonomy', 99 );
+	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
 	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
 
 	// Filters.
@@ -75,6 +80,17 @@ function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : vo
 	} catch ( \Exception $e ) {
 		// Nothing at the moment.
 	}
+}
+
+/**
+ * Adds the authorship field to the REST API for post objects.
+ *
+ * @param WP_REST_Server $server Server object.
+ */
+function register_rest_api_fields( WP_REST_Server $server ) : void {
+	$post_types = get_post_types_by_support( 'author' );
+
+	array_map( __NAMESPACE__ . '\\register_rest_api_field', $post_types );
 }
 
 /**
@@ -151,6 +167,96 @@ function set_authors( WP_Post $post, array $authors ) : array {
 
 	return $users;
 }
+
+/**
+ * Validates a passed argument for the list of authors.
+ *
+ * @param mixed           $authors   The passed value.
+ * @param WP_REST_Request $request   The REST API request object.
+ * @param string          $param     The param name.
+ * @param string          $post_type The post type name.
+ * @return WP_Error True if the validation passes, `WP_Error` instance otherwise.
+ */
+function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ) :? WP_Error {
+	$schema_validation = rest_validate_request_arg( $authors, $request, $param );
+
+	if ( is_wp_error( $schema_validation ) ) {
+		return $schema_validation;
+	}
+
+	$post_type_object = get_post_type_object( $post_type );
+
+	if ( ! $post_type_object ) {
+		return null;
+	}
+
+	if ( ! current_user_can( $post_type_object->cap->edit_others_posts ) ) {
+		return new WP_Error( 'authorship', __( 'You are not allowed to set the authors for this post.', 'authorship' ) );
+	}
+
+	// The REST API accepts and coerces a comma-separated string as an array, so
+	// we need to allow for that here.
+	$authors = wp_parse_id_list( $authors );
+
+	/**
+	 * User objects.
+	 *
+	 * @var WP_User[] $users
+	 */
+	$users = get_users( [
+		'include' => $authors,
+		'orderby' => 'ID',
+		'order'   => 'ASC',
+	] );
+
+	if ( count( $users ) !== count( $authors ) ) {
+		return new WP_Error( 'authorship', __( 'One or more user IDs are not valid for this site.', 'authorship' ) );
+	}
+
+	return null;
+}
+
+function register_rest_api_field( string $post_type ) : void {
+	$validate_callback = function( $authors, WP_REST_Request $request, string $param ) use ( $post_type ) :? WP_Error {
+		return validate_authors( $authors, $request, $param, $post_type );
+	};
+
+	register_rest_field( $post_type, 'authorship', [
+		'get_callback' => function( array $post ) : array {
+			$post = get_post( $post['id'] );
+
+			if ( ! $post ) {
+				return [];
+			}
+
+			return array_map( function( WP_User $user ) : int {
+				return $user->ID;
+			}, get_authors( $post ) );
+		},
+		'update_callback' => function( array $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
+			try {
+				set_authors( $post, $value );
+			} catch ( \Exception $e ) {
+				return new WP_Error( 'authorship', $e->getMessage(), [
+					'status' => WP_Http::BAD_REQUEST,
+				] );
+			}
+
+			return null;
+		},
+		'schema'       => [
+			'description' => __( 'Authors', 'authorship' ),
+			'type'        => 'array',
+			'items'       => [
+				'type' => 'integer',
+			],
+			'arg_options' => [
+				'validate_callback' => $validate_callback,
+			],
+		],
+	] );
+}
+
 /**
  * Registers the taxonomy that creates a connection between posts and users.
  */
