@@ -2,6 +2,10 @@
 	width: 100%;
 
 	.authorship-select {
+		&__value-container {
+			padding: 1px;
+		}
+
 		&__multi-value {
 			width: 100%;
 			background: #f6f6f6;
@@ -14,5 +18,12 @@
 			}
 		}
 
+		&__indicator-separator {
+			display: none;
+		}
+
+		&__indicator {
+			padding: 2px;
+		}
 	}
 }
