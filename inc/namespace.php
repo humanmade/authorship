@@ -59,7 +59,7 @@ function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Respons
 	}
 
 	foreach ( $data[ REST_PARAM ] as $author ) {
-		$result->add_link( 'wp:authorship', sprintf(
+		$result->add_link( REST_LINK_ID, sprintf(
 			rest_url( 'wp/v2/users/%d' ),
 			$author
 		) );

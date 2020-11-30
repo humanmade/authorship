@@ -14,6 +14,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 use const Authorship\POSTS_PARAM;
+use const Authorship\REST_LINK_ID;
 use const Authorship\REST_PARAM;
 
 class TestPostProperty extends TestCase {
@@ -185,7 +186,7 @@ class TestPostProperty extends TestCase {
 		$response = self::do_request( $request );
 		$links    = $response->get_links();
 
-		$this->assertArrayHasKey( 'wp:authorship', $links );
-		$this->assertCount( 2, $links['wp:authorship'] );
+		$this->assertArrayHasKey( REST_LINK_ID, $links );
+		$this->assertCount( 2, $links[ REST_LINK_ID ] );
 	}
 }
