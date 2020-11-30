@@ -1,5 +1,10 @@
 {
   "extends": "@humanmade/stylelint-config",
+  "rules": {
+    "declaration-property-unit-blacklist": null,
+    "max-nesting-depth": null,
+    "selector-class-pattern": null
+  },
   "ignoreFiles": [
     "build/**",
     "lib/**",
