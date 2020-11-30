@@ -42,6 +42,10 @@ class TestPostProperty extends TestCase {
 		}
 	}
 
+	public function setUp() {
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+	}
+
 	// public function testPropertyIsDeclaredOnRoute() {
 	// 	$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts' );
 	// 	$response = rest_do_request( $request );
