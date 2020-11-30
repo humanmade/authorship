@@ -387,4 +387,11 @@ function enqueue_assets() : void {
 			],
 		]
 	);
+	\Asset_Loader\enqueue_asset(
+		plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json',
+		'style.css',
+		[
+			'handle' => 'authorship-css',
+		]
+	);
 }

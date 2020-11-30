@@ -74,6 +74,8 @@ const AuthorsSelect = () => {
 			{ option.avatar && (
 				<div style={ {
 					flex: '0 0 24px',
+					marginRight: '5px',
+					alignContent: 'center',
 				} }>
 					<img alt="" src={ option.avatar } />
 				</div>
