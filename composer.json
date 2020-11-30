@@ -1,42 +1,15 @@
 {
   "name": "humanmade/authorship",
-  "description": "Authorship",
   "type": "wordpress-plugin",
+  "description": "Authorship",
   "license": "GPL-3.0-or-later",
-  "config": {
-    "sort-packages": true,
-    "preferred-install": "dist"
-  },
-  "extra": {
-    "wordpress-install-dir": "tests/wordpress"
-  },
-  "scripts": {
-    "post-update-cmd": [
-      "@php -r \"! file_exists( 'tests/.env' ) && copy( 'tests/.env.dist', 'tests/.env' );\""
-    ],
-    "test": [
-      "@test:phpcs",
-      "@test:phpstan",
-      "@test:ut"
-    ],
-    "test:phpstan": [
-      "phpstan analyze"
-    ],
-    "test:phpcs": [
-      "phpcs -ps --cache=tests/cache/phpcs ."
-    ],
-    "test:ut": [
-      "wp db reset --yes --path=$(npm run --silent jq '.extra .\"wordpress-install-dir\"' composer.json -- -r) #",
-      "export WP_MULTISITE=0 && phpunit --verbose --colors=always --exclude-group=ms-required",
-      "export WP_MULTISITE=1 && phpunit --verbose --colors=always --exclude-group=ms-excluded"
-    ]
-  },
   "require": {
     "php": "~7.2",
     "composer/installers": "~1.0"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "0.7.0",
+    "ergebnis/composer-normalize": "2.11.0",
     "humanmade/coding-standards": "1.1.1",
     "php-stubs/wordpress-stubs": "^5.5",
     "phpcompatibility/phpcompatibility-wp": "2.1.0",
@@ -48,5 +21,34 @@
     "vlucas/phpdotenv": "^3",
     "wp-cli/db-command": "^2",
     "wp-phpunit/wp-phpunit": "*"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "extra": {
+    "wordpress-install-dir": "tests/wordpress"
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "@composer normalize",
+      "@php -r \"! file_exists( 'tests/.env' ) && copy( 'tests/.env.dist', 'tests/.env' );\""
+    ],
+    "test": [
+      "@test:phpcs",
+      "@test:phpstan",
+      "@test:ut"
+    ],
+    "test:phpcs": [
+      "phpcs -ps --cache=tests/cache/phpcs ."
+    ],
+    "test:phpstan": [
+      "phpstan analyze"
+    ],
+    "test:ut": [
+      "wp db reset --yes --path=$(npm run --silent jq '.extra .\"wordpress-install-dir\"' composer.json -- -r) #",
+      "export WP_MULTISITE=0 && phpunit --verbose --colors=always --exclude-group=ms-required",
+      "export WP_MULTISITE=1 && phpunit --verbose --colors=always --exclude-group=ms-excluded"
+    ]
   }
 }
