@@ -192,7 +192,7 @@ const AuthorsSelect = args => {
 		<SortableSelectContainer
 			axis="y"
 			distance={ 4 }
-			// helperContainer={ () => document.getElementsByClassName( 'authorship-select-container' )[0] }
+			helperContainer={ () => document.getElementsByClassName( 'authorship-select-container' )[0] as HTMLElement }
 			lockAxis="y"
 			lockToContainerEdges
 			onSortEnd={ onSortEnd }
