@@ -21,6 +21,17 @@ interface Option {
 	avatar: string;
 }
 
+interface SortedOption {
+	/**
+	 * The old index position.
+	 */
+	oldIndex: number;
+	/**
+	 * The new index position.
+	 */
+	newIndex: number;
+}
+
 interface authorshipDataFromWP {
 	authors: Option[];
 }
@@ -28,6 +39,15 @@ interface authorshipDataFromWP {
 declare const authorshipData: authorshipDataFromWP;
 declare const wp;
 
+/**
+ * Moves an element in array from one position to another. Used as the sorting callback.
+ *
+ * @template T
+ * @param {T[]}    array The affected array.
+ * @param {number} from  The position of the element to move.
+ * @param {number} to    The new position for the element.
+ * @returns {T[]} The updated array.
+ */
 function arrayMove<T>( array: T[], from: number, to: number ) : T[] {
 	array = array.slice();
 	array.splice( to < 0 ? array.length + to : to, 0, array.splice( from, 1 )[0] );
@@ -36,7 +56,7 @@ function arrayMove<T>( array: T[], from: number, to: number ) : T[] {
 }
 
 /**
- * Renders the author selector control.
+ * Returns the author selector control.
  *
  * @param {object} args Arguments.
  * @returns {JSX.Element} An element.
@@ -107,7 +127,12 @@ const AuthorsSelect = args => {
 		// This prevents the menu from being opened/closed when the user clicks
 		// on a value to begin dragging it.
 		const innerProps = {
-			onMouseDown: e => {
+			/**
+			 * Stops event propagation when sorting options.
+			 *
+			 * @param {Event} e The event.
+			 */
+			onMouseDown: ( e: Event ) => {
 				e.preventDefault();
 				e.stopPropagation();
 			},
@@ -126,12 +151,22 @@ const AuthorsSelect = args => {
 		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
 	};
 
-	const onSortEnd = ( { oldIndex, newIndex } ) => {
-		const value = arrayMove( selected, oldIndex, newIndex );
+	/**
+	 * Fired when option sorting ends. Updates the component state and calls the update callback.
+	 *
+	 * @param {SortedOption} option Sorting information for the option.
+	 */
+	const onSortEnd = ( option: SortedOption ) => {
+		const value = arrayMove( selected, option.oldIndex, option.newIndex );
 		setSelected( value );
 		onUpdate( value.map( option => option.value ) );
 	};
 
+	/**
+	 * Returns the base author selector control.
+	 *
+	 * @returns {JSX.Element} An element.
+	 */
 	const Select = () => (
 		<AsyncCreatableSelect
 			cacheOptions
