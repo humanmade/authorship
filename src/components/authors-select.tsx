@@ -141,12 +141,12 @@ const AuthorsSelect = args => {
 				MultiValue: SortableMultiValueElement,
 			} }
 			defaultValue={ currentAuthors }
-			value={ selected }
 			formatOptionLabel={ formatOptionLabel }
 			isClearable={ false }
 			isMulti
 			isValidNewOption={ ( value: string ) => value.length >= 2 }
 			loadOptions={ loadOptions }
+			value={ selected }
 			onChange={ changeValue }
 		/>
 	);
