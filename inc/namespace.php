@@ -23,6 +23,7 @@ const COLUMN_NAME = 'authorship';
 const POSTS_PARAM = 'authorship';
 const REST_LINK_ID = 'wp:authorship';
 const REST_PARAM = 'authorship';
+const ROLE = 'guest-author';
 const SCRIPT_HANDLE = 'authorship-js';
 const STYLE_HANDLE = 'authorship-css';
 const TAXONOMY = 'authorship';
@@ -33,6 +34,7 @@ const TAXONOMY = 'authorship';
 function bootstrap() : void {
 	// Actions.
 	add_action( 'init', __NAMESPACE__ . '\\init_taxonomy', 99 );
+	add_action( 'init', __NAMESPACE__ . '\\register_roles_and_caps', 1 );
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
 	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
@@ -42,6 +44,13 @@ function bootstrap() : void {
 	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
+}
+
+/**
+ * Fires after WordPress has finished loading but before any headers are sent.
+ */
+function register_roles_and_caps() : void {
+	add_role( ROLE, __( 'Guest Author', 'authorship' ), [] );
 }
 
 /**
