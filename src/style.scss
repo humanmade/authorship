@@ -24,6 +24,7 @@
 			background: #f1f1f1;
 			border-radius: 2px;
 			margin: 2px 0 4px;
+			cursor: move;
 
 			&__label {
 				font-size: 14px;
@@ -35,6 +36,10 @@
 				img {
 					display: block;
 				}
+			}
+
+			&__remove {
+				cursor: pointer;
 			}
 		}
 

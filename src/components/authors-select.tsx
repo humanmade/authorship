@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { ActionMeta } from 'react-select';
+import { ActionMeta, components } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import type { WP_REST_API_User as User } from 'wp-types';
 
 import { addQueryArgs } from '@wordpress/url';
@@ -93,6 +94,18 @@ const AuthorsSelect = args => {
 		</div>
 	);
 
+	const SortableMultiValueElement = SortableElement( props => {
+		// This prevents the menu from being opened/closed when the user clicks
+		// on a value to begin dragging it.
+		const innerProps = {
+			onMouseDown : e => {
+				e.preventDefault();
+				e.stopPropagation();
+			},
+		};
+		return <components.MultiValue { ...props } innerProps={ innerProps } />;
+	} );
+
 	/**
 	 * Handles changes to the selected authors.
 	 *
@@ -103,11 +116,14 @@ const AuthorsSelect = args => {
 		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
 	};
 
-	return (
+	const select = () => (
 		<AsyncCreatableSelect
 			cacheOptions
 			className="authorship-select-container"
 			classNamePrefix="authorship-select"
+			components={ {
+				MultiValue: SortableMultiValueElement,
+			} }
 			defaultValue={ currentAuthors }
 			formatOptionLabel={ formatOptionLabel }
 			isClearable={ false }
@@ -115,6 +131,23 @@ const AuthorsSelect = args => {
 			isValidNewOption={ ( value: string ) => value.length >= 2 }
 			loadOptions={ loadOptions }
 			onChange={ changeValue }
+		/>
+	);
+
+	const onSortEnd = ( { oldIndex, newIndex } ) => {
+		console.log( 'Values sorted' );
+	};
+
+	const SortableSelectContainer = SortableContainer( select );
+
+	return (
+		<SortableSelectContainer
+			axis="y"
+			distance={ 4 }
+			// helperContainer={ () => document.getElementsByClassName( 'authorship-select-container' )[0] }
+			lockAxis="y"
+			lockToContainerEdges
+			onSortEnd={ onSortEnd }
 		/>
 	);
 };
