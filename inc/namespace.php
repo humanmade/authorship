@@ -160,7 +160,10 @@ function get_authors( WP_Post $post ) : array {
 	 *
 	 * @var WP_Term[] $authors
 	 */
-	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
+	$authors = wp_get_post_terms( $post->ID, TAXONOMY, [
+		'orderby' => 'term_order',
+		'order'   => 'ASC',
+	] );
 
 	if ( empty( $authors ) ) {
 		return [];
@@ -332,6 +335,7 @@ function init_taxonomy() : void {
 		$post_types,
 		[
 			'hierarchical'      => false,
+			'sort'              => true,
 			'public'            => false,
 			'show_in_rest'      => false,
 			'capabilities'      => [
