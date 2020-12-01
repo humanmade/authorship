@@ -78,7 +78,6 @@ const AuthorsSelect = args => {
 			'/wp/v2/users/',
 			{
 				search,
-				who: 'authors',
 			}
 		);
 
