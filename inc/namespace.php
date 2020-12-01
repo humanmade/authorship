@@ -398,7 +398,8 @@ function enqueue_assets_for_post() : void {
 		'main.js',
 		[
 			'handle'       => SCRIPT_HANDLE,
-			'dependencies' => [ // @TODO check:
+			// @TODO check:
+			'dependencies' => [
 				'react',
 				'wp-block-editor',
 				'wp-blocks',

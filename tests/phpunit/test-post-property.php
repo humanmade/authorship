@@ -9,13 +9,13 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
-use WP_Http;
-use WP_REST_Request;
-use WP_REST_Response;
-
 use const Authorship\POSTS_PARAM;
 use const Authorship\REST_LINK_ID;
 use const Authorship\REST_PARAM;
+
+use WP_Http;
+use WP_REST_Request;
+use WP_REST_Response;
 
 class TestPostProperty extends TestCase {
 	/**
