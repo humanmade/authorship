@@ -5,3 +5,5 @@ parameters:
   paths:
     - plugin.php
     - inc
+  scanDirectories:
+    - lib
