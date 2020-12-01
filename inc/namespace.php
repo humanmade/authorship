@@ -75,7 +75,11 @@ function action_author_column( string $column_name, int $post_id ) : void {
 
 	$authors = get_authors( $post );
 
-	echo '<ul>';
+	if ( empty( $authors ) ) {
+		return;
+	}
+
+	echo '<ul style="margin:0">';
 
 	foreach ( $authors as $user ) {
 		$url = add_query_arg( [
