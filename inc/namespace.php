@@ -19,6 +19,7 @@ use WP_REST_Server;
 use WP_Term;
 use WP_User;
 
+const COLUMN_NAME = 'authorship';
 const POSTS_PARAM = 'authorship';
 const REST_LINK_ID = 'wp:authorship';
 const REST_PARAM = 'authorship';
@@ -62,7 +63,7 @@ function init_admin_cols() : void {
  * @param int    $post_id     The current post ID.
  */
 function action_author_column( string $column_name, int $post_id ) : void {
-	if ( 'authorship' !== $column_name ) {
+	if ( COLUMN_NAME !== $column_name ) {
 		return;
 	}
 
@@ -107,7 +108,7 @@ function filter_post_columns( array $post_columns ) : array {
 
 	foreach ( $post_columns as $key => $value ) {
 		if ( 'author' === $key ) {
-			$new_columns['authorship'] = __( 'Authors', 'authorship' );
+			$new_columns[ COLUMN_NAME ] = __( 'Authors', 'authorship' );
 		} else {
 			$new_columns[ $key ] = $value;
 		}
