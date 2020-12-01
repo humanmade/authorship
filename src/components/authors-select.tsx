@@ -28,6 +28,13 @@ interface authorshipDataFromWP {
 declare const authorshipData: authorshipDataFromWP;
 declare const wp;
 
+function arrayMove<T>( array: T[], from: number, to: number ) : T[] {
+	array = array.slice();
+	array.splice( to < 0 ? array.length + to : to, 0, array.splice( from, 1 )[0] );
+
+	return array;
+}
+
 /**
  * Renders the author selector control.
  *
@@ -37,6 +44,8 @@ declare const wp;
 const AuthorsSelect = args => {
 	const currentAuthors = authorshipData.authors;
 	const { onUpdate } = args;
+
+	const [ selected, setSelected ] = React.useState( currentAuthors );
 
 	/**
 	 * Asynchronously loads the options for the control based on the search paramter.
@@ -113,7 +122,14 @@ const AuthorsSelect = args => {
 	 * @param {ActionMeta}    action  The action performed that triggered the value change.
 	 */
 	const changeValue = ( options: Option[]|null, action: ActionMeta<any> ) => {
+		setSelected( options );
 		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
+	};
+
+	const onSortEnd = ( { oldIndex, newIndex } ) => {
+		const value = arrayMove( selected, oldIndex, newIndex );
+		setSelected( value );
+		onUpdate( value.map( option => option.value ) );
 	};
 
 	const Select = () => (
@@ -125,6 +141,7 @@ const AuthorsSelect = args => {
 				MultiValue: SortableMultiValueElement,
 			} }
 			defaultValue={ currentAuthors }
+			value={ selected }
 			formatOptionLabel={ formatOptionLabel }
 			isClearable={ false }
 			isMulti
@@ -133,10 +150,6 @@ const AuthorsSelect = args => {
 			onChange={ changeValue }
 		/>
 	);
-
-	const onSortEnd = ( { oldIndex, newIndex } ) => {
-		console.log( 'Values sorted' );
-	};
 
 	const SortableSelectContainer = SortableContainer( Select );
 
