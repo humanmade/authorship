@@ -20,6 +20,7 @@ use WP_Term;
 use WP_User;
 
 const POSTS_PARAM = 'authorship';
+const REST_LINK_ID = 'wp:authorship';
 const REST_PARAM = 'authorship';
 const SCRIPT_HANDLE = 'authorship-js';
 const STYLE_HANDLE = 'authorship-css';
