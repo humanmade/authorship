@@ -1,6 +1,6 @@
 <?php
 /**
- * Meta tests for the plugin.
+ * REST API property tests.
  *
  * @package authorship
  */
@@ -18,39 +18,6 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 class TestPostProperty extends TestCase {
-	/**
-	 * Users.
-	 *
-	 * @var \WP_User[]
-	 */
-	private static $users = [];
-
-	/**
-	 * Set up class test fixtures.
-	 *
-	 * @param WP_UnitTest_Factory $factory Test factory.
-	 */
-	public static function wpSetUpBeforeClass( \WP_UnitTest_Factory $factory ) {
-		$roles = [
-			'admin'       => 'administrator',
-			'editor'      => 'editor',
-			'author'      => 'author',
-			'contributor' => 'contributor',
-			'subscriber'  => 'subscriber',
-			'no_role'     => '',
-		];
-
-		foreach ( $roles as $name => $role ) {
-			self::$users[ $name ] = $factory->user->create_and_get( [
-				'role' => $role,
-			] );
-		}
-	}
-
-	public function setUp() {
-		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
-	}
-
 	protected static function do_request( WP_REST_Request $request ) : WP_REST_Response {
 		$response = rest_do_request( $request );
 		$response = apply_filters( 'rest_post_dispatch', $response, rest_get_server(), $request );
