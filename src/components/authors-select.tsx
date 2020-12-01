@@ -98,7 +98,7 @@ const AuthorsSelect = args => {
 		// This prevents the menu from being opened/closed when the user clicks
 		// on a value to begin dragging it.
 		const innerProps = {
-			onMouseDown : e => {
+			onMouseDown: e => {
 				e.preventDefault();
 				e.stopPropagation();
 			},
@@ -116,7 +116,7 @@ const AuthorsSelect = args => {
 		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
 	};
 
-	const select = () => (
+	const Select = () => (
 		<AsyncCreatableSelect
 			cacheOptions
 			className="authorship-select-container"
@@ -138,7 +138,7 @@ const AuthorsSelect = args => {
 		console.log( 'Values sorted' );
 	};
 
-	const SortableSelectContainer = SortableContainer( select );
+	const SortableSelectContainer = SortableContainer( Select );
 
 	return (
 		<SortableSelectContainer
