@@ -7,8 +7,8 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "lint": "concurrently \"npm run lint:js\" \"npm run lint:css\"",
-    "lint:css": "stylelint src/**",
-    "lint:js": "eslint src/**",
+    "lint:css": "stylelint src/",
+    "lint:js": "eslint src/",
     "start": "webpack-dev-server --config=.config/webpack.config.dev.js",
     "build": "webpack --config=.config/webpack.config.prod.js",
     "jq": "jq"
@@ -37,6 +37,7 @@
     "babel-eslint": "^10.1.0",
     "bell-on-bundler-error-plugin": "^2.0.0",
     "classnames": "^2.2",
+    "concurrently": "^5.3.0",
     "eslint": "^5.16.0",
     "eslint-config-react-app": "^3.0.8",
     "eslint-plugin-flowtype": "^3.13.0",
