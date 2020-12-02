@@ -240,6 +240,10 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
  * @return WP_User[] Array of user objects.
  */
 function get_authors( WP_Post $post ) : array {
+	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+		return [];
+	}
+
 	/**
 	 * Term objects.
 	 *
@@ -278,6 +282,10 @@ function get_authors( WP_Post $post ) : array {
  * @return WP_User[] Array of user objects.
  */
 function set_authors( WP_Post $post, array $authors ) : array {
+	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+		throw new \Exception( __( 'This post type does not support authorship.', 'authorship' ) );
+	}
+
 	/**
 	 * Author IDs mapped to integers.
 	 *
