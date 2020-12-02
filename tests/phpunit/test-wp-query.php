@@ -59,7 +59,7 @@ class TestWPQuery extends TestCase {
 		$this->assertSame( [ $yes1->ID, $yes2->ID ], $posts );
 	}
 
-	public function testQueriedObjectIsRetained() {
+	public function testQueryForAuthorNameQueriedObjectIsRetained() {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -77,9 +77,37 @@ class TestWPQuery extends TestCase {
 			'post_status' => 'publish',
 		];
 
-		$query = new WP_Query( $args );
+		$query = new WP_Query();
+		$posts = $query->query( $args );
 
+		$this->assertCount( 1, $posts );
 		$this->assertSame( self::$users['editor']->ID, $query->get_queried_object_id() );
 		$this->assertInstanceOf( 'WP_User', $query->get_queried_object() );
+	}
+
+	public function testQueryForInvalidAuthorNameReturnsNoResults() {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, owned by Admin.
+		$factory->create_and_get( [
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$args = [
+			'post_type'   => 'post',
+			'author_name' => 'thisusernamedoesnotexist',
+			'fields'      => 'ids',
+			'post_status' => 'publish',
+		];
+
+		$query = new WP_Query();
+		$posts = $query->query( $args );
+
+		$this->assertCount( 0, $posts );
+		$this->assertSame( 0, $query->get_queried_object_id() );
+		$this->assertFalse( $query->get_queried_object() );
 	}
 }
