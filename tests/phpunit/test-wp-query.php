@@ -10,7 +10,6 @@ declare( strict_types=1 );
 namespace Authorship\Tests;
 
 use const Authorship\POSTS_PARAM;
-use const Authorship\TAXONOMY;
 
 use WP_Query;
 
