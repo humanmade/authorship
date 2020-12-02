@@ -92,6 +92,8 @@ class TestWPQuery extends TestCase {
 		$common_args = [
 			'post_type'   => 'post',
 			'fields'      => 'ids',
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
 		];
 
 		$test_args = [
@@ -134,6 +136,8 @@ class TestWPQuery extends TestCase {
 		$common_args = [
 			'post_type'   => 'post',
 			'fields'      => 'ids',
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
 		];
 
 		$test_args = [
