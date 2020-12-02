@@ -14,7 +14,7 @@ use const Authorship\POSTS_PARAM;
 use WP_Query;
 
 class TestWPQuery extends TestCase {
-	public function testQueryForAuthorNameReturnsPostsAttributedToAuthor() {
+	public function testQueryForAuthorReturnsPostsAttributedToAuthor() {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -45,47 +45,40 @@ class TestWPQuery extends TestCase {
 			],
 		] );
 
-		$args = [
-			'author_name' => self::$users['editor']->user_nicename,
+		$common_args = [
+			'post_type'   => 'post',
 			'fields'      => 'ids',
 			'orderby'     => 'ID',
 			'order'       => 'ASC',
 		];
 
-		$query = new WP_Query();
-		$posts = $query->query( $args );
-
-		$this->assertCount( 2, $posts );
-		$this->assertSame( [ $yes1->ID, $yes2->ID ], $posts );
-	}
-
-	public function testQueryForAuthorNameQueriedObjectIsRetained() {
-		$factory = self::factory()->post;
-
-		// Attributed to Editor, owned by Admin.
-		$factory->create_and_get( [
-			'post_author' => self::$users['admin']->ID,
-			POSTS_PARAM   => [
-				self::$users['editor']->ID,
-			],
-		] );
-
-		$args = [
-			'post_type'   => 'post',
+		$test_args = [
 			'author_name' => self::$users['editor']->user_nicename,
-			'fields'      => 'ids',
-			'post_status' => 'publish',
+			'author'      => self::$users['editor']->ID,
 		];
 
-		$query = new WP_Query();
-		$posts = $query->query( $args );
+		foreach ( $test_args as $test_key => $test_value ) {
+			$args = array_merge( $common_args, [
+				$test_key => $test_value,
+			] );
 
-		$this->assertCount( 1, $posts );
-		$this->assertSame( self::$users['editor']->ID, $query->get_queried_object_id() );
-		$this->assertInstanceOf( 'WP_User', $query->get_queried_object() );
+			$query = new WP_Query();
+			$posts = $query->query( $args );
+
+			$this->assertCount(
+				2,
+				$posts,
+				"Post count for {$test_key} query is incorrect."
+			);
+			$this->assertSame(
+				[ $yes1->ID, $yes2->ID ],
+				$posts,
+				"Post IDs for {$test_key} query are incorrect."
+			);
+		}
 	}
 
-	public function testQueryForInvalidAuthorNameReturnsNoResults() {
+	public function testQueryForAuthorQueriedObjectIsRetained() {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -96,18 +89,75 @@ class TestWPQuery extends TestCase {
 			],
 		] );
 
-		$args = [
+		$common_args = [
 			'post_type'   => 'post',
-			'author_name' => 'thisusernamedoesnotexist',
 			'fields'      => 'ids',
-			'post_status' => 'publish',
 		];
 
-		$query = new WP_Query();
-		$posts = $query->query( $args );
+		$test_args = [
+			'author_name' => self::$users['editor']->user_nicename,
+			'author'      => self::$users['editor']->ID,
+		];
 
-		$this->assertCount( 0, $posts );
-		$this->assertSame( 0, $query->get_queried_object_id() );
-		$this->assertFalse( $query->get_queried_object() );
+		foreach ( $test_args as $test_key => $test_value ) {
+			$args = array_merge( $common_args, [
+				$test_key => $test_value,
+			] );
+
+			$query = new WP_Query();
+			$posts = $query->query( $args );
+
+			$this->assertSame(
+				self::$users['editor']->ID,
+				$query->get_queried_object_id(),
+				"Queried object ID for {$test_key} query is incorrect."
+			);
+			$this->assertInstanceOf(
+				'WP_User',
+				$query->get_queried_object(),
+				"Queried object for {$test_key} query is incorrect."
+			);
+		}
+	}
+
+	public function testQueryForInvalidAuthorReturnsNoResults() {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, owned by Admin.
+		$factory->create_and_get( [
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$common_args = [
+			'post_type'   => 'post',
+			'fields'      => 'ids',
+		];
+
+		$test_args = [
+			'author_name' => 'thisusernamedoesnotexist',
+			'author'      => 99999,
+		];
+
+		foreach ( $test_args as $test_key => $test_value ) {
+			$args = array_merge( $common_args, [
+				$test_key => $test_value,
+			] );
+
+			$query = new WP_Query();
+			$posts = $query->query( $args );
+
+			$this->assertCount(
+				0,
+				$posts,
+				"Post count for {$test_key} query is incorrect."
+			);
+			$this->assertFalse(
+				$query->get_queried_object(),
+				"Queried object for {$test_key} query is incorrect."
+			);
+		}
 	}
 }
