@@ -11,8 +11,6 @@ namespace Authorship\Tests;
 
 use const Authorship\POSTS_PARAM;
 
-use WP_Query;
-
 class TestArchive extends TestCase {
 	public function testAuthorArchiveQueryIsCorrect() {
 		$factory = self::factory()->post;
@@ -35,7 +33,7 @@ class TestArchive extends TestCase {
 
 		$this->go_to( get_author_posts_url( self::$users['editor']->ID ) );
 
-		/** @var WP_Query */
+		/** @var \WP_Query */
 		global $wp_query, $authordata;
 
 		$this->assertQueryTrue( 'is_author', 'is_archive' );
