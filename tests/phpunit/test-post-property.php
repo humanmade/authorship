@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API property tests.
+ * REST API post property tests.
  *
  * @package authorship
  */
@@ -17,7 +17,7 @@ use WP_Http;
 use WP_REST_Request;
 use WP_REST_Response;
 
-class TestPostProperty extends TestCase {
+class TestRESTAPIPostProperty extends TestCase {
 	protected static function do_request( WP_REST_Request $request ) : WP_REST_Response {
 		$response = rest_do_request( $request );
 		$response = apply_filters( 'rest_post_dispatch', $response, rest_get_server(), $request );
@@ -25,7 +25,7 @@ class TestPostProperty extends TestCase {
 		return $response;
 	}
 
-	public function testREST_API_Post_Property_Can_Be_Specified_When_Creating() {
+	public function testAuthorsCanBeSpecifiedWhenCreatingPost() {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$authors = [
@@ -44,7 +44,7 @@ class TestPostProperty extends TestCase {
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
-	public function testREST_API_Post_Property_Only_Accepts_Array() {
+	public function testAuthorsOnlyAcceptsAnArray() {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
@@ -56,7 +56,7 @@ class TestPostProperty extends TestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
 
-	public function testREST_API_Post_Property_Cannot_Be_Specified_When_Creating_As_Author() {
+	public function testAuthorsCannotBeSpecifiedWhenCreatingAsAuthorRole() {
 		wp_set_current_user( self::$users['author']->ID );
 
 		$authors = [
@@ -72,7 +72,7 @@ class TestPostProperty extends TestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
 
-	public function testREST_API_Post_Property_Can_Be_Specified_When_Editing() {
+	public function testAuthorsCanBeSpecifiedWhenEditing() {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$post = self::factory()->post->create_and_get( [
@@ -97,7 +97,7 @@ class TestPostProperty extends TestCase {
 		$this->assertArrayHasKey( REST_PARAM, $data );
 	}
 
-	public function testREST_API_Post_Property_Exists() {
+	public function testAuthorsPropertyExists() {
 		$post = self::factory()->post->create_and_get( [
 			'post_type'   => 'post',
 			'post_status' => 'publish',
@@ -116,7 +116,7 @@ class TestPostProperty extends TestCase {
 		$this->assertSame( [ self::$users['editor']->ID ], $data[ REST_PARAM ] );
 	}
 
-	public function testREST_API_Response_Contains_Links() {
+	public function testAuthorLinksArePresent() {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$authors = [
