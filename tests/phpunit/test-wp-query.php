@@ -65,11 +65,6 @@ class TestWPQuery extends TestCase {
 			$query = new WP_Query();
 			$posts = $query->query( $args );
 
-			$this->assertCount(
-				2,
-				$posts,
-				"Post count for {$test_key} query is incorrect."
-			);
 			$this->assertSame(
 				[ $yes1->ID, $yes2->ID ],
 				$posts,
@@ -204,11 +199,6 @@ class TestWPQuery extends TestCase {
 			$query = new WP_Query();
 			$posts = $query->query( $args );
 
-			$this->assertCount(
-				1,
-				$posts,
-				"Post count for {$test_key} query is incorrect."
-			);
 			$this->assertSame(
 				[ $author_post->ID ],
 				$posts,
