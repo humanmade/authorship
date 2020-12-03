@@ -13,6 +13,7 @@ use WP_Error;
 use WP_Http;
 use WP_HTTP_Response;
 use WP_Post;
+use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -39,6 +40,7 @@ function bootstrap() : void {
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
 	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
+	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 
 	// Filters.
 	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
@@ -544,4 +546,94 @@ function preload_author_data( WP_Post $post ) : void {
 			'authors' => $authors,
 		]
 	);
+}
+
+/**
+ * Fires after the query variable object is created, but before the actual query is run.
+ *
+ * @param WP_Query $query The WP_Query instance.
+ */
+function action_pre_get_posts( WP_Query $query ) : void {
+	$post_type = $query->get( 'post_type' );
+
+	if ( empty( $post_type ) ) {
+		// @TODO this needs more work so it matches the behaviour of the internals of `WP_Query`.
+		$post_type = 'post';
+	}
+
+	if ( array_diff( (array) $post_type, get_post_types_by_support( 'author' ) ) ) {
+		// can't do anything.
+		return;
+	}
+
+	$stored_values = [];
+
+	$concerns = [
+		'author_name',
+		'author',
+	];
+
+	foreach ( $concerns as $concern ) {
+		$value = $query->get( $concern );
+		if ( '' !== $value ) {
+			$stored_values[ $concern ] = $value;
+			$query->set( $concern, '' );
+		}
+	}
+
+	if ( empty( $stored_values ) ) {
+		return;
+	}
+
+	$user_id = 0;
+
+	if ( ! empty( $stored_values['author'] ) ) {
+		$user_id = (int) $stored_values['author'];
+	} elseif ( ! empty( $stored_values['author_name'] ) ) {
+		$user = get_user_by( 'slug', $stored_values['author_name'] );
+
+		if ( $user ) {
+			$user_id = $user->ID;
+		}
+	}
+
+	$tax_query = $query->get( 'tax_query' );
+
+	$stored_values['tax_query'] = $tax_query;
+
+	if ( empty( $tax_query ) ) {
+		$tax_query = [];
+	}
+
+	$tax_query[] = [
+		'taxonomy' => TAXONOMY,
+		'terms'    => $user_id,
+		'field'    => 'slug',
+	];
+
+	$query->set( 'tax_query', $tax_query );
+
+	/**
+	 * Filters the posts array before the query takes place.
+	 *
+	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
+	 * @param WP_Query       $query The WP_Query instance.
+	 */
+	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_id ) : ?array {
+		if ( empty( $stored_values ) ) {
+			return $posts;
+		}
+
+		foreach ( $stored_values as $concern => $value ) {
+			$query->set( $concern, $value );
+		}
+
+		if ( ! empty( $stored_values['author_name'] ) ) {
+			$query->set( 'author', $user_id );
+		}
+
+		$stored_values = [];
+
+		return $posts;
+	}, 999, 2 );
 }
