@@ -78,11 +78,7 @@ function action_author_column( string $column_name, int $post_id ) : void {
 		return;
 	}
 
-	/**
-	 * The post for this row.
-	 *
-	 * @var WP_Post
-	 */
+	/** @var WP_Post */
 	$post = get_post( $post_id );
 
 	$authors = get_authors( $post );
@@ -246,11 +242,7 @@ function get_authors( WP_Post $post ) : array {
 		return [];
 	}
 
-	/**
-	 * Term objects.
-	 *
-	 * @var WP_Term[] $authors
-	 */
+	/** @var WP_Term[] */
 	$authors = wp_get_post_terms( $post->ID, TAXONOMY, [
 		'orderby' => 'term_order',
 		'order'   => 'ASC',
@@ -260,11 +252,7 @@ function get_authors( WP_Post $post ) : array {
 		return [];
 	}
 
-	/**
-	 * User objects.
-	 *
-	 * @var WP_User[] $users
-	 */
+	/** @var WP_User[] */
 	$users = get_users( [
 		'include' => array_map( function( WP_Term $term ) : int {
 			return intval( $term->name );
@@ -288,18 +276,10 @@ function set_authors( WP_Post $post, array $authors ) : array {
 		throw new \Exception( __( 'This post type does not support authorship.', 'authorship' ) );
 	}
 
-	/**
-	 * Author IDs mapped to integers.
-	 *
-	 * @var int[] $authors
-	 */
+	/** @var int[] $authors */
 	$authors = array_filter( array_map( 'intval', $authors ) );
 
-	/**
-	 * User objects.
-	 *
-	 * @var WP_User[] $users
-	 */
+	/** @var WP_User[] */
 	$users = get_users( [
 		'include' => $authors,
 		'orderby' => 'include',
@@ -341,11 +321,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		return null;
 	}
 
-	/**
-	 * Post type capabilities.
-	 *
-	 * @var \stdClass
-	 */
+	/** @var \stdClass */
 	$caps = $post_type_object->cap;
 
 	if ( ! current_user_can( $caps->edit_others_posts ) ) {
@@ -356,11 +332,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	// we need to allow for that here.
 	$authors = wp_parse_id_list( $authors );
 
-	/**
-	 * User objects.
-	 *
-	 * @var WP_User[] $users
-	 */
+	/** @var WP_User[] */
 	$users = get_users( [
 		'include' => $authors,
 		'orderby' => 'include',
@@ -471,11 +443,7 @@ function init_taxonomy() : void {
  * Fires after block assets have been enqueued for the editing interface.
  */
 function enqueue_assets() : void {
-	/**
-	 * The post being edited.
-	 *
-	 * @var WP_Post
-	 */
+	/** @var WP_Post */
 	$post = get_post();
 
 	enqueue_assets_for_post();
