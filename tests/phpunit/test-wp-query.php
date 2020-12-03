@@ -206,4 +206,84 @@ class TestWPQuery extends TestCase {
 			);
 		}
 	}
+
+	public function testQueryVarsRemainUnaffectedAfterQuery() {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor.
+		$factory->create_and_get( [
+			POSTS_PARAM => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$args = [
+			'author_name' => self::$users['author']->user_nicename,
+			'post_type'   => 'post',
+			'fields'      => 'ids',
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		];
+
+		$query = new WP_Query( $args );
+
+		$this->assertSame( '', $query->get( 'tax_query' ) );
+		$this->assertSame( self::$users['author']->user_nicename, $query->get( 'author_name' ) );
+		$this->assertSame( self::$users['author']->ID, $query->get( 'author' ) );
+	}
+
+	public function testSubsequentQueriesAreUnaffected() {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor.
+		$post1 = $factory->create_and_get( [
+			POSTS_PARAM => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		// Attributed to Author.
+		$post2 = $factory->create_and_get( [
+			POSTS_PARAM => [
+				self::$users['author']->ID,
+			],
+		] );
+
+		$args = [
+			'author_name' => self::$users['author']->user_nicename,
+			'post_type'   => 'post',
+			'fields'      => 'ids',
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		];
+
+		$query1 = new WP_Query( $args );
+
+		$args = [
+			'post_type'   => 'post',
+			'fields'      => 'ids',
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		];
+
+		$query2 = new WP_Query();
+		$posts = $query2->query( $args );
+
+		$this->assertSame(
+			[ $post1->ID, $post2->ID ],
+			$posts
+		);
+		$this->assertSame(
+			'',
+			$query2->get( 'tax_query' )
+		);
+		$this->assertSame(
+			'',
+			$query2->get( 'author_name' )
+		);
+		$this->assertSame(
+			'',
+			$query2->get( 'author' )
+		);
+	}
 }
