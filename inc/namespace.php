@@ -81,7 +81,7 @@ function action_author_column( string $column_name, int $post_id ) : void {
 	/**
 	 * The post for this row.
 	 *
-	 * @var \WP_Post
+	 * @var WP_Post
 	 */
 	$post = get_post( $post_id );
 
@@ -474,7 +474,7 @@ function enqueue_assets() : void {
 	/**
 	 * The post being edited.
 	 *
-	 * @var \WP_Post
+	 * @var WP_Post
 	 */
 	$post = get_post();
 
@@ -551,6 +551,9 @@ function preload_author_data( WP_Post $post ) : void {
 /**
  * Fires after the query variable object is created, but before the actual query is run.
  *
+ * This is used to override author-related query vars with a corresponding taxonomy query and
+ * then add a second filter that resets the vars after the query has run.
+ *
  * @param WP_Query $query The WP_Query instance.
  */
 function action_pre_get_posts( WP_Query $query ) : void {
@@ -562,7 +565,9 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	}
 
 	if ( array_diff( (array) $post_type, get_post_types_by_support( 'author' ) ) ) {
-		// can't do anything.
+		// If _any_ of the requested post types don't support `author`, let the default query run.
+		// @TODO I don't think anything can be done about a query for multiple post types where one or
+		// more support `author` and one or more don't.
 		return;
 	}
 
@@ -573,6 +578,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		'author',
 	];
 
+	// Record the original values of concerned query vars and remove them from the query.
 	foreach ( $concerns as $concern ) {
 		$value = $query->get( $concern );
 		if ( '' !== $value ) {
@@ -581,12 +587,15 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		}
 	}
 
+	// None of the set query vars concern us? Then we have nothing more to do.
 	if ( empty( $stored_values ) ) {
 		return;
 	}
 
 	$user_id = 0;
 
+	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
+	// as WP_Query will handle the validation before constructing its query.
 	if ( ! empty( $stored_values['author'] ) ) {
 		$user_id = (int) $stored_values['author'];
 	} elseif ( ! empty( $stored_values['author_name'] ) ) {
@@ -599,12 +608,14 @@ function action_pre_get_posts( WP_Query $query ) : void {
 
 	$tax_query = $query->get( 'tax_query' );
 
+	// Record the value of an existing tax query, if there is one.
 	$stored_values['tax_query'] = $tax_query;
 
 	if ( empty( $tax_query ) ) {
 		$tax_query = [];
 	}
 
+	// Add a corresponding tax query that queries for posts with terms with a slug matching the requested user ID.
 	$tax_query[] = [
 		'taxonomy' => TAXONOMY,
 		'terms'    => $user_id,
@@ -616,6 +627,8 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	/**
 	 * Filters the posts array before the query takes place.
 	 *
+	 * This allows the query vars to be reset to their original values.
+	 *
 	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
 	 * @param WP_Query       $query The WP_Query instance.
 	 */
@@ -624,14 +637,17 @@ function action_pre_get_posts( WP_Query $query ) : void {
 			return $posts;
 		}
 
+		// Reset the query vars to their original values.
 		foreach ( $stored_values as $concern => $value ) {
 			$query->set( $concern, $value );
 		}
 
+		// Specifically set `author` when `author_name` is in use as WP_Query also sets `author` internally.
 		if ( ! empty( $stored_values['author_name'] ) ) {
 			$query->set( 'author', $user_id );
 		}
 
+		// Clear the recorded values so subsequent queries are not affected.
 		$stored_values = [];
 
 		return $posts;
