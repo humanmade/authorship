@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Authorship;
 
+use WP;
 use WP_Error;
 use WP_Http;
 use WP_HTTP_Response;
@@ -41,6 +42,7 @@ function bootstrap() : void {
 	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
+	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 
 	// Filters.
 	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
@@ -48,6 +50,22 @@ function bootstrap() : void {
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
 }
 
+/**
+ * Fires once the WordPress environment has been set up.
+ *
+ * This is used to correct the `$authordata` global on author archives.
+ *
+ * @link https://core.trac.wordpress.org/ticket/44183
+ *
+ * @param WP $wp Current WordPress environment instance.
+ */
+function action_wp( WP $wp ) : void {
+	global $wp_query;
+
+	if ( $wp_query->is_author() ) {
+		$GLOBALS['authordata'] = get_userdata( $wp_query->get( 'author' ) );
+	}
+}
 /**
  * Fires after WordPress has finished loading but before any headers are sent.
  */
