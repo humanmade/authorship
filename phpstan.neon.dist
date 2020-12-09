@@ -9,6 +9,7 @@ parameters:
     - plugin.php
     - inc/namespace.php
     - inc/template.php
+    - tests/phpunit/includes/testcase.php
   scanDirectories:
     - inc
     - lib
