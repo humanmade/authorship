@@ -6,4 +6,5 @@ parameters:
     - plugin.php
     - inc
   scanDirectories:
+    - inc
     - lib

@@ -56,7 +56,7 @@ function bootstrap() : void {
  *
  * @link https://core.trac.wordpress.org/ticket/44183
  *
- * @param WP $wp Current WordPress environment instance.
+ * @param \WP $wp Current WordPress environment instance.
  */
 function action_wp( WP $wp ) : void {
 	global $wp_query;
@@ -95,7 +95,7 @@ function action_author_column( string $column_name, int $post_id ) : void {
 		return;
 	}
 
-	/** @var WP_Post */
+	/** @var \WP_Post */
 	$post = get_post( $post_id );
 
 	$authors = get_authors( $post );
@@ -144,8 +144,8 @@ function filter_post_columns( array $post_columns ) : array {
 /**
  * Filters the REST API response.
  *
- * @param WP_HTTP_Response $result Result to send to the client. Usually a `WP_REST_Response`.
- * @return WP_HTTP_Response Result to send to the client. Usually a `WP_REST_Response`.
+ * @param \WP_HTTP_Response $result Result to send to the client. Usually a `\WP_REST_Response`.
+ * @return \WP_HTTP_Response Result to send to the client. Usually a `\WP_REST_Response`.
  */
 function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Response {
 	if ( ! ( $result instanceof WP_REST_Response ) ) {
@@ -181,9 +181,9 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 	/**
 	 * Fires once a post has been saved.
 	 *
-	 * @param int     $post_ID Post ID.
-	 * @param WP_Post $post    Post object.
-	 * @param bool    $update  Whether this is an existing post being updated.
+	 * @param int      $post_ID Post ID.
+	 * @param \WP_Post $post    Post object.
+	 * @param bool     $update  Whether this is an existing post being updated.
 	 */
 	add_action( 'wp_insert_post', function( int $post_ID, WP_Post $post, bool $update ) use ( $unsanitized_postarr ) : void {
 		if ( isset( $unsanitized_postarr['tax_input'] ) && ! empty( $unsanitized_postarr['tax_input'][ TAXONOMY ] ) ) {
@@ -215,9 +215,9 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 /**
  * Allows the `author` field to be used in the REST API in place of `authorship` for compatibility.
  *
- * @param mixed           $result  Response to replace the requested version with.
- * @param WP_REST_Server  $server  Server instance.
- * @param WP_REST_Request $request Request used to generate the response.
+ * @param mixed            $result  Response to replace the requested version with.
+ * @param \WP_REST_Server  $server  Server instance.
+ * @param \WP_REST_Request $request Request used to generate the response.
  * @return mixed Response to replace the requested version with.
  */
 function filter_rest_pre_dispatch( $result, WP_REST_Server $server, WP_REST_Request $request ) {
@@ -234,7 +234,7 @@ function filter_rest_pre_dispatch( $result, WP_REST_Server $server, WP_REST_Requ
 /**
  * Adds the authorship field to the REST API for post objects.
  *
- * @param WP_REST_Server $server Server object.
+ * @param \WP_REST_Server $server Server object.
  */
 function register_rest_api_fields( WP_REST_Server $server ) : void {
 	$post_types = get_post_types_by_support( 'author' );
@@ -245,15 +245,15 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
 /**
  * Gets the user objects for the authors of the given post.
  *
- * @param WP_Post $post The post object.
- * @return WP_User[] Array of user objects.
+ * @param \WP_Post $post The post object.
+ * @return \WP_User[] Array of user objects.
  */
 function get_authors( WP_Post $post ) : array {
 	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
 		return [];
 	}
 
-	/** @var WP_Term[] */
+	/** @var \WP_Term[] */
 	$authors = wp_get_post_terms( $post->ID, TAXONOMY, [
 		'orderby' => 'term_order',
 		'order'   => 'ASC',
@@ -263,7 +263,7 @@ function get_authors( WP_Post $post ) : array {
 		return [];
 	}
 
-	/** @var WP_User[] */
+	/** @var \WP_User[] */
 	$users = get_users( [
 		'include' => array_map( function( WP_Term $term ) : int {
 			return intval( $term->name );
@@ -277,10 +277,10 @@ function get_authors( WP_Post $post ) : array {
 /**
  * Sets the authors for the given post.
  *
- * @param WP_Post $post    The post object.
- * @param int[]   $authors Array of user IDs.
+ * @param \WP_Post $post    The post object.
+ * @param int[]    $authors Array of user IDs.
  * @throws \Exception If any of the users do not exist.
- * @return WP_User[] Array of user objects.
+ * @return \WP_User[] Array of user objects.
  */
 function set_authors( WP_Post $post, array $authors ) : array {
 	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
@@ -290,7 +290,7 @@ function set_authors( WP_Post $post, array $authors ) : array {
 	/** @var int[] $authors */
 	$authors = array_filter( array_map( 'intval', $authors ) );
 
-	/** @var WP_User[] */
+	/** @var \WP_User[] */
 	$users = get_users( [
 		'include' => $authors,
 		'orderby' => 'include',
@@ -313,11 +313,11 @@ function set_authors( WP_Post $post, array $authors ) : array {
 /**
  * Validates a passed argument for the list of authors.
  *
- * @param mixed           $authors   The passed value.
- * @param WP_REST_Request $request   The REST API request object.
- * @param string          $param     The param name.
- * @param string          $post_type The post type name.
- * @return WP_Error True if the validation passes, `WP_Error` instance otherwise.
+ * @param mixed            $authors   The passed value.
+ * @param \WP_REST_Request $request   The REST API request object.
+ * @param string           $param     The param name.
+ * @param string           $post_type The post type name.
+ * @return \WP_Error True if the validation passes, `\WP_Error` instance otherwise.
  */
 function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ) :? WP_Error {
 	$schema_validation = rest_validate_request_arg( $authors, $request, $param );
@@ -343,7 +343,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	// we need to allow for that here.
 	$authors = wp_parse_id_list( $authors );
 
-	/** @var WP_User[] */
+	/** @var \WP_User[] */
 	$users = get_users( [
 		'include' => $authors,
 		'orderby' => 'include',
@@ -454,7 +454,7 @@ function init_taxonomy() : void {
  * Fires after block assets have been enqueued for the editing interface.
  */
 function enqueue_assets() : void {
-	/** @var WP_Post */
+	/** @var \WP_Post */
 	$post = get_post();
 
 	enqueue_assets_for_post();
@@ -496,7 +496,7 @@ function enqueue_assets_for_post() : void {
 /**
  * Preloads author data for the post editing screen.
  *
- * @param WP_Post $post The post being edited.
+ * @param \WP_Post $post The post being edited.
  */
 function preload_author_data( WP_Post $post ) : void {
 	$authors = get_authors( $post );
@@ -535,7 +535,7 @@ function preload_author_data( WP_Post $post ) : void {
  * This is used to override author-related query vars with a corresponding taxonomy query and
  * then add a second filter that resets the vars after the query has run.
  *
- * @param WP_Query $query The WP_Query instance.
+ * @param \WP_Query $query The \WP_Query instance.
  */
 function action_pre_get_posts( WP_Query $query ) : void {
 	$post_type = $query->get( 'post_type' );
@@ -576,7 +576,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	$user_id = 0;
 
 	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
-	// as WP_Query will handle the validation before constructing its query.
+	// as \WP_Query will handle the validation before constructing its query.
 	if ( ! empty( $stored_values['author'] ) ) {
 		$user_id = (int) $stored_values['author'];
 	} elseif ( ! empty( $stored_values['author_name'] ) ) {
@@ -610,8 +610,8 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 *
 	 * This allows the query vars to be reset to their original values.
 	 *
-	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
-	 * @param WP_Query       $query The WP_Query instance.
+	 * @param \WP_Post[]|null $posts Array of post objects. Passed by reference.
+	 * @param \WP_Query       $query The \WP_Query instance.
 	 */
 	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_id ) : ?array {
 		if ( empty( $stored_values ) ) {
