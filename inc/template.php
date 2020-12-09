@@ -24,10 +24,7 @@ function get_authors( WP_Post $post ) : array {
 	}
 
 	/** @var \WP_Term[] */
-	$authors = wp_get_post_terms( $post->ID, TAXONOMY, [
-		'orderby' => 'term_order',
-		'order'   => 'ASC',
-	] );
+	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
 
 	if ( empty( $authors ) ) {
 		return [];

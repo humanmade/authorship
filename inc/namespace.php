@@ -347,6 +347,10 @@ function init_taxonomy() : void {
 		[
 			'hierarchical'      => false,
 			'sort'              => true,
+			'args'              => [
+				'orderby' => 'term_order',
+				'order'   => 'ASC',
+			],
 			'public'            => false,
 			'show_in_rest'      => false,
 			'capabilities'      => [
