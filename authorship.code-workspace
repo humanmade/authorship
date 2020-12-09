@@ -21,14 +21,16 @@
       "*.xml.dist": "xml"
     },
     "files.exclude": {
-      "noop.php": true
+      "noop.php": true,
+      "vendor/roots/wordpress": true
     },
     "files.watcherExclude": {
       "**/vendor/**": true,
       "noop.php": true
     },
     "search.exclude": {
-      "noop.php": true
+      "noop.php": true,
+      "vendor/roots/wordpress": true
     },
     "phpstan.configuration": "phpstan.neon.dist",
     "phpstan.level": "config"
