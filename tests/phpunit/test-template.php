@@ -47,8 +47,12 @@ class TestTemplate extends TestCase {
 		$this->assertSame( $expected, user_is_author( $user, $post ) );
 	}
 
+	/**
+	 * @return mixed[]
+	 */
 	public function dataAuthorsYes() : array {
 		return [
+			// Checking Admin, owned by Editor, attributed to Admin:
 			[
 				true,
 				function() : WP_User {
@@ -61,6 +65,7 @@ class TestTemplate extends TestCase {
 					return self::$users['admin'];
 				},
 			],
+			// Checking Author, owned by nobody, attributed to Author:
 			[
 				true,
 				function() : WP_User {
@@ -71,6 +76,7 @@ class TestTemplate extends TestCase {
 					return self::$users['author'];
 				},
 			],
+			// Checking Editor, owned by nobody, attributed to Admin, Editor, and Author:
 			[
 				true,
 				function() : WP_User {
@@ -90,8 +96,12 @@ class TestTemplate extends TestCase {
 		];
 	}
 
+	/**
+	 * @return mixed[]
+	 */
 	public function dataAuthorsNo() : array {
 		return [
+			// Checking Editor, owned by Editor, attributed to Admin:
 			[
 				false,
 				function() : WP_User {
@@ -104,6 +114,7 @@ class TestTemplate extends TestCase {
 					return self::$users['admin'];
 				},
 			],
+			// Checking Author, owned by nobody, attributed to nobody:
 			[
 				false,
 				function() : WP_User {
@@ -111,6 +122,7 @@ class TestTemplate extends TestCase {
 				},
 				null,
 			],
+			// Checking Editor, owned by Editor, attributed to nobody (inherits Editor):
 			[
 				false,
 				function() : WP_User {
