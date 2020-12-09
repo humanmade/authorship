@@ -39,10 +39,16 @@ class TestTemplate extends TestCase {
 			return $user->ID;
 		}, $post_authorship );
 
-		$post = $factory->create_and_get( [
-			'post_author' => $post_author,
-			POSTS_PARAM   => $post_authorship,
-		] );
+		$args = [];
+
+		if ( $post_author ) {
+			$args['post_author'] = $post_author;
+		}
+		if ( $post_authorship ) {
+			$args[ POSTS_PARAM ] = $post_authorship;
+		}
+
+		$post = $factory->create_and_get( $args );
 
 		$this->assertSame( $expected, user_is_author( $user, $post ) );
 	}
@@ -93,6 +99,16 @@ class TestTemplate extends TestCase {
 					return self::$users['author'];
 				},
 			],
+			// Checking Editor, owned by Editor, attributed to nobody (inherits Editor):
+			[
+				true,
+				function() : WP_User {
+					return self::$users['editor'];
+				},
+				function() : WP_User {
+					return self::$users['editor'];
+				},
+			],
 		];
 	}
 
@@ -121,16 +137,6 @@ class TestTemplate extends TestCase {
 					return self::$users['author'];
 				},
 				null,
-			],
-			// Checking Editor, owned by Editor, attributed to nobody (inherits Editor):
-			[
-				false,
-				function() : WP_User {
-					return self::$users['editor'];
-				},
-				function() : WP_User {
-					return self::$users['editor'];
-				},
 			],
 		];
 	}
