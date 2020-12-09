@@ -138,6 +138,16 @@ class TestTemplate extends TestCase {
 				},
 				null,
 			],
+			// Checking Editor, owned by Admin, attributed to nobody:
+			[
+				false,
+				function() : WP_User {
+					return self::$users['editor'];
+				},
+				function() : WP_User {
+					return self::$users['admin'];
+				},
+			],
 		];
 	}
 }
