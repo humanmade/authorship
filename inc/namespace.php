@@ -508,10 +508,12 @@ function preload_author_data( WP_Post $post ) : void {
 	}
 
 	$authors = array_map( function( WP_User $user ) {
+		$avatar = get_avatar_url( $user->ID );
+
 		return [
 			'value'  => $user->ID,
 			'label'  => $user->display_name,
-			'avatar' => get_avatar_url( $user->ID ),
+			'avatar' => $avatar ? $avatar : null,
 		];
 	}, $authors );
 

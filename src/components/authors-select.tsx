@@ -18,7 +18,7 @@ interface Option {
 	/**
 	 * The option avatar.
 	 */
-	avatar: string;
+	avatar: string | null;
 }
 
 interface SortedOption {
@@ -88,7 +88,7 @@ const AuthorsSelect = args => {
 				const option: Option = {
 					value: user.id,
 					label: user.name,
-					avatar: user.avatar_urls[48] ?? null,
+					avatar: user.avatar_urls ? user.avatar_urls[48] : null,
 				};
 
 				return option;
