@@ -6,7 +6,7 @@ import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 import AuthorsSelect from './components/authors-select';
 
-declare const wp;
+declare const wp: any;
 
 const registerPlugin = wp.plugins.registerPlugin;
 

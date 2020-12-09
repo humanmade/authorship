@@ -37,7 +37,7 @@ interface authorshipDataFromWP {
 }
 
 declare const authorshipData: authorshipDataFromWP;
-declare const wp;
+declare const wp: any;
 
 /**
  * Moves an element in array from one position to another. Used as the sorting callback.
@@ -146,7 +146,7 @@ const AuthorsSelect = args => {
 	 * @param {ActionMeta}    action  The action performed that triggered the value change.
 	 */
 	const changeValue = ( options: Option[]|null, action: ActionMeta<any> ) => {
-		setSelected( options );
+		setSelected( options || [] );
 		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
 	};
 
