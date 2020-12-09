@@ -1,0 +1,41 @@
+{
+  "extensions": {
+    "recommendations": [
+      "bmewburn.vscode-intelephense-client",
+      "breezelin.phpstan",
+      "dbaeumer.vscode-eslint",
+      "editorconfig.editorconfig",
+      "felixfbecker.php-debug",
+      "johnbillion.vscode-wordpress-hooks",
+      "neilbrayfield.php-docblocker",
+      "shevaua.phpcs",
+      "stylelint.vscode-stylelint"
+    ],
+    "unwantedRecommendations": [
+      "ikappas.phpcs"
+    ]
+  },
+  "settings": {
+    "files.associations": {
+      "*.neon.dist": "neon",
+      "*.xml.dist": "xml"
+    },
+    "files.exclude": {
+      "noop.php": true
+    },
+    "files.watcherExclude": {
+      "**/vendor/**": true,
+      "noop.php": true
+    },
+    "search.exclude": {
+      "noop.php": true
+    },
+    "phpstan.configuration": "phpstan.neon.dist",
+    "phpstan.level": "config"
+  },
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+}
