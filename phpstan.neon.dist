@@ -8,6 +8,7 @@ parameters:
   scanFiles:
     - plugin.php
     - inc/namespace.php
+    - inc/template.php
   scanDirectories:
     - inc
     - lib
