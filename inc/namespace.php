@@ -39,7 +39,6 @@ function bootstrap() : void {
 	add_action( 'init', __NAMESPACE__ . '\\register_roles_and_caps', 1 );
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
-	add_action( 'wp_insert_post', __NAMESPACE__ . '\\action_wp_insert_post', 10, 3 );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
@@ -179,44 +178,38 @@ function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Respons
  * @return mixed[] An array of slashed, sanitized, and processed post data.
  */
 function filter_wp_insert_post_data( array $data, array $postarr, array $unsanitized_postarr ) : array {
-	global $authorship_postarr;
+	/**
+	 * Fires once a post has been saved.
+	 *
+	 * @param int     $post_ID Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @param bool    $update  Whether this is an existing post being updated.
+	 */
+	add_action( 'wp_insert_post', function( int $post_ID, WP_Post $post, bool $update ) use ( $unsanitized_postarr ) : void {
+		if ( isset( $unsanitized_postarr['tax_input'] ) && ! empty( $unsanitized_postarr['tax_input'][ TAXONOMY ] ) ) {
+			return;
+		}
 
-	$authorship_postarr = $unsanitized_postarr;
+		if ( isset( $unsanitized_postarr[ POSTS_PARAM ] ) ) {
+			$authors = $unsanitized_postarr[ POSTS_PARAM ];
+		} elseif ( ! empty( $unsanitized_postarr['post_author'] ) ) {
+			$authors = [
+				$unsanitized_postarr['post_author'],
+			];
+		}
+
+		if ( ! isset( $authors ) ) {
+			return;
+		}
+
+		try {
+			set_authors( $post, $authors );
+		} catch ( \Exception $e ) {
+			// Nothing at the moment.
+		}
+	}, 10, 3 );
 
 	return $data;
-}
-
-/**
- * Fires once a post has been saved.
- *
- * @param int     $post_ID Post ID.
- * @param WP_Post $post    Post object.
- * @param bool    $update  Whether this is an existing post being updated.
- */
-function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
-	global $authorship_postarr;
-
-	if ( isset( $authorship_postarr['tax_input'] ) && ! empty( $authorship_postarr['tax_input'][ TAXONOMY ] ) ) {
-		return;
-	}
-
-	if ( isset( $authorship_postarr[ POSTS_PARAM ] ) ) {
-		$authors = $authorship_postarr[ POSTS_PARAM ];
-	} elseif ( ! empty( $authorship_postarr['post_author'] ) ) {
-		$authors = [
-			$authorship_postarr['post_author'],
-		];
-	}
-
-	if ( ! isset( $authors ) ) {
-		return;
-	}
-
-	try {
-		set_authors( $post, $authors );
-	} catch ( \Exception $e ) {
-		// Nothing at the moment.
-	}
 }
 
 /**
