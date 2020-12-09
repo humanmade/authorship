@@ -132,6 +132,7 @@ function filter_post_columns( array $post_columns ) : array {
 
 	foreach ( $post_columns as $key => $value ) {
 		if ( 'author' === $key ) {
+			// This replaces the default Author column with our own, in the same position.
 			$new_columns[ COLUMN_NAME ] = __( 'Authors', 'authorship' );
 		} else {
 			$new_columns[ $key ] = $value;
@@ -158,6 +159,7 @@ function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Respons
 		return $result;
 	}
 
+	/** @var int $author */
 	foreach ( $data[ REST_PARAM ] as $author ) {
 		$result->add_link( REST_LINK_ID, sprintf(
 			rest_url( 'wp/v2/users/%d' ),
@@ -213,7 +215,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 }
 
 /**
- * Allows the `author` field to be used in the REST API in place of `authorship` for compatibility.
+ * Allows falling back to the `author` field in the REST API if `authorship` isn't set.
  *
  * @param mixed            $result  Response to replace the requested version with.
  * @param \WP_REST_Server  $server  Server instance.
