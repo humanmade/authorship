@@ -12,3 +12,4 @@ parameters:
   scanDirectories:
     - inc
     - lib
+    - vendor/wp-phpunit/wp-phpunit/includes

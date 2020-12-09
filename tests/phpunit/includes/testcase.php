@@ -23,7 +23,7 @@ abstract class TestCase extends \WP_UnitTestCase {
 	/**
 	 * Set up class test fixtures.
 	 *
-	 * @param WP_UnitTest_Factory $factory Test factory.
+	 * @param \WP_UnitTest_Factory $factory Test factory.
 	 */
 	public static function wpSetUpBeforeClass( \WP_UnitTest_Factory $factory ) {
 		$roles = [
