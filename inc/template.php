@@ -11,6 +11,7 @@ namespace Authorship;
 
 use WP_Post;
 use WP_Term;
+use WP_User;
 
 /**
  * Gets the user objects for the authors of the given post.
@@ -75,4 +76,26 @@ function set_authors( WP_Post $post, array $authors ) : array {
 	}
 
 	return $users;
+}
+
+/**
+ * Determines if the given user is an author of the given post.
+ *
+ * @param \WP_User $user The user object.
+ * @param \WP_Post $post The post object.
+ * @return bool If the user is an author of the post.
+ */
+function user_is_author( WP_User $user, WP_Post $post ) : bool {
+	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+		return ( intval( $post->post_author ) === $user->ID );
+	}
+
+	/** @var \WP_Term[] */
+	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
+
+	$author_ids = array_map( function( WP_Term $term ) : int {
+		return intval( $term->name );
+	}, $authors );
+
+	return in_array( $user->ID, $author_ids, true );
 }
