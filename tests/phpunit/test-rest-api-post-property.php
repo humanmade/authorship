@@ -94,7 +94,6 @@ class TestRESTAPIPostProperty extends TestCase {
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
-		$this->assertSame( 'Test Post', $data['title']['rendered'] );
 		$this->assertArrayHasKey( REST_PARAM, $data );
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
@@ -121,7 +120,6 @@ class TestRESTAPIPostProperty extends TestCase {
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
-		$this->assertSame( 'Test Post', $data['title']['rendered'] );
 		$this->assertArrayHasKey( REST_PARAM, $data );
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
@@ -158,8 +156,6 @@ class TestRESTAPIPostProperty extends TestCase {
 			'post_status' => 'publish',
 			POSTS_PARAM   => $authors,
 		] );
-
-		wp_set_post_tags( $post->ID, 'testing1,testing2,testing3' );
 
 		$request = new WP_REST_Request( 'GET', sprintf(
 			'/wp/v2/posts/%d',
