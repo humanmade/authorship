@@ -8,6 +8,8 @@
  *
  *  - a CPT with `map_meta_cap` set to `true`
  *  - a CPT with `map_meta_cap` set to `false`
+ *  - posts with post status of type that is not `public`
+ *  - posts with post status of type that is `private`
  */
 
 declare( strict_types=1 );
@@ -17,12 +19,17 @@ namespace Authorship\Tests;
 use const Authorship\POSTS_PARAM;
 
 class TestCapabilities extends TestCase {
-	public function testAuthorRoleCanManagePostTheyAreAttributedTo() : void {
+	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 */
+	public function testUserCanManagePostTheyAreAttributedTo( string $role ) : void {
 		$factory = self::factory()->post;
 
-		$user_id = self::$users['author']->ID;
+		$user_id = self::$users[ $role ]->ID;
 
-		// Attributed to Author, owned by Admin.
+		// Attributed to user, owned by Admin.
 		$draft_post = $factory->create_and_get( [
 			'post_status' => 'draft',
 			'post_author' => self::$users['admin']->ID,
@@ -31,7 +38,7 @@ class TestCapabilities extends TestCase {
 			],
 		] );
 
-		// Attributed to Author, owned by Admin.
+		// Attributed to user, owned by Admin.
 		$published_post = $factory->create_and_get( [
 			'post_status' => 'publish',
 			'post_author' => self::$users['admin']->ID,
@@ -40,7 +47,7 @@ class TestCapabilities extends TestCase {
 			],
 		] );
 
-		// Attributed to Author, owned by Admin.
+		// Attributed to user, owned by Admin.
 		$scheduled_post = $factory->create_and_get( [
 			'post_status' => 'future',
 			'post_date'   => date( 'Y-m-d H:i:s', strtotime( '+24 hours' ) ),
@@ -67,5 +74,16 @@ class TestCapabilities extends TestCase {
 		$this->assertTrue( user_can( $user_id, 'publish_post', $scheduled_post->ID ) );
 		$this->assertTrue( user_can( $user_id, 'read_post', $scheduled_post->ID ) );
 		$this->assertTrue( user_can( $user_id, 'delete_post', $scheduled_post->ID ) );
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataRolesAndCaps() : array {
+		return [
+			[
+				'author',
+			],
+		];
 	}
 }
