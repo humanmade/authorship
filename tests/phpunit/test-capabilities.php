@@ -200,7 +200,7 @@ class TestCapabilities extends TestCase {
 					'future' => [
 						'edit_post'    => false,
 						'publish_post' => false,
-						'read_post'    => false, // @TODO Can a Contributor not read their own scheduled post?
+						'read_post'    => false,
 						'delete_post'  => false,
 					],
 					'pending' => [
