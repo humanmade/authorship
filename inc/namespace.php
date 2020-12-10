@@ -43,7 +43,6 @@ function bootstrap() : void {
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 
 	// Filters.
-	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap', 10, 4 );
@@ -313,6 +312,10 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 			return;
 		}
 
+		if ( $update && ! isset( $unsanitized_postarr[ POSTS_PARAM ] ) ) {
+			return;
+		}
+
 		if ( isset( $unsanitized_postarr[ POSTS_PARAM ] ) ) {
 			$authors = $unsanitized_postarr[ POSTS_PARAM ];
 		} elseif ( ! empty( $unsanitized_postarr['post_author'] ) ) {
@@ -333,25 +336,6 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 	}, 10, 3 );
 
 	return $data;
-}
-
-/**
- * Allows falling back to the `author` field in the REST API if `authorship` isn't set.
- *
- * @param mixed            $result  Response to replace the requested version with.
- * @param \WP_REST_Server  $server  Server instance.
- * @param \WP_REST_Request $request Request used to generate the response.
- * @return mixed Response to replace the requested version with.
- */
-function filter_rest_pre_dispatch( $result, WP_REST_Server $server, WP_REST_Request $request ) {
-	$author     = $request->get_param( 'author' );
-	$authorship = $request->get_param( REST_PARAM );
-
-	if ( ( null === $authorship ) && ! empty( $author ) ) {
-		$request->set_param( REST_PARAM, [ intval( $author ) ] );
-	}
-
-	return $result;
 }
 
 /**
