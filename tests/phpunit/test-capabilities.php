@@ -201,6 +201,28 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
+	public function testUserCannotManagePublishedPostTheyAreNotAttributedTo( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$status  = 'publish_not_mine';
+
+		// Published, owned by Admin, not attributed to user.
+		$post = self::factory()->post->create_and_get( [
+			'post_status' => 'publish',
+			'post_author' => self::$users['admin']->ID,
+		] );
+
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
 	public function testUserCannotManageNonExistentPost( string $role, array $caps ) : void {
 		$user_id = self::$users[ $role ]->ID;
 		$post_id = 1;
@@ -256,6 +278,12 @@ class TestCapabilities extends TestCase {
 						'read_post'    => true,
 						'delete_post'  => true,
 					],
+					'publish_not_mine' => [
+						'edit_post'    => true,
+						'publish_post' => true,
+						'read_post'    => true,
+						'delete_post'  => true,
+					],
 				],
 			],
 			[
@@ -296,6 +324,12 @@ class TestCapabilities extends TestCase {
 						'publish_post' => true,
 						'read_post'    => true,
 						'delete_post'  => true,
+					],
+					'publish_not_mine' => [
+						'edit_post'    => false,
+						'publish_post' => false,
+						'read_post'    => true,
+						'delete_post'  => false,
 					],
 				],
 			],
@@ -338,6 +372,12 @@ class TestCapabilities extends TestCase {
 						'read_post'    => true,
 						'delete_post'  => true,
 					],
+					'publish_not_mine' => [
+						'edit_post'    => false,
+						'publish_post' => false,
+						'read_post'    => true,
+						'delete_post'  => false,
+					],
 				],
 			],
 			[
@@ -374,6 +414,12 @@ class TestCapabilities extends TestCase {
 						'delete_post'  => false,
 					],
 					'private' => [
+						'edit_post'    => false,
+						'publish_post' => false,
+						'read_post'    => true,
+						'delete_post'  => false,
+					],
+					'publish_not_mine' => [
 						'edit_post'    => false,
 						'publish_post' => false,
 						'read_post'    => true,
