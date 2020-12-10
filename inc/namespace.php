@@ -46,6 +46,128 @@ function bootstrap() : void {
 	add_filter( 'rest_pre_dispatch', __NAMESPACE__ . '\\filter_rest_pre_dispatch', 10, 3 );
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
+	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap', 10, 4 );
+}
+
+/**
+ * Filters a user's capabilities depending on specific context and/or privilege.
+ *
+ * @param string[] $caps    Array of the user's capabilities.
+ * @param string   $cap     Capability name.
+ * @param int      $user_id The user ID.
+ * @param mixed[]  $args    The context for the cap, typically with the object ID as the first element.
+ * @return string[] Array of the user's capabilities.
+ */
+function filter_map_meta_cap( array $caps, string $cap, int $user_id, array $args ) : array {
+	$concerns = [
+		'delete_post',
+		'delete_page',
+		'edit_post',
+		'edit_page',
+		'read_post',
+		'read_page',
+		// 'publish_post',
+	];
+
+	if ( ! in_array( $cap, $concerns, true ) ) {
+		return $caps;
+	}
+
+	if ( empty( $user_id ) || empty( $args[0] ) ) {
+		return $caps;
+	}
+	$user = get_userdata( $user_id );
+	$post = get_post( $args[0] );
+
+	if ( empty( $user ) || empty( $post ) ) {
+		return $caps;
+	}
+
+	$post_type  = get_post_type_object( $post->post_type );
+	$status_obj = get_post_status_object( $post->post_status );
+
+	if ( empty( $post_type ) || empty( $status_obj ) ) {
+		return $caps;
+	}
+
+	if ( ! user_is_author( $user, $post ) ) {
+		return $caps;
+	}
+
+	/** @var \stdClass */
+	$post_type_cap = $post_type->cap;
+
+	// Remove the following from `$caps`.
+	$remove = [
+		'delete' => [
+			$post_type_cap->delete_others_posts,
+			$post_type_cap->delete_published_posts,
+			$post_type_cap->delete_private_posts,
+		],
+		'edit' => [
+			$post_type_cap->edit_others_posts,
+			$post_type_cap->edit_published_posts,
+			$post_type_cap->edit_private_posts,
+		],
+		'read' => [
+			$post_type_cap->read_private_posts,
+		],
+	];
+
+	switch ( $cap ) {
+		case 'delete_post':
+		case 'delete_page':
+			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
+				return ! in_array( $cap, $remove['delete'], true );
+			} );
+
+			// If the post is published or scheduled...
+			if ( in_array( $post->post_status, [ 'publish', 'future' ], true ) ) {
+				$caps[] = $post_type_cap->delete_published_posts;
+			} elseif ( 'trash' === $post->post_status ) {
+				$status = get_post_meta( $post->ID, '_wp_trash_meta_status', true );
+				if ( in_array( $status, [ 'publish', 'future' ], true ) ) {
+					$caps[] = $post_type_cap->delete_published_posts;
+				} else {
+					$caps[] = $post_type_cap->delete_posts;
+				}
+			} else {
+				// If the post is draft...
+				$caps[] = $post_type_cap->delete_posts;
+			}
+			break;
+		case 'edit_post':
+		case 'edit_page':
+			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
+				return ! in_array( $cap, $remove['edit'], true );
+			} );
+
+			// If the post is published or scheduled...
+			if ( in_array( $post->post_status, [ 'publish', 'future' ], true ) ) {
+				$caps[] = $post_type_cap->edit_published_posts;
+			} elseif ( 'trash' === $post->post_status ) {
+				$status = get_post_meta( $post->ID, '_wp_trash_meta_status', true );
+				if ( in_array( $status, [ 'publish', 'future' ], true ) ) {
+					$caps[] = $post_type_cap->edit_published_posts;
+				} else {
+					$caps[] = $post_type_cap->edit_posts;
+				}
+			} else {
+				// If the post is draft...
+				$caps[] = $post_type_cap->edit_posts;
+			}
+			break;
+		case 'read_post':
+		case 'read_page':
+			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
+				return ! in_array( $cap, $remove['read'], true );
+			} );
+
+			$caps[] = $post_type_cap->read;
+			break;
+	}//end switch
+
+	return $caps;
 }
 
 /**
