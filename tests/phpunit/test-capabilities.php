@@ -8,8 +8,6 @@
  *
  *  - a CPT with `map_meta_cap` set to `true`
  *  - a CPT with `map_meta_cap` set to `false`
- *  - posts with post status of type that is not `public`
- *  - posts with post status of type that is `private`
  */
 
 declare( strict_types=1 );
