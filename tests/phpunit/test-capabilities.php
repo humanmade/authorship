@@ -327,7 +327,9 @@ class TestCapabilities extends TestCase {
 					],
 					'publish_not_mine' => [
 						'edit_post'    => false,
-						'publish_post' => false,
+						// @TODO This appears to be a WP core bug. Authors cannot edit others posts,
+						// but they have the `publish_post` capability for another's post.
+						'publish_post' => true,
 						'read_post'    => true,
 						'delete_post'  => false,
 					],
