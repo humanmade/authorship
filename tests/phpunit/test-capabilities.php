@@ -294,7 +294,7 @@ class TestCapabilities extends TestCase {
 					],
 					'private' => [
 						'edit_post'    => true,
-						'publish_post' => true,
+						'publish_post' => false,
 						'read_post'    => true,
 						'delete_post'  => true,
 					],
