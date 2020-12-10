@@ -196,6 +196,23 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testUserCannotManageNonExistentPost( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$post_id = 1;
+
+		$this->assertNull( get_post( $post_id ) );
+		$this->assertFalse( user_can( $user_id, 'edit_post', $post_id ) );
+		$this->assertFalse( user_can( $user_id, 'publish_post', $post_id ) );
+		$this->assertFalse( user_can( $user_id, 'read_post', $post_id ) );
+		$this->assertFalse( user_can( $user_id, 'delete_post', $post_id ) );
+	}
+
+	/**
 	 * @return mixed[]
 	 */
 	public function dataRolesAndCaps() : array {
