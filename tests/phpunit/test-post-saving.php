@@ -47,18 +47,36 @@ class TestPostSaving extends TestCase {
 			],
 		] );
 
-		/** @var int[] */
-		$author_ids_before = wp_list_pluck( get_authors( $post ), 'ID' );
-
 		wp_update_post( [
 			'ID'          => $post->ID,
 			'post_status' => 'draft',
 		], true );
 
 		/** @var int[] */
-		$author_ids_after = wp_list_pluck( get_authors( $post ), 'ID' );
+		$author_ids = wp_list_pluck( get_authors( $post ), 'ID' );
 
-		$this->assertSame( [ self::$users['editor']->ID ], $author_ids_before );
-		$this->assertSame( [ self::$users['editor']->ID ], $author_ids_after );
+		$this->assertSame( [ self::$users['editor']->ID ], $author_ids );
+	}
+
+	public function testPostAuthorsAreRetainedWhenUpdatingPostWithPostAuthorParameter() : void {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, owned by Admin.
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		wp_update_post( [
+			'ID'          => $post->ID,
+			'post_author' => self::$users['author']->ID,
+		], true );
+
+		/** @var int[] */
+		$author_ids = wp_list_pluck( get_authors( $post ), 'ID' );
+
+		$this->assertSame( [ self::$users['editor']->ID ], $author_ids );
 	}
 }

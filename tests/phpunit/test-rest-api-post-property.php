@@ -124,6 +124,32 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
+	public function testAuthorsAreRetainedWhenOnlyPostAuthorIsSpecifiedWhenEditing() {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$authors = [
+			self::$users['author']->ID,
+		];
+		$post = self::factory()->post->create_and_get( [
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			POSTS_PARAM   => $authors,
+		] );
+
+		$request = new WP_REST_Request( 'PUT', sprintf(
+			'/wp/v2/posts/%d',
+			$post->ID
+		) );
+		$request->set_param( 'author', self::$users['editor']->ID );
+
+		$response = self::do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertArrayHasKey( REST_PARAM, $data );
+		$this->assertSame( $authors, $data[ REST_PARAM ] );
+	}
+
 	public function testAuthorsPropertyExists() {
 		$post = self::factory()->post->create_and_get( [
 			'post_type'   => 'post',
