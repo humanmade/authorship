@@ -29,7 +29,7 @@ class TestCapabilities extends TestCase {
 		$factory = self::factory()->post;
 		$user_id = self::$users[ $role ]->ID;
 
-		// Attributed to user, owned by Admin.
+		// Draft, attributed to user, owned by Admin.
 		$draft_post = $factory->create_and_get( [
 			'post_status' => 'draft',
 			'post_author' => self::$users['admin']->ID,
@@ -38,7 +38,7 @@ class TestCapabilities extends TestCase {
 			],
 		] );
 
-		// Attributed to user, owned by Admin.
+		// Published, attributed to user, owned by Admin.
 		$published_post = $factory->create_and_get( [
 			'post_status' => 'publish',
 			'post_author' => self::$users['admin']->ID,
@@ -47,10 +47,19 @@ class TestCapabilities extends TestCase {
 			],
 		] );
 
-		// Attributed to user, owned by Admin.
+		// Scheduled, attributed to user, owned by Admin.
 		$scheduled_post = $factory->create_and_get( [
 			'post_status' => 'future',
 			'post_date'   => date( 'Y-m-d H:i:s', strtotime( '+24 hours' ) ),
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				$user_id,
+			],
+		] );
+
+		// Pending ("Submit for Review"), attributed to user, owned by Admin.
+		$pending_post = $factory->create_and_get( [
+			'post_status' => 'pending',
 			'post_author' => self::$users['admin']->ID,
 			POSTS_PARAM   => [
 				$user_id,
@@ -74,6 +83,12 @@ class TestCapabilities extends TestCase {
 		$this->assertSame( $caps['future']['publish_post'], user_can( $user_id, 'publish_post', $scheduled_post->ID ) );
 		$this->assertSame( $caps['future']['read_post'], user_can( $user_id, 'read_post', $scheduled_post->ID ) );
 		$this->assertSame( $caps['future']['delete_post'], user_can( $user_id, 'delete_post', $scheduled_post->ID ) );
+
+		// Pending post:
+		$this->assertSame( $caps['pending']['edit_post'], user_can( $user_id, 'edit_post', $pending_post->ID ) );
+		$this->assertSame( $caps['pending']['publish_post'], user_can( $user_id, 'publish_post', $pending_post->ID ) );
+		$this->assertSame( $caps['pending']['read_post'], user_can( $user_id, 'read_post', $pending_post->ID ) );
+		$this->assertSame( $caps['pending']['delete_post'], user_can( $user_id, 'delete_post', $pending_post->ID ) );
 	}
 
 	/**
@@ -102,6 +117,12 @@ class TestCapabilities extends TestCase {
 						'read_post'    => true,
 						'delete_post'  => true,
 					],
+					'pending' => [
+						'edit_post'    => true,
+						'publish_post' => true,
+						'read_post'    => true,
+						'delete_post'  => true,
+					],
 				],
 			],
 			[
@@ -120,6 +141,12 @@ class TestCapabilities extends TestCase {
 						'delete_post'  => true,
 					],
 					'future' => [
+						'edit_post'    => true,
+						'publish_post' => true,
+						'read_post'    => true,
+						'delete_post'  => true,
+					],
+					'pending' => [
 						'edit_post'    => true,
 						'publish_post' => true,
 						'read_post'    => true,
@@ -148,6 +175,12 @@ class TestCapabilities extends TestCase {
 						'read_post'    => false, // @TODO Can a Contributor not read their own scheduled post?
 						'delete_post'  => false,
 					],
+					'pending' => [
+						'edit_post'    => true,
+						'publish_post' => false,
+						'read_post'    => true,
+						'delete_post'  => true,
+					],
 				],
 			],
 			[
@@ -166,6 +199,12 @@ class TestCapabilities extends TestCase {
 						'delete_post'  => false,
 					],
 					'future' => [
+						'edit_post'    => false,
+						'publish_post' => false,
+						'read_post'    => false,
+						'delete_post'  => false,
+					],
+					'pending' => [
 						'edit_post'    => false,
 						'publish_post' => false,
 						'read_post'    => false,
