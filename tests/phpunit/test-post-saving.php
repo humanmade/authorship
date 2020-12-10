@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
+use const Authorship\POSTS_PARAM;
 use const Authorship\TAXONOMY;
 
 use function Authorship\get_authors;
@@ -33,5 +34,31 @@ class TestPostSaving extends TestCase {
 
 		$this->assertCount( 0, $terms );
 		$this->assertCount( 0, $authors );
+	}
+
+	public function testPostAuthorsAreRetainedWhenUpdatingPostWithNoAuthorParameter() : void {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, owned by Admin.
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		/** @var int[] */
+		$author_ids_before = wp_list_pluck( get_authors( $post ), 'ID' );
+
+		wp_update_post( [
+			'ID'          => $post->ID,
+			'post_status' => 'draft',
+		], true );
+
+		/** @var int[] */
+		$author_ids_after = wp_list_pluck( get_authors( $post ), 'ID' );
+
+		$this->assertSame( [ self::$users['editor']->ID ], $author_ids_before );
+		$this->assertSame( [ self::$users['editor']->ID ], $author_ids_after );
 	}
 }

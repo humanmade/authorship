@@ -80,14 +80,15 @@ class TestRESTAPIPostProperty extends TestCase {
 			'post_status' => 'publish',
 		] );
 
+		$authors = [
+			self::$users['author']->ID,
+		];
 		$request = new WP_REST_Request( 'PUT', sprintf(
 			'/wp/v2/posts/%d',
 			$post->ID
 		) );
 		$request->set_param( 'title', 'Test Post' );
-		$request->set_param( REST_PARAM, [
-			self::$users['author']->ID,
-		] );
+		$request->set_param( REST_PARAM, $authors );
 
 		$response = self::do_request( $request );
 		$data     = $response->get_data();
@@ -95,6 +96,34 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( WP_Http::OK, $response->get_status() );
 		$this->assertSame( 'Test Post', $data['title']['rendered'] );
 		$this->assertArrayHasKey( REST_PARAM, $data );
+		$this->assertSame( $authors, $data[ REST_PARAM ] );
+	}
+
+	public function testAuthorsAreRetainedWhenNotSpecifiedWhenEditing() {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$authors = [
+			self::$users['author']->ID,
+		];
+		$post = self::factory()->post->create_and_get( [
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			POSTS_PARAM   => $authors,
+		] );
+
+		$request = new WP_REST_Request( 'PUT', sprintf(
+			'/wp/v2/posts/%d',
+			$post->ID
+		) );
+		$request->set_param( 'title', 'Test Post' );
+
+		$response = self::do_request( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( 'Test Post', $data['title']['rendered'] );
+		$this->assertArrayHasKey( REST_PARAM, $data );
+		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
 	public function testAuthorsPropertyExists() {
