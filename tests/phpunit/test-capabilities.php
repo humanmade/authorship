@@ -25,31 +25,63 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManagePostTheyAreAttributedTo( string $role, array $caps ) : void {
-		$factory = self::factory()->post;
+	public function testUserCanManageDraftPostTheyAreAttributedTo( string $role, array $caps ) : void {
 		$user_id = self::$users[ $role ]->ID;
+		$status  = 'draft';
 
 		// Draft, attributed to user, owned by Admin.
-		$draft_post = $factory->create_and_get( [
-			'post_status' => 'draft',
+		$post = self::factory()->post->create_and_get( [
+			'post_status' => $status,
 			'post_author' => self::$users['admin']->ID,
 			POSTS_PARAM   => [
 				$user_id,
 			],
 		] );
+
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testUserCanManagePublishedPostTheyAreAttributedTo( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$status  = 'publish';
 
 		// Published, attributed to user, owned by Admin.
-		$published_post = $factory->create_and_get( [
-			'post_status' => 'publish',
+		$post = self::factory()->post->create_and_get( [
+			'post_status' => $status,
 			'post_author' => self::$users['admin']->ID,
 			POSTS_PARAM   => [
 				$user_id,
 			],
 		] );
 
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testUserCanManageScheduledPostTheyAreAttributedTo( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$status  = 'future';
+
 		// Scheduled, attributed to user, owned by Admin.
-		$scheduled_post = $factory->create_and_get( [
-			'post_status' => 'future',
+		$post = self::factory()->post->create_and_get( [
+			'post_status' => $status,
 			'post_date'   => date( 'Y-m-d H:i:s', strtotime( '+24 hours' ) ),
 			'post_author' => self::$users['admin']->ID,
 			POSTS_PARAM   => [
@@ -57,54 +89,62 @@ class TestCapabilities extends TestCase {
 			],
 		] );
 
+		// Scheduled post:
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testUserCanManagePendingPostTheyAreAttributedTo( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$status  = 'pending';
+
 		// Pending ("Submit for Review"), attributed to user, owned by Admin.
-		$pending_post = $factory->create_and_get( [
-			'post_status' => 'pending',
+		$post = self::factory()->post->create_and_get( [
+			'post_status' => $status,
 			'post_author' => self::$users['admin']->ID,
 			POSTS_PARAM   => [
 				$user_id,
 			],
 		] );
 
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testUserCanManageTrashedPostTheyAreAttributedTo( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$status  = 'trash';
+
 		// Trashed, attributed to user, owned by Admin.
-		$trash_post = $factory->create_and_get( [
+		$post = self::factory()->post->create_and_get( [
 			'post_status' => 'publish',
 			'post_author' => self::$users['admin']->ID,
 			POSTS_PARAM   => [
 				$user_id,
 			],
 		] );
-		wp_trash_post( $trash_post->ID );
+		wp_trash_post( $post->ID );
 
-		// Draft post:
-		$this->assertSame( $caps['draft']['edit_post'], user_can( $user_id, 'edit_post', $draft_post->ID ) );
-		$this->assertSame( $caps['draft']['publish_post'], user_can( $user_id, 'publish_post', $draft_post->ID ) );
-		$this->assertSame( $caps['draft']['read_post'], user_can( $user_id, 'read_post', $draft_post->ID ) );
-		$this->assertSame( $caps['draft']['delete_post'], user_can( $user_id, 'delete_post', $draft_post->ID ) );
-
-		// Published post:
-		$this->assertSame( $caps['publish']['edit_post'], user_can( $user_id, 'edit_post', $published_post->ID ) );
-		$this->assertSame( $caps['publish']['publish_post'], user_can( $user_id, 'publish_post', $published_post->ID ) );
-		$this->assertSame( $caps['publish']['read_post'], user_can( $user_id, 'read_post', $published_post->ID ) );
-		$this->assertSame( $caps['publish']['delete_post'], user_can( $user_id, 'delete_post', $published_post->ID ) );
-
-		// Scheduled post:
-		$this->assertSame( $caps['future']['edit_post'], user_can( $user_id, 'edit_post', $scheduled_post->ID ) );
-		$this->assertSame( $caps['future']['publish_post'], user_can( $user_id, 'publish_post', $scheduled_post->ID ) );
-		$this->assertSame( $caps['future']['read_post'], user_can( $user_id, 'read_post', $scheduled_post->ID ) );
-		$this->assertSame( $caps['future']['delete_post'], user_can( $user_id, 'delete_post', $scheduled_post->ID ) );
-
-		// Pending post:
-		$this->assertSame( $caps['pending']['edit_post'], user_can( $user_id, 'edit_post', $pending_post->ID ) );
-		$this->assertSame( $caps['pending']['publish_post'], user_can( $user_id, 'publish_post', $pending_post->ID ) );
-		$this->assertSame( $caps['pending']['read_post'], user_can( $user_id, 'read_post', $pending_post->ID ) );
-		$this->assertSame( $caps['pending']['delete_post'], user_can( $user_id, 'delete_post', $pending_post->ID ) );
-
-		// Trashed post:
-		$this->assertSame( $caps['trash']['edit_post'], user_can( $user_id, 'edit_post', $trash_post->ID ) );
-		$this->assertSame( $caps['trash']['publish_post'], user_can( $user_id, 'publish_post', $trash_post->ID ) );
-		$this->assertSame( $caps['trash']['read_post'], user_can( $user_id, 'read_post', $trash_post->ID ) );
-		$this->assertSame( $caps['trash']['delete_post'], user_can( $user_id, 'delete_post', $trash_post->ID ) );
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
 	}
 
 	/**
