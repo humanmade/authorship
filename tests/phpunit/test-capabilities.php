@@ -171,6 +171,31 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
+	 * @dataProvider dataRolesAndCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testUserCanManagePublishedPostTheyAreOwnerOfButNotAttributedTo( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+		$status  = 'publish';
+
+		// Published, attributed to Admin, owned by user.
+		$post = self::factory()->post->create_and_get( [
+			'post_status' => $status,
+			'post_author' => $user_id,
+			POSTS_PARAM   => [
+				self::$users['admin']->ID,
+			],
+		] );
+
+		$this->assertSame( $caps[ $status ]['edit_post'], user_can( $user_id, 'edit_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['publish_post'], user_can( $user_id, 'publish_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['read_post'], user_can( $user_id, 'read_post', $post->ID ) );
+		$this->assertSame( $caps[ $status ]['delete_post'], user_can( $user_id, 'delete_post', $post->ID ) );
+	}
+
+	/**
 	 * @return mixed[]
 	 */
 	public function dataRolesAndCaps() : array {
