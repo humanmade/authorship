@@ -66,6 +66,16 @@ class TestCapabilities extends TestCase {
 			],
 		] );
 
+		// Trashed, attributed to user, owned by Admin.
+		$trash_post = $factory->create_and_get( [
+			'post_status' => 'publish',
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				$user_id,
+			],
+		] );
+		wp_trash_post( $trash_post->ID );
+
 		// Draft post:
 		$this->assertSame( $caps['draft']['edit_post'], user_can( $user_id, 'edit_post', $draft_post->ID ) );
 		$this->assertSame( $caps['draft']['publish_post'], user_can( $user_id, 'publish_post', $draft_post->ID ) );
@@ -89,6 +99,12 @@ class TestCapabilities extends TestCase {
 		$this->assertSame( $caps['pending']['publish_post'], user_can( $user_id, 'publish_post', $pending_post->ID ) );
 		$this->assertSame( $caps['pending']['read_post'], user_can( $user_id, 'read_post', $pending_post->ID ) );
 		$this->assertSame( $caps['pending']['delete_post'], user_can( $user_id, 'delete_post', $pending_post->ID ) );
+
+		// Trashed post:
+		$this->assertSame( $caps['trash']['edit_post'], user_can( $user_id, 'edit_post', $trash_post->ID ) );
+		$this->assertSame( $caps['trash']['publish_post'], user_can( $user_id, 'publish_post', $trash_post->ID ) );
+		$this->assertSame( $caps['trash']['read_post'], user_can( $user_id, 'read_post', $trash_post->ID ) );
+		$this->assertSame( $caps['trash']['delete_post'], user_can( $user_id, 'delete_post', $trash_post->ID ) );
 	}
 
 	/**
@@ -123,6 +139,12 @@ class TestCapabilities extends TestCase {
 						'read_post'    => true,
 						'delete_post'  => true,
 					],
+					'trash' => [
+						'edit_post'    => true,
+						'publish_post' => true,
+						'read_post'    => true,
+						'delete_post'  => true,
+					],
 				],
 			],
 			[
@@ -147,6 +169,12 @@ class TestCapabilities extends TestCase {
 						'delete_post'  => true,
 					],
 					'pending' => [
+						'edit_post'    => true,
+						'publish_post' => true,
+						'read_post'    => true,
+						'delete_post'  => true,
+					],
+					'trash' => [
 						'edit_post'    => true,
 						'publish_post' => true,
 						'read_post'    => true,
@@ -181,6 +209,12 @@ class TestCapabilities extends TestCase {
 						'read_post'    => true,
 						'delete_post'  => true,
 					],
+					'trash' => [
+						'edit_post'    => false,
+						'publish_post' => false,
+						'read_post'    => false,
+						'delete_post'  => false,
+					],
 				],
 			],
 			[
@@ -205,6 +239,12 @@ class TestCapabilities extends TestCase {
 						'delete_post'  => false,
 					],
 					'pending' => [
+						'edit_post'    => false,
+						'publish_post' => false,
+						'read_post'    => false,
+						'delete_post'  => false,
+					],
+					'trash' => [
 						'edit_post'    => false,
 						'publish_post' => false,
 						'read_post'    => false,
