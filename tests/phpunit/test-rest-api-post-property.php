@@ -12,6 +12,7 @@ namespace Authorship\Tests;
 use const Authorship\POSTS_PARAM;
 use const Authorship\REST_LINK_ID;
 use const Authorship\REST_PARAM;
+use const Authorship\REST_REL_LINK_ID;
 
 use WP_Http;
 use WP_REST_Request;
@@ -193,5 +194,23 @@ class TestRESTAPIPostProperty extends TestCase {
 
 		$this->assertArrayHasKey( REST_LINK_ID, $links );
 		$this->assertCount( 2, $links[ REST_LINK_ID ] );
+	}
+
+	public function testRelLinksArePresent() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$post = self::factory()->post->create_and_get();
+
+		$request = new WP_REST_Request( 'GET', sprintf(
+			'/wp/v2/posts/%d',
+			$post->ID
+		) );
+		$request->set_param( 'context', 'edit' );
+
+		$response = self::do_request( $request );
+		$links    = $response->get_links();
+
+		$this->assertArrayHasKey( REST_REL_LINK_ID, $links );
+		$this->assertArrayNotHasKey( 'https://api.w.org/action-assign-author', $links );
 	}
 }

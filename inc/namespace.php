@@ -23,6 +23,7 @@ use WP_User;
 const COLUMN_NAME = 'authorship';
 const POSTS_PARAM = 'authorship';
 const REST_LINK_ID = 'wp:authorship';
+const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
 const REST_PARAM = 'authorship';
 const ROLE = 'guest-author';
 const SCRIPT_HANDLE = 'authorship-js';
@@ -46,6 +47,7 @@ function bootstrap() : void {
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap', 10, 4 );
+	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
 }
 
 /**
@@ -443,6 +445,48 @@ function register_rest_api_field( string $post_type ) : void {
 			],
 		],
 	] );
+
+	add_filter( "rest_prepare_{$post_type}", __NAMESPACE__ . '\\rest_prepare_post', 10, 3 );
+}
+
+/**
+ * Filters the post data for a REST API response.
+ *
+ * This removes the `wp:action-assign-author` rel from the response so the default post author
+ * control doesn't get shown on the block editor post editing screen.
+ *
+ * This also adds a new `authorship:action-assign-authorship` rel so custom clients can refer to this.
+ *
+ * @param \WP_REST_Response $response The response object.
+ * @param \WP_Post          $post     Post object.
+ * @param \WP_REST_Request  $request  Request object.
+ * @return \WP_REST_Response The response object.
+ */
+function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : \WP_REST_Response {
+	$links = $response->get_links();
+
+	if ( isset( $links['https://api.w.org/action-assign-author'] ) ) {
+		$response->remove_link( 'https://api.w.org/action-assign-author' );
+		$response->add_link( REST_REL_LINK_ID, $links['self'][0]['href'] );
+	}
+
+	return $response;
+}
+
+/**
+ * Filters extra CURIEs available on REST API responses.
+ *
+ * @param array[] $additional Additional CURIEs to register with the API.
+ * @return array[] Additional CURIEs to register with the API.
+ */
+function filter_rest_response_link_curies( array $additional ) : array {
+	$additional[] = [
+		'name'      => REST_PARAM,
+		'href'      => 'https://authorship.hmn.md/{rel}',
+		'templated' => true,
+	];
+
+	return $additional;
 }
 
 /**
