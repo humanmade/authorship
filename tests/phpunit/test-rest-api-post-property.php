@@ -26,7 +26,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		return $response;
 	}
 
-	public function testAuthorsCanBeSpecifiedWhenCreatingPost() {
+	public function testAuthorsCanBeSpecifiedWhenCreatingPost() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$authors = [
@@ -45,7 +45,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
-	public function testAuthorsOnlyAcceptsAnArray() {
+	public function testAuthorsOnlyAcceptsAnArray() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/posts' );
@@ -57,7 +57,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
 
-	public function testAuthorsCannotBeSpecifiedWhenCreatingAsAuthorRole() {
+	public function testAuthorsCannotBeSpecifiedWhenCreatingAsAuthorRole() : void {
 		wp_set_current_user( self::$users['author']->ID );
 
 		$authors = [
@@ -73,7 +73,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
 
-	public function testAuthorsCanBeSpecifiedWhenEditing() {
+	public function testAuthorsCanBeSpecifiedWhenEditing() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$post = self::factory()->post->create_and_get( [
@@ -99,7 +99,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
-	public function testAuthorsAreRetainedWhenNotSpecifiedWhenEditing() {
+	public function testAuthorsAreRetainedWhenNotSpecifiedWhenEditing() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$authors = [
@@ -125,7 +125,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
-	public function testAuthorsAreRetainedWhenOnlyPostAuthorIsSpecifiedWhenEditing() {
+	public function testAuthorsAreRetainedWhenOnlyPostAuthorIsSpecifiedWhenEditing() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$authors = [
@@ -151,7 +151,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
 
-	public function testAuthorsPropertyExists() {
+	public function testAuthorsPropertyExists() : void {
 		$post = self::factory()->post->create_and_get( [
 			'post_type'   => 'post',
 			'post_status' => 'publish',
@@ -170,7 +170,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$this->assertSame( [ self::$users['editor']->ID ], $data[ REST_PARAM ] );
 	}
 
-	public function testAuthorLinksArePresent() {
+	public function testAuthorLinksArePresent() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$authors = [

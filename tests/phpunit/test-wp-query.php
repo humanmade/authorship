@@ -14,7 +14,7 @@ use const Authorship\POSTS_PARAM;
 use WP_Query;
 
 class TestWPQuery extends TestCase {
-	public function testQueryForAuthorReturnsPostsAttributedToAuthor() {
+	public function testQueryForAuthorReturnsPostsAttributedToAuthor() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -73,7 +73,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryForAuthorQueriedObjectIsRetained() {
+	public function testQueryForAuthorQueriedObjectIsRetained() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -117,7 +117,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryForInvalidAuthorReturnsNoResults() {
+	public function testQueryForInvalidAuthorReturnsNoResults() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -160,7 +160,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryOverridesDoNotAffectPostTypesThatDoNotSupportAuthor() {
+	public function testQueryOverridesDoNotAffectPostTypesThatDoNotSupportAuthor() : void {
 		$factory = self::factory()->post;
 
 		register_post_type( 'testing', [
@@ -207,7 +207,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryVarsRemainUnaffectedAfterQuery() {
+	public function testQueryVarsRemainUnaffectedAfterQuery() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor.
@@ -232,7 +232,7 @@ class TestWPQuery extends TestCase {
 		$this->assertSame( self::$users['author']->ID, $query->get( 'author' ) );
 	}
 
-	public function testSubsequentQueriesAreUnaffected() {
+	public function testSubsequentQueriesAreUnaffected() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor.

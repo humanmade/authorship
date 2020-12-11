@@ -10,7 +10,7 @@ declare( strict_types=1 );
 namespace Authorship\Tests;
 
 class TestPlugin extends TestCase {
-	public function testReadmeIsUpToDate() {
+	public function testReadmeIsUpToDate() : void {
 		$file = dirname( dirname( __DIR__ ) ) . '/README.md';
 
 		if ( ! is_file( $file ) ) {

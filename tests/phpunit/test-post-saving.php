@@ -15,7 +15,7 @@ use const Authorship\TAXONOMY;
 use function Authorship\get_authors;
 
 class TestPostSaving extends TestCase {
-	public function testPostAuthorTermDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor() {
+	public function testPostAuthorTermDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor() : void {
 		$factory = self::factory()->post;
 
 		register_post_type( 'testing', [
