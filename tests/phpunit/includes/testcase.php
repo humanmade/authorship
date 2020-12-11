@@ -47,4 +47,12 @@ abstract class TestCase extends \WP_UnitTestCase {
 
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 	}
+
+	public function tearDown() {
+		parent::tearDown();
+
+		global $wp_rest_server;
+		$wp_rest_server = null;
+	}
+
 }
