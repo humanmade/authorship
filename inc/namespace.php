@@ -18,6 +18,7 @@ use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Term;
 use WP_User;
 
 const COLUMN_NAME = 'authorship';
@@ -539,6 +540,60 @@ function init_taxonomy() : void {
 			],
 		]
 	);
+
+	array_map( function( string $post_type ) {
+		/**
+		 * Filters the list of available list table views.
+		 *
+		 * @param string[] $views An array of available list table views.
+		 * @return string[] An array of available list table views.
+		 */
+		add_filter( "views_edit-{$post_type}", function( array $views ) use ( $post_type ) : array {
+			unset( $views['mine'] );
+
+			$user_id = get_current_user_id();
+			$term = get_term_by( 'slug', $user_id, TAXONOMY );
+
+			if ( ! ( $term instanceof WP_Term ) ) {
+				return $views;
+			}
+
+			$count = $term->count;
+			$args = [
+				'post_type' => $post_type,
+				'author'    => $user_id,
+			];
+			$link = add_query_arg( $args, admin_url( 'edit.php' ) );
+			$text = sprintf(
+				/* translators: %s: Number of posts. */
+				_nx(
+					'Mine <span class="count">(%s)</span>',
+					'Mine <span class="count">(%s)</span>',
+					$count,
+					'posts',
+					'authorship'
+				),
+				number_format_i18n( $count )
+			);
+			$mine = sprintf(
+				'<a href="%1$s">%2$s</a>',
+				$link,
+				$text
+			);
+			$new_views = [];
+
+			foreach ( $views as $key => $value ) {
+				$new_views[ $key ] = $value;
+
+				if ( 'all' === $key ) {
+					// Always insert the 'Mine' view after the 'All' view.
+					$new_views['mine'] = $mine;
+				}
+			}
+
+			return $new_views;
+		} );
+	}, $post_types );
 }
 
 /**
