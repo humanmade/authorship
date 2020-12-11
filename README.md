@@ -80,6 +80,22 @@ Authorship creates a real WordPress user account for each guest author, and this
 * No need to keep data in sync between a user and their "author" profile
 * Promoting a guest author to a functional user is done just by changing their user role
 
+## WP-CLI
+
+The following WP-CLI commands and flags are available:
+
+## --authorship flag
+
+When creating or updating posts, the `--authorship` flag can be used to specify the attributed users of the post. The flag accepts a comma-separated list of user IDs. Examples:
+
+* `wp post create --post_title="My New Post" --authorship=4,11`
+* `wp post update 220 --authorship=13`
+
+When this flag is *not* set:
+
+* When creating a new post, if the `--post_author` flag is set then it will be used for authorship
+* When updating an existing post, no change will be made to authorship
+
 ## Team
 
 Authorship is developed and maintained by [Human Made](https://humanmade.com) and [Altis](https://www.altis-dxp.com). Its initial development was funded by [Siemens](https://www.siemens.com).

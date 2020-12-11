@@ -329,7 +329,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 		}
 
 		try {
-			set_authors( $post, $authors );
+			set_authors( $post, wp_parse_id_list( $authors ) );
 		} catch ( \Exception $e ) {
 			// Nothing at the moment.
 		}
