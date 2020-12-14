@@ -9,9 +9,6 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
-use WP_REST_Request;
-use WP_REST_Response;
-
 /**
  * Base test case for the plugin.
  */
