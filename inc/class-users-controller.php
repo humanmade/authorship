@@ -112,7 +112,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 				'rest_forbidden_context',
 				__( 'Sorry, you are not allowed to filter users by this parameter.', 'authorship' ),
 				[
-					'status' => WP_Http::FORBIDDEN,
+					'status' => WP_Http::BAD_REQUEST,
 				]
 			);
 		}
@@ -152,7 +152,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 				'rest_forbidden_context',
 				__( 'Sorry, you are not allowed to edit users.', 'authorship' ),
 				[
-					'status' => WP_Http::FORBIDDEN,
+					'status' => WP_Http::BAD_REQUEST,
 				]
 			);
 		}

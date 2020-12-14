@@ -23,6 +23,7 @@ use WP_REST_Request;
 
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
+	protected static $user_route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE . '/%d';
 
 	public function testGuestAuthorCanBeCreatedWithJustAName() : void {
 		wp_set_current_user( self::$users['admin']->ID );
@@ -101,6 +102,21 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'testing' );
+		$request->set_param( 'context', 'edit' );
+
+		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
+
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
+	}
+
+	public function testContextCannotBeSetToEditWhenFetchingUser() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$request = new WP_REST_Request( 'GET', sprintf(
+			self::$user_route,
+			self::$users['editor']->ID
+		) );
 		$request->set_param( 'context', 'edit' );
 
 		$response = self::rest_do_request( $request );
