@@ -40,4 +40,9 @@ require_once __DIR__ . '/inc/namespace.php';
 require_once __DIR__ . '/inc/class-users-controller.php';
 require_once __DIR__ . '/inc/template.php';
 
+if ( is_admin() ) {
+	require_once __DIR__ . '/inc/admin.php';
+	Admin\bootstrap();
+}
+
 bootstrap();

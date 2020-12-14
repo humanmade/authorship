@@ -8,7 +8,9 @@ parameters:
   scanFiles:
     - plugin.php
     - inc/namespace.php
+    - inc/class-users-controller.php
     - inc/template.php
+    - inc/admin.php
     - tests/phpunit/includes/testcase.php
     - tests/phpunit/includes/restapi-testcase.php
   scanDirectories:
