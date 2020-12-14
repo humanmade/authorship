@@ -52,4 +52,22 @@
 			box-shadow: none;
 		}
 	}
+
+	&.authorship-select--is-disabled {
+		.authorship-select {
+			&__multi-value {
+				&__remove {
+					display: none;
+				}
+			}
+
+			&__input {
+				display: none !important;
+			}
+
+			&__control {
+				background: transparent;
+			}
+		}
+	}
 }

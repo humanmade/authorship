@@ -66,9 +66,10 @@ function arrayMove<T>( array: T[], from: number, to: number ) : T[] {
  */
 const AuthorsSelect = args => {
 	const currentAuthors = authorshipData.authors;
-	const { onUpdate, onError } = args;
+	const { hasAssignAuthorAction, onUpdate, onError } = args;
 
 	const [ selected, setSelected ] = React.useState( currentAuthors );
+	const isDisabled = ! hasAssignAuthorAction;
 
 	/**
 	 * Asynchronously loads the options for the control based on the search paramter.
@@ -212,6 +213,7 @@ const AuthorsSelect = args => {
 			defaultValue={ currentAuthors }
 			formatOptionLabel={ formatOptionLabel }
 			isClearable={ false }
+			isDisabled={ isDisabled }
 			isMulti
 			isValidNewOption={ ( value: string ) => value.length >= 2 }
 			loadOptions={ loadOptions }
