@@ -179,7 +179,7 @@ const AuthorsSelect = args => {
 			const options = [ ...selected, createOption( user ) ];
 
 			setSelected( options );
-			onUpdate( options );
+			onUpdate( options.map( option => option.value ) );
 		} ).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
 		} );
