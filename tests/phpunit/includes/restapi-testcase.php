@@ -29,6 +29,23 @@ abstract class RESTAPITestCase extends TestCase {
 		$wp_rest_server = null;
 	}
 
+	protected static function get_message( WP_REST_REsponse $response ) : string {
+		if ( $response->is_error() ) {
+			$error = $response->as_error();
+			$message = [];
+			foreach ( $error->get_error_codes() as $code ) {
+				$message[] = sprintf(
+					'%1$s (%2$s)',
+					$error->get_error_message( $code ),
+					$code
+				);
+			}
+			return implode( "\n", $message );
+		}
+
+		return '';
+	}
+
 	protected static function rest_do_request( WP_REST_Request $request ) : WP_REST_Response {
 		$response = rest_do_request( $request );
 		$response = apply_filters( 'rest_post_dispatch', $response, rest_get_server(), $request );

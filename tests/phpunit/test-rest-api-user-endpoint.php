@@ -32,8 +32,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$response = self::rest_do_request( $request );
 		$data = $response->get_data();
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::CREATED, $response->get_status() );
+		$this->assertSame( WP_Http::CREATED, $response->get_status(), $message );
 		$this->assertSame( [ GUEST_ROLE ], $data['roles'] );
 	}
 
@@ -48,10 +49,11 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request = new WP_REST_Request( 'POST', self::$route );
 		$request->set_param( 'name', 'Firsty Lasty' );
 		$request->set_param( $param, 'testing' );
+		$message = self::get_message( $response );
 
 		$response = self::rest_do_request( $request );
 
-		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
+		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 	}
 
 	public function testUserOutputFieldsAreRestricted() : void {
@@ -62,7 +64,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$response = self::rest_do_request( $request );
 		$data = $response->get_data();
-
+		$message = self::get_message( $response );
 		$expected = [
 			'id',
 			'name',
@@ -72,7 +74,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 			'_links',
 		];
 
-		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
 		$this->assertEqualSets( $expected, array_keys( $data[0] ) );
 	}
 
@@ -89,8 +91,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( $param, 'testing' );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
+		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 	}
 
 	public function testContextCannotBeSetToEditWhenListingUsers() : void {
@@ -101,8 +104,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( 'context', 'edit' );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
 	public function testEndpointRequiresAuthentication() : void {
@@ -110,8 +114,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( 'search', 'testing' );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::UNAUTHORIZED, $response->get_status() );
+		$this->assertSame( WP_Http::UNAUTHORIZED, $response->get_status(), $message );
 	}
 
 	public function testSearchParameterIsRequiredWhenListingUsers() : void {
@@ -125,8 +130,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		/** @var \WP_Error */
 		$error = $response->as_error();
 		$data = $error->get_error_data();
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 		$this->assertArrayHasKey( 'params', $data );
 		$this->assertContains( 'search', $data['params'] );
 	}
@@ -144,8 +150,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( 'orderby', $orderby );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
 	}
 
 	/**
@@ -161,6 +168,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( 'orderby', $orderby );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
 		$this->assertTrue( $response->is_error() );
 
@@ -168,7 +176,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$error = $response->as_error();
 		$data = $error->get_error_data();
 
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 		$this->assertArrayHasKey( 'params', $data );
 		$this->assertArrayHasKey( 'orderby', $data['params'] );
 	}
@@ -186,11 +194,12 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( 'name', 'testing' );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
 		if ( $expected ) {
-			$this->assertSame( WP_Http::CREATED, $response->get_status() );
+			$this->assertSame( WP_Http::CREATED, $response->get_status(), $message );
 		} else {
-			$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
+			$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 		}
 	}
 
