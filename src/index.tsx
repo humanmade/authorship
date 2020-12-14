@@ -17,6 +17,9 @@ const Select = compose( [
 				authorship: value,
 			} );
 		},
+		onError( message: string ) {
+			dispatch( 'core/notices' ).createErrorNotice( message );
+		},
 	} ) ),
 ] )( AuthorsSelect );
 

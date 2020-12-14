@@ -2,7 +2,10 @@ import * as React from 'react';
 import { ActionMeta, components } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import type { WP_REST_API_User as User } from 'wp-types';
+import type {
+	WP_REST_API_Error,
+	WP_REST_API_User,
+} from 'wp-types';
 
 import { addQueryArgs } from '@wordpress/url';
 
@@ -63,7 +66,7 @@ function arrayMove<T>( array: T[], from: number, to: number ) : T[] {
  */
 const AuthorsSelect = args => {
 	const currentAuthors = authorshipData.authors;
-	const { onUpdate } = args;
+	const { onUpdate, onError } = args;
 
 	const [ selected, setSelected ] = React.useState( currentAuthors );
 
@@ -81,7 +84,7 @@ const AuthorsSelect = args => {
 			}
 		);
 
-		const api: Promise<User[]> = wp.apiFetch( { path } );
+		const api: Promise<WP_REST_API_User[]> = wp.apiFetch( { path } );
 
 		return api.then( users =>
 			users.map( user => {
@@ -93,7 +96,9 @@ const AuthorsSelect = args => {
 
 				return option;
 			} )
-		);
+		).catch( ( error: WP_REST_API_Error ) => {
+			onError( error.message );
+		} );
 	};
 
 	/**
