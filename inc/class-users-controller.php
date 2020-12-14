@@ -189,7 +189,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 		) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to provide this parameter when created a guest author.', 'authorship' ),
+				__( 'Sorry, you are not allowed to provide this parameter when creating a guest author.', 'authorship' ),
 				[
 					'status' => WP_Http::FORBIDDEN,
 				]
