@@ -32,6 +32,23 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	}
 
 	/**
+	 * @dataProvider dataDisallowedFields
+	 *
+	 * @param string $param
+	 */
+	public function testFieldCannotBeSpecifiedWhenCreatingGuestAuthor( string $param ) : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', 'Firsty Lasty' );
+		$request->set_param( $param, 'testing' );
+
+		$response = self::rest_do_request( $request );
+
+		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
+	}
+
+	/**
 	 * @dataProvider dataDisallowedFilters
 	 *
 	 * @param string $param
@@ -41,7 +58,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'testing' );
-		$request->set_param( $param, 'editor' );
+		$request->set_param( $param, 'testing' );
 
 		$response = self::rest_do_request( $request );
 
@@ -187,6 +204,20 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 			],
 			[
 				'who',
+			],
+		];
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataDisallowedFields() : array {
+		return [
+			[
+				'password',
+			],
+			[
+				'roles',
 			],
 		];
 	}

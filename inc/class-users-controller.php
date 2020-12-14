@@ -183,6 +183,19 @@ class Users_Controller extends WP_REST_Users_Controller {
 			);
 		}
 
+		if (
+			$request->get_param( 'roles' ) ||
+			$request->get_param( 'password' )
+		) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you are not allowed to provide this parameter when created a guest author.', 'authorship' ),
+				[
+					'status' => WP_Http::FORBIDDEN,
+				]
+			);
+		}
+
 		return true;
 	}
 
@@ -219,11 +232,15 @@ class Users_Controller extends WP_REST_Users_Controller {
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
 
+		$schema['properties']['email']['required'] = false;
+		$schema['properties']['username']['required'] = false;
+		$schema['properties']['password']['required'] = false;
+
+		$schema['properties']['name']['required'] = true;
+
 		unset(
 			$schema['properties']['capabilities'],
-			$schema['properties']['extra_capabilities'],
-			$schema['properties']['password'],
-			$schema['properties']['roles']
+			$schema['properties']['extra_capabilities']
 		);
 
 		return $schema;
