@@ -245,14 +245,18 @@ class Users_Controller extends WP_REST_Users_Controller {
 	}
 
 	/**
-	 * Prepares a single user for creation or update.
+	 * Prepares a single user for creation or update. update pw
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return object User object.
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$request->set_param( 'password', 'password' );
-		$request->set_param( 'email', '' );
+
+		if ( $request->get_param( 'email' ) && ! current_user_can( 'create_users' ) ) {
+			$request->set_param( 'email', '' );
+		}
+
 		$request->set_param( 'roles', [ GUEST_ROLE ] );
 
 		return parent::prepare_item_for_database( $request );

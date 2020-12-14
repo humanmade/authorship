@@ -257,6 +257,29 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	}
 
 	/**
+	 * @dataProvider dataRolesThatCanManageUsers
+	 *
+	 * @param string $role
+	 * @param bool   $expected
+	 */
+	public function testGuestAuthorEmailIsAllowed( string $role, bool $expected ) : void {
+		wp_set_current_user( self::$users[ $role ]->ID );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', 'testing' );
+		$request->set_param( 'email', 'test@example.org' );
+
+		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
+
+		if ( $expected ) {
+			$this->assertSame( WP_Http::CREATED, $response->get_status(), $message );
+		} else {
+			$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
+		}
+	}
+
+	/**
 	 * @return mixed[]
 	 */
 	public function dataDisallowedOrderby() : array {
@@ -331,6 +354,34 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 			[
 				'editor',
 				true,
+			],
+			[
+				'author',
+				false,
+			],
+			[
+				'contributor',
+				false,
+			],
+			[
+				'subscriber',
+				false,
+			],
+		];
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataRolesThatCanManageUsers() : array {
+		return [
+			[
+				'admin',
+				( ! is_multisite() ),
+			],
+			[
+				'editor',
+				false,
 			],
 			[
 				'author',
