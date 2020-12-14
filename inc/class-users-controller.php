@@ -173,10 +173,20 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 * @return true|\WP_Error True if the request has access to create items, \WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
-		if ( ! current_user_can( 'create_users' ) ) {
+		if ( ! current_user_can( 'create_guest_authors' ) ) {
 			return new WP_Error(
 				'rest_cannot_create_user',
 				__( 'Sorry, you are not allowed to create new users.', 'authorship' ),
+				[
+					'status' => rest_authorization_required_code(),
+				]
+			);
+		}
+
+		if ( $request->get_param( 'email' ) && ! current_user_can( 'create_users' ) ) {
+			return new WP_Error(
+				'rest_cannot_create_user_with_email',
+				__( 'Sorry, you are not allowed to create new users with an email address.', 'authorship' ),
 				[
 					'status' => rest_authorization_required_code(),
 				]
@@ -219,6 +229,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$request->set_param( 'password', 'password' );
+		$request->set_param( 'email', '' );
 		$request->set_param( 'roles', [ GUEST_ROLE ] );
 
 		return parent::prepare_item_for_database( $request );

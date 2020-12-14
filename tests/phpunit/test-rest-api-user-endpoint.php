@@ -174,6 +174,27 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	}
 
 	/**
+	 * @dataProvider dataRolesThatCanCreateGuestAuthors
+	 *
+	 * @param string $role
+	 * @param bool   $expected
+	 */
+	public function testUserRolesThatCanCreateGuestAuthors( string $role, bool $expected ) : void {
+		wp_set_current_user( self::$users[ $role ]->ID );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', 'testing' );
+
+		$response = self::rest_do_request( $request );
+
+		if ( $expected ) {
+			$this->assertSame( WP_Http::CREATED, $response->get_status() );
+		} else {
+			$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
+		}
+	}
+
+	/**
 	 * @return mixed[]
 	 */
 	public function dataAllowedOrderby() : array {
@@ -246,6 +267,34 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 			],
 			[
 				'roles',
+			],
+		];
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataRolesThatCanCreateGuestAuthors() : array {
+		return [
+			[
+				'admin',
+				true,
+			],
+			[
+				'editor',
+				true,
+			],
+			[
+				'author',
+				false,
+			],
+			[
+				'contributor',
+				false,
+			],
+			[
+				'subscriber',
+				false,
 			],
 		];
 	}

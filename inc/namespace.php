@@ -47,20 +47,21 @@ function bootstrap() : void {
 	// Filters.
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
-	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap', 10, 4 );
+	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_editing', 10, 4 );
+	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_users', 10, 4 );
 	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
 }
 
 /**
- * Filters a user's capabilities depending on specific context and/or privilege.
+ * Filters the primitive capabilities required of the given user to perform the action given in `$cap`.
  *
  * @param string[] $caps    Array of the user's capabilities.
- * @param string   $cap     Capability name.
+ * @param string   $cap     Capability being checked.
  * @param int      $user_id The user ID.
  * @param mixed[]  $args    The context for the cap, typically with the object ID as the first element.
  * @return string[] Array of the user's capabilities.
  */
-function filter_map_meta_cap( array $caps, string $cap, int $user_id, array $args ) : array {
+function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id, array $args ) : array {
 	$concerns = [
 		'delete_post',
 		'delete_page',
@@ -168,6 +169,31 @@ function filter_map_meta_cap( array $caps, string $cap, int $user_id, array $arg
 			$caps[] = $post_type_cap->read;
 			break;
 	}//end switch
+
+	return $caps;
+}
+
+/**
+ * Filters the primitive capabilities required of the given user to perform the action given in `$cap`.
+ *
+ * @param string[] $caps    Array of the user's capabilities.
+ * @param string   $cap     Capability being checked.
+ * @param int      $user_id The user ID.
+ * @param mixed[]  $args    The context for the cap, typically with the object ID as the first element.
+ * @return string[] Array of the user's capabilities.
+ */
+function filter_map_meta_cap_for_users( array $caps, string $cap, int $user_id, array $args ) : array {
+	$concerns = [
+		'create_guest_authors',
+	];
+
+	if ( ! in_array( $cap, $concerns, true ) ) {
+		return $caps;
+	}
+
+	$caps = [
+		'edit_others_posts',
+	];
 
 	return $caps;
 }
