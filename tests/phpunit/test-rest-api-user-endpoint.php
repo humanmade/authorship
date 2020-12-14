@@ -65,8 +65,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$expected = [
 			'id',
 			'name',
-			'url',
-			'description',
 			'link',
 			'slug',
 			'avatar_urls',
@@ -74,7 +72,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		];
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
-		$this->assertSame( $expected, array_keys( $data[0] ) );
+		$this->assertEqualSets( $expected, array_keys( $data[0] ) );
 	}
 
 	/**

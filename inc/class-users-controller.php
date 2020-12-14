@@ -240,7 +240,9 @@ class Users_Controller extends WP_REST_Users_Controller {
 
 		unset(
 			$schema['properties']['capabilities'],
-			$schema['properties']['extra_capabilities']
+			$schema['properties']['description'],
+			$schema['properties']['extra_capabilities'],
+			$schema['properties']['url']
 		);
 
 		return $schema;
