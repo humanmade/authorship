@@ -235,6 +235,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 		$schema['properties']['email']['required'] = false;
 		$schema['properties']['username']['required'] = false;
 		$schema['properties']['password']['required'] = false;
+		$schema['properties']['password']['readonly'] = true;
 
 		$schema['properties']['name']['required'] = true;
 
