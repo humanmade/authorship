@@ -33,6 +33,18 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
 	}
 
+	public function testContextCannotBeSetToEditWhenListingUsers() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$request = new WP_REST_Request( 'GET', self::$route );
+		$request->set_param( 'search', 'testing' );
+		$request->set_param( 'context', 'edit' );
+
+		$response = self::rest_do_request( $request );
+
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
+	}
+
 	public function testEndpointRequiresAuthentication() : void {
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'testing' );

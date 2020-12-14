@@ -120,9 +120,9 @@ class Users_Controller extends WP_REST_Users_Controller {
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to edit users.', 'authorship' ),
+				__( 'Sorry, you are not allowed to list users in the context of editing.', 'authorship' ),
 				[
-					'status' => WP_Http::FORBIDDEN,
+					'status' => WP_Http::BAD_REQUEST,
 				]
 			);
 		}
