@@ -17,7 +17,7 @@ use const Authorship\REST_REL_LINK_ID;
 use WP_Http;
 use WP_REST_Request;
 
-class TestRESTAPIPostProperty extends TestCase {
+class TestRESTAPIPostProperty extends RESTAPITestCase {
 	public function testAuthorsCanBeSpecifiedWhenCreatingPost() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
