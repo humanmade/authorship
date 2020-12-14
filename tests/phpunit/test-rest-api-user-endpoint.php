@@ -13,8 +13,23 @@ use Authorship\Users_Controller;
 use WP_Http;
 use WP_REST_Request;
 
+use const Authorship\GUEST_ROLE;
+
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
+
+	public function testGuestAuthorCanBeCreatedWithJustAName() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', 'Firsty Lasty' );
+
+		$response = self::rest_do_request( $request );
+		$data = $response->get_data();
+
+		$this->assertSame( WP_Http::CREATED, $response->get_status() );
+		$this->assertSame( [ GUEST_ROLE ], $data['roles'] );
+	}
 
 	/**
 	 * @dataProvider dataDisallowedFilters

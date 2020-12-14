@@ -187,6 +187,18 @@ class Users_Controller extends WP_REST_Users_Controller {
 	}
 
 	/**
+	 * Creates a single user.
+	 *
+	 * @param \WP_REST_Request $request Full details about the request.
+	 * @return \WP_REST_Response|\WP_Error Response object on success, or \WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		$request->set_param( 'username', sanitize_title( sanitize_user( $request->get_param( 'name' ), true ) ) );
+
+		return parent::create_item( $request );
+	}
+
+	/**
 	 * Prepares a single user for creation or update.
 	 *
 	 * @param \WP_REST_Request $request Request object.
