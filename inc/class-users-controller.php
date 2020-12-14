@@ -194,7 +194,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$request->set_param( 'password', 'password' );
-		$request->set_param( 'roles', [ ROLE ] );
+		$request->set_param( 'roles', [ GUEST_ROLE ] );
 
 		return parent::prepare_item_for_database( $request );
 	}

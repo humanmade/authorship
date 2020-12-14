@@ -26,7 +26,7 @@ const POSTS_PARAM = 'authorship';
 const REST_LINK_ID = 'wp:authorship';
 const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
 const REST_PARAM = 'authorship';
-const ROLE = 'guest-author';
+const GUEST_ROLE = 'guest-author';
 const SCRIPT_HANDLE = 'authorship-js';
 const STYLE_HANDLE = 'authorship-css';
 const TAXONOMY = 'authorship';
@@ -192,7 +192,7 @@ function action_wp( WP $wp ) : void {
  * Fires after WordPress has finished loading but before any headers are sent.
  */
 function register_roles_and_caps() : void {
-	add_role( ROLE, __( 'Guest Author', 'authorship' ), [] );
+	add_role( GUEST_ROLE, __( 'Guest Author', 'authorship' ), [] );
 }
 
 /**
