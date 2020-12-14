@@ -216,7 +216,30 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 * @return \WP_REST_Response|\WP_Error Response object on success, or \WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$request->set_param( 'username', sanitize_title( sanitize_user( $request->get_param( 'name' ), true ) ) );
+		$username = sanitize_title( sanitize_user( $request->get_param( 'name' ), true ) );
+		$username = preg_replace( '/[^a-z0-9]/', '', $username );
+
+		$request->set_param( 'username', $username );
+
+		/**
+		 * Filters the validated user registration details.
+		 *
+		 * @param array $result {
+		 *     The array of user name, email, and the error messages.
+		 *
+		 *     @type string    $user_name     Sanitized and unique username.
+		 *     @type string    $orig_username Original username.
+		 *     @type string    $user_email    User email address.
+		 *     @type \WP_Error $errors        \WP_Error object containing any errors found.
+		 * }
+		 */
+		add_filter( 'wpmu_validate_user_signup', function( array $result ) : array {
+			/** @var \WP_Error $errors */
+			$errors = $result['errors'];
+			$errors->remove( 'user_email' );
+
+			return $result;
+		} );
 
 		return parent::create_item( $request );
 	}
