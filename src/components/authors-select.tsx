@@ -76,7 +76,7 @@ const AuthorsSelect = args => {
 	 * @param {string} search The search string.
 	 * @returns {Promise<Option[]>} A promise that fulfils the options.
 	 */
-	const loadOptions = ( search: string ) => {
+	const loadOptions = ( search: string ) : Promise<Option[]> => {
 		const path = addQueryArgs(
 			'/authorship/v1/users/',
 			{
@@ -87,19 +87,24 @@ const AuthorsSelect = args => {
 		const api: Promise<WP_REST_API_User[]> = wp.apiFetch( { path } );
 
 		return api.then( users =>
-			users.map( user => {
-				const option: Option = {
-					value: user.id,
-					label: user.name,
-					avatar: user.avatar_urls ? user.avatar_urls[48] : null,
-				};
-
-				return option;
-			} )
+			users.map( createOption )
 		).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
+			return [];
 		} );
 	};
+
+	/**
+	 * Creates an option from a REST API user response.
+	 *
+	 * @param {WP_REST_API_User} user The user object.
+	 * @returns {Option} The option object.
+	 */
+	const createOption = ( user: WP_REST_API_User ): Option => ( {
+		value: user.id,
+		label: user.name,
+		avatar: user.avatar_urls ? user.avatar_urls[48] : null,
+	} );
 
 	/**
 	 * Overrides the default option display with our custom one.
