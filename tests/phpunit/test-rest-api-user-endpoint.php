@@ -15,10 +15,11 @@ declare( strict_types=1 );
 namespace Authorship\Tests;
 
 use Authorship\Users_Controller;
-use WP_Http;
-use WP_REST_Request;
 
 use const Authorship\GUEST_ROLE;
+
+use WP_Http;
+use WP_REST_Request;
 
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;

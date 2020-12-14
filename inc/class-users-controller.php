@@ -167,7 +167,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access create users.
+	 * Checks if a given request has access to create users.
 	 *
 	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return true|\WP_Error True if the request has access to create items, \WP_Error object otherwise.
