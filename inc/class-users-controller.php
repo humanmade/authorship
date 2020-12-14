@@ -176,7 +176,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 		if ( ! current_user_can( 'create_guest_authors' ) ) {
 			return new WP_Error(
 				'rest_cannot_create_user',
-				__( 'Sorry, you are not allowed to create new users.', 'authorship' ),
+				__( 'Sorry, you are not allowed to create guest authors.', 'authorship' ),
 				[
 					'status' => rest_authorization_required_code(),
 				]
@@ -186,7 +186,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 		if ( $request->get_param( 'email' ) && ! current_user_can( 'create_users' ) ) {
 			return new WP_Error(
 				'rest_cannot_create_user_with_email',
-				__( 'Sorry, you are not allowed to create new users with an email address.', 'authorship' ),
+				__( 'Sorry, you are not allowed to create guest authors with an email address.', 'authorship' ),
 				[
 					'status' => rest_authorization_required_code(),
 				]

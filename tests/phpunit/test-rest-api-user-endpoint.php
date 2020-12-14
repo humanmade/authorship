@@ -49,9 +49,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request = new WP_REST_Request( 'POST', self::$route );
 		$request->set_param( 'name', 'Firsty Lasty' );
 		$request->set_param( $param, 'testing' );
-		$message = self::get_message( $response );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
 		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 	}
