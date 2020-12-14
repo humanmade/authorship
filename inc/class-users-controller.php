@@ -207,16 +207,10 @@ class Users_Controller extends WP_REST_Users_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
-		$query_params['orderby'] = array(
-			'default'     => 'name',
-			'description' => __( 'Sort collection by object attribute.' ),
-			'enum'        => array(
-				'id',
-				'name',
-			),
-			'type'        => 'string',
-		);
-
+		$query_params['orderby']['enum'] = [
+			'id',
+			'name',
+		];
 		$query_params['search']['required'] = true;
 
 		unset(
