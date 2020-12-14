@@ -117,7 +117,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$response = self::rest_do_request( $request );
 		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
 	public function testContextCannotBeSetToEditWhenListingUsers() : void {
