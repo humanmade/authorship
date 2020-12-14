@@ -80,6 +80,21 @@ Authorship creates a real WordPress user account for each guest author, and this
 * No need to keep data in sync between a user and their "author" profile
 * Promoting a guest author to a functional user is done just by changing their user role
 
+## REST API
+
+The following REST API endpoints are available:
+
+## authorship/v1/users endpoint
+
+This endpoint allows:
+
+* Searching all users who can be assigned to content
+* Creating guest authors
+
+## authorship property
+
+This property is added to the endpoint for all post types that have post type support for `author`. This field is readable and writable and accepts an array of user IDs assigned to the post.
+
 ## WP-CLI
 
 The following WP-CLI commands and flags are available:
