@@ -38,6 +38,7 @@ abstract class TestCase extends \WP_UnitTestCase {
 		foreach ( $roles as $name => $role ) {
 			self::$users[ $name ] = $factory->user->create_and_get( [
 				'role' => $role,
+				'display_name' => $role,
 			] );
 		}
 	}

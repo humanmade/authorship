@@ -2,6 +2,11 @@
 /**
  * REST API user endpoint tests.
  *
+ * This endpoint is as extension of the `wp/v2/users` endpoint, therefore its
+ * tests take this into account by asserting that various fields are not exposed
+ * and various filters are not available, and also by not testing functionality
+ * that is natively provided by the WordPress endpoint such as search and sort.
+ *
  * @package authorship
  */
 
@@ -46,6 +51,30 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$response = self::rest_do_request( $request );
 
 		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
+	}
+
+	public function testUserOutputFieldsAreRestricted() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$request = new WP_REST_Request( 'GET', self::$route );
+		$request->set_param( 'search', 'editor' );
+
+		$response = self::rest_do_request( $request );
+		$data = $response->get_data();
+
+		$expected = [
+			'id',
+			'name',
+			'url',
+			'description',
+			'link',
+			'slug',
+			'avatar_urls',
+			'_links',
+		];
+
+		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( $expected, array_keys( $data[0] ) );
 	}
 
 	/**
