@@ -350,6 +350,9 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
 	$post_types = get_post_types_by_support( 'author' );
 
 	array_map( __NAMESPACE__ . '\\register_rest_api_field', $post_types );
+
+	$users_controller = new Users_Controller;
+	$users_controller->register_routes();
 }
 
 /**
