@@ -16,16 +16,8 @@ use const Authorship\REST_REL_LINK_ID;
 
 use WP_Http;
 use WP_REST_Request;
-use WP_REST_Response;
 
 class TestRESTAPIPostProperty extends TestCase {
-	protected static function do_request( WP_REST_Request $request ) : WP_REST_Response {
-		$response = rest_do_request( $request );
-		$response = apply_filters( 'rest_post_dispatch', $response, rest_get_server(), $request );
-
-		return $response;
-	}
-
 	public function testAuthorsCanBeSpecifiedWhenCreatingPost() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
@@ -37,7 +29,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( REST_PARAM, $authors );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::CREATED, $response->get_status() );
@@ -52,7 +44,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( REST_PARAM, '123' );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
@@ -68,7 +60,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( REST_PARAM, $authors );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 	}
@@ -91,7 +83,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		$request->set_param( 'title', 'Test Post' );
 		$request->set_param( REST_PARAM, $authors );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
@@ -117,7 +109,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		) );
 		$request->set_param( 'title', 'Test Post' );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
@@ -143,7 +135,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		) );
 		$request->set_param( 'author', self::$users['editor']->ID );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( WP_Http::OK, $response->get_status() );
@@ -163,7 +155,7 @@ class TestRESTAPIPostProperty extends TestCase {
 			$post->ID
 		) );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( REST_PARAM, $data );
@@ -189,7 +181,7 @@ class TestRESTAPIPostProperty extends TestCase {
 			$post->ID
 		) );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$links    = $response->get_links();
 
 		$this->assertArrayHasKey( REST_LINK_ID, $links );
@@ -207,7 +199,7 @@ class TestRESTAPIPostProperty extends TestCase {
 		) );
 		$request->set_param( 'context', 'edit' );
 
-		$response = self::do_request( $request );
+		$response = self::rest_do_request( $request );
 		$links    = $response->get_links();
 
 		$this->assertArrayHasKey( REST_REL_LINK_ID, $links );
