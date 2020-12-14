@@ -251,7 +251,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 * @return object User object.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$request->set_param( 'password', 'password' );
+		$request->set_param( 'password', wp_generate_password( 24 ) );
 
 		if ( $request->get_param( 'email' ) && ! current_user_can( 'create_users' ) ) {
 			$request->set_param( 'email', '' );
