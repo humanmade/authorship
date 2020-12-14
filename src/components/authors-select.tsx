@@ -75,7 +75,7 @@ const AuthorsSelect = args => {
 	 */
 	const loadOptions = ( search: string ) => {
 		const path = addQueryArgs(
-			'/wp/v2/users/',
+			'/authorship/v1/users/',
 			{
 				search,
 			}
