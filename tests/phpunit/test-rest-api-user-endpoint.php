@@ -16,12 +16,17 @@ use WP_REST_Request;
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
 
-	public function testUsersCannotBeFilteredByRole() : void {
+	/**
+	 * @dataProvider dataDisallowedFilters
+	 *
+	 * @param string $param
+	 */
+	public function testUsersCannotBeFilteredByParameter( string $param ) : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'testing' );
-		$request->set_param( 'roles', 'editor' );
+		$request->set_param( $param, 'editor' );
 
 		$response = self::rest_do_request( $request );
 
@@ -132,6 +137,29 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 			],
 			[
 				'url',
+			],
+		];
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataDisallowedFilters() : array {
+		return [
+			[
+				'include',
+			],
+			[
+				'exclude',
+			],
+			[
+				'roles',
+			],
+			[
+				'slug',
+			],
+			[
+				'who',
 			],
 		];
 	}

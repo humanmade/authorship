@@ -99,10 +99,16 @@ class Users_Controller extends WP_REST_Users_Controller {
 			);
 		}
 
-		if ( $request->get_param( 'roles' ) ) {
+		if (
+			$request->get_param( 'include' ) ||
+			$request->get_param( 'slug' ) ||
+			$request->get_param( 'who' ) ||
+			$request->get_param( 'roles' ) ||
+			$request->get_param( 'exclude' )
+		) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to filter users by role.' ),
+				__( 'Sorry, you are not allowed to filter users by this parameter.' ),
 				array( 'status' => WP_Http::FORBIDDEN )
 			);
 		}
