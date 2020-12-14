@@ -29,6 +29,7 @@ class TestPostSaving extends TestCase {
 			'post_author' => self::$users['editor']->ID,
 		] );
 
+		/** @var \WP_Term[] */
 		$terms = wp_get_post_terms( $post->ID, TAXONOMY );
 		$authors = get_authors( $post );
 

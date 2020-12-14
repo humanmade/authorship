@@ -47,40 +47,40 @@ class Users_Controller extends WP_REST_Users_Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
-			array(
-				array(
+			[
+				[
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'callback'            => [ $this, 'get_items' ],
+					'permission_callback' => [ $this, 'get_items_permissions_check' ],
 					'args'                => $this->get_collection_params(),
-				),
-				array(
+				],
+				[
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'callback'            => [ $this, 'create_item' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+				],
+				'schema' => [ $this, 'get_public_item_schema' ],
+			]
 		);
 
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)',
-			array(
-				'args'   => array(
-					'id' => array(
-						'description' => __( 'Unique identifier for the user.' ),
+			[
+				'args'   => [
+					'id' => [
+						'description' => __( 'Unique identifier for the user.', 'authorship' ),
 						'type'        => 'integer',
-					),
-				),
-				array(
+					],
+				],
+				[
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+					'callback'            => [ $this, 'get_item' ],
+					'permission_callback' => [ $this, 'get_item_permissions_check' ],
+				],
+				'schema' => [ $this, 'get_public_item_schema' ],
+			]
 		);
 	}
 
@@ -94,8 +94,10 @@ class Users_Controller extends WP_REST_Users_Controller {
 		if ( ! current_user_can( 'list_users' ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to list users.' ),
-				array( 'status' => rest_authorization_required_code() )
+				__( 'Sorry, you are not allowed to list users.', 'authorship' ),
+				[
+					'status' => rest_authorization_required_code(),
+				]
 			);
 		}
 
@@ -108,16 +110,20 @@ class Users_Controller extends WP_REST_Users_Controller {
 		) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to filter users by this parameter.' ),
-				array( 'status' => WP_Http::FORBIDDEN )
+				__( 'Sorry, you are not allowed to filter users by this parameter.', 'authorship' ),
+				[
+					'status' => WP_Http::FORBIDDEN,
+				]
 			);
 		}
 
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to edit users.' ),
-				array( 'status' => WP_Http::FORBIDDEN )
+				__( 'Sorry, you are not allowed to edit users.', 'authorship' ),
+				[
+					'status' => WP_Http::FORBIDDEN,
+				]
 			);
 		}
 
@@ -134,16 +140,20 @@ class Users_Controller extends WP_REST_Users_Controller {
 		if ( ! current_user_can( 'list_users' ) ) {
 			return new WP_Error(
 				'rest_user_cannot_view',
-				__( 'Sorry, you are not allowed to list users.' ),
-				array( 'status' => rest_authorization_required_code() )
+				__( 'Sorry, you are not allowed to list users.', 'authorship' ),
+				[
+					'status' => rest_authorization_required_code(),
+				]
 			);
 		}
 
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to edit users.' ),
-				array( 'status' => WP_Http::FORBIDDEN )
+				__( 'Sorry, you are not allowed to edit users.', 'authorship' ),
+				[
+					'status' => WP_Http::FORBIDDEN,
+				]
 			);
 		}
 
@@ -166,8 +176,10 @@ class Users_Controller extends WP_REST_Users_Controller {
 		if ( ! current_user_can( 'create_users' ) ) {
 			return new WP_Error(
 				'rest_cannot_create_user',
-				__( 'Sorry, you are not allowed to create new users.' ),
-				array( 'status' => rest_authorization_required_code() )
+				__( 'Sorry, you are not allowed to create new users.', 'authorship' ),
+				[
+					'status' => rest_authorization_required_code(),
+				]
 			);
 		}
 
@@ -190,7 +202,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	/**
 	 * Retrieves the user's schema, conforming to JSON Schema.
 	 *
-	 * @return array Item schema data.
+	 * @return mixed[] Item schema data.
 	 */
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
