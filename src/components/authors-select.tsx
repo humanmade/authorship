@@ -161,6 +161,31 @@ const AuthorsSelect = args => {
 	};
 
 	/**
+	 * Handles the creation of a new option.
+	 *
+	 * @param {string} option The new option.
+	 */
+	const onCreateOption = ( option: string ) => {
+		const path = addQueryArgs(
+			'/authorship/v1/users/',
+			{
+				name: option,
+			}
+		);
+
+		const api: Promise<WP_REST_API_User> = wp.apiFetch( { path, method: 'POST' } );
+
+		return api.then( user => {
+			const options = [ ...selected, createOption( user ) ];
+
+			setSelected( options );
+			onUpdate( options );
+		} ).catch( ( error: WP_REST_API_Error ) => {
+			onError( error.message );
+		} );
+	};
+
+	/**
 	 * Fired when option sorting ends. Updates the component state and calls the update callback.
 	 *
 	 * @param {SortedOption} option Sorting information for the option.
@@ -192,6 +217,7 @@ const AuthorsSelect = args => {
 			loadOptions={ loadOptions }
 			value={ selected }
 			onChange={ changeValue }
+			onCreateOption={ onCreateOption }
 		/>
 	);
 
