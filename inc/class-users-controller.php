@@ -245,7 +245,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	}
 
 	/**
-	 * Prepares a single user for creation or update. update pw
+	 * Prepares a single user for creation or update.
 	 *
 	 * @param \WP_REST_Request $request Request object.
 	 * @return object User object.
