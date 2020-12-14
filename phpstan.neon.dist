@@ -10,6 +10,7 @@ parameters:
     - inc/namespace.php
     - inc/template.php
     - tests/phpunit/includes/testcase.php
+    - tests/phpunit/includes/restapi-testcase.php
   scanDirectories:
     - inc
     - lib
