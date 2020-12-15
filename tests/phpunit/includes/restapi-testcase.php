@@ -31,6 +31,7 @@ abstract class RESTAPITestCase extends TestCase {
 
 	protected static function get_message( WP_REST_REsponse $response ) : string {
 		if ( $response->is_error() ) {
+			/** @var \WP_Error $error */
 			$error = $response->as_error();
 			$message = [];
 			foreach ( $error->get_error_codes() as $code ) {
@@ -39,6 +40,10 @@ abstract class RESTAPITestCase extends TestCase {
 					$error->get_error_message( $code ),
 					$code
 				);
+				$data = $error->get_error_data( $code );
+				if ( isset( $data['params'] ) ) {
+					$message = array_merge( $message, array_values( $data['params'] ) );
+				}
 			}
 			return implode( "\n", $message );
 		}
