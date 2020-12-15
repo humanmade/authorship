@@ -332,14 +332,18 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	}
 
 	if ( ! post_type_supports( $post_type, 'author' ) ) {
-		return new WP_Error( 'authorship', __( 'You are not allowed to set the authors for this post.', 'authorship' ) );
+		return new WP_Error( 'authorship', __( 'This post type does not support specifying authorship.', 'authorship' ), [
+			'status' => WP_Http::BAD_REQUEST,
+		] );
 	}
 
 	/** @var \stdClass */
 	$caps = $post_type_object->cap;
 
 	if ( ! current_user_can( $caps->edit_others_posts ) ) {
-		return new WP_Error( 'authorship', __( 'You are not allowed to set the authors for this post.', 'authorship' ) );
+		return new WP_Error( 'authorship', __( 'You are not allowed to set the authorship for this post.', 'authorship' ), [
+			'status' => WP_Http::FORBIDDEN,
+		] );
 	}
 
 	// The REST API accepts and coerces a comma-separated string as an array, so
@@ -353,7 +357,9 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	] );
 
 	if ( count( $users ) !== count( $authors ) ) {
-		return new WP_Error( 'authorship', __( 'One or more user IDs are not valid for this site.', 'authorship' ) );
+		return new WP_Error( 'authorship', __( 'One or more user IDs are not valid for this site.', 'authorship' ), [
+			'status' => WP_Http::BAD_REQUEST,
+		] );
 	}
 
 	return null;
