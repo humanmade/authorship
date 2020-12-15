@@ -73,7 +73,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryForAuthorQueriedObjectIsRetained() : void {
+	public function testQueriedObjectIsRetainedAfterQueryingForAuthor() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.

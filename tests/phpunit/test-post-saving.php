@@ -15,7 +15,7 @@ use const Authorship\TAXONOMY;
 use function Authorship\get_authors;
 
 class TestPostSaving extends TestCase {
-	public function testPostAuthorTermDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor() : void {
+	public function testPostAuthorshipDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor() : void {
 		$factory = self::factory()->post;
 
 		register_post_type( 'testing', [
@@ -37,7 +37,7 @@ class TestPostSaving extends TestCase {
 		$this->assertCount( 0, $authors );
 	}
 
-	public function testPostAuthorsAreRetainedWhenUpdatingPostWithNoAuthorParameter() : void {
+	public function testPostAuthorshipIsRetainedWhenUpdatingPostWithNoAuthorshipParameter() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -59,7 +59,7 @@ class TestPostSaving extends TestCase {
 		$this->assertSame( [ self::$users['editor']->ID ], $author_ids );
 	}
 
-	public function testPostAuthorsAreRetainedWhenUpdatingPostWithPostAuthorParameter() : void {
+	public function testPostAuthorshipIsRetainedWhenUpdatingPostWithPostAuthorParameter() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.

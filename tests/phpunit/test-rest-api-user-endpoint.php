@@ -243,20 +243,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	}
 
 	/**
-	 * @return mixed[]
-	 */
-	public function dataAllowedOrderby() : array {
-		return [
-			[
-				'id',
-			],
-			[
-				'name',
-			],
-		];
-	}
-
-	/**
 	 * @dataProvider dataRolesThatCanManageUsers
 	 *
 	 * @param string $role
@@ -277,6 +263,20 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		} else {
 			$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 		}
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataAllowedOrderby() : array {
+		return [
+			[
+				'id',
+			],
+			[
+				'name',
+			],
+		];
 	}
 
 	/**
