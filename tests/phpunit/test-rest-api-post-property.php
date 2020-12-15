@@ -31,8 +31,9 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 
 		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::CREATED, $response->get_status() );
+		$this->assertSame( WP_Http::CREATED, $response->get_status(), $message );
 		$this->assertArrayHasKey( REST_PARAM, $data );
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
@@ -45,8 +46,9 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 		$request->set_param( REST_PARAM, '123' );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
 	public function testAuthorsCannotBeSpecifiedWhenCreatingAsAuthorRole() : void {
@@ -61,8 +63,9 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 		$request->set_param( REST_PARAM, $authors );
 
 		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
 	public function testAuthorsCanBeSpecifiedWhenEditing() : void {
@@ -85,8 +88,9 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 
 		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
 		$this->assertArrayHasKey( REST_PARAM, $data );
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
@@ -111,8 +115,9 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 
 		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
 		$this->assertArrayHasKey( REST_PARAM, $data );
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
@@ -137,8 +142,9 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 
 		$response = self::rest_do_request( $request );
 		$data     = $response->get_data();
+		$message = self::get_message( $response );
 
-		$this->assertSame( WP_Http::OK, $response->get_status() );
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
 		$this->assertArrayHasKey( REST_PARAM, $data );
 		$this->assertSame( $authors, $data[ REST_PARAM ] );
 	}
