@@ -80,4 +80,38 @@ class TestPostSaving extends TestCase {
 
 		$this->assertSame( [ self::$users['editor']->ID ], $author_ids );
 	}
+
+	public function testPostAuthorshipIsSetToAuthorWhenCreatingPost() : void {
+		/** @var int */
+		$post_id = wp_insert_post( [
+			'post_title'  => 'Testing',
+			'post_author' => self::$users['author']->ID,
+		], true );
+		/** @var \WP_Post */
+		$post = get_post( $post_id );
+
+		/** @var int[] */
+		$author_ids = wp_list_pluck( get_authors( $post ), 'ID' );
+
+		$this->assertSame( [ self::$users['author']->ID ], $author_ids );
+	}
+
+	public function testPostAuthorshipIsSetToAuthorWhenUpdatingPostWithNoExistingAuthorship() : void {
+		$factory = self::factory()->post;
+
+		// Owned by Author.
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['author']->ID,
+		] );
+
+		wp_update_post( [
+			'ID'         => $post->ID,
+			'post_title' => 'Updated Title',
+		], true );
+
+		/** @var int[] */
+		$author_ids = wp_list_pluck( get_authors( $post ), 'ID' );
+
+		$this->assertSame( [ self::$users['author']->ID ], $author_ids );
+	}
 }

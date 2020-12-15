@@ -269,7 +269,9 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 			return;
 		}
 
-		if ( $update && ! isset( $unsanitized_postarr[ POSTS_PARAM ] ) ) {
+		$existing_authors = get_authors( $post );
+
+		if ( $update && ! isset( $unsanitized_postarr[ POSTS_PARAM ] ) && $existing_authors ) {
 			return;
 		}
 
