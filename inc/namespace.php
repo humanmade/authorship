@@ -387,9 +387,9 @@ function register_rest_api_field( string $post_type ) : void {
 				return $user->ID;
 			}, get_authors( $post ) );
 		},
-		'update_callback' => function( array $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
+		'update_callback' => function( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
 			try {
-				set_authors( $post, $value );
+				set_authors( $post, wp_parse_id_list( $value ) );
 			} catch ( \Exception $e ) {
 				return new WP_Error( 'authorship', $e->getMessage(), [
 					'status' => WP_Http::BAD_REQUEST,
