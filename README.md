@@ -65,7 +65,7 @@ There's a lot more to a WordPress site than just its theme. Data can be consumed
 
 Authorship provides:
 
-* Read and write access to attributed authors via an `authorship` property on the default `wp/v2/posts` REST API endpoints
+* Read and write access to attributed authors via an `authorship` field on the default `wp/v2/posts` REST API endpoints
 * Ability to create guest authors via the `authorship/v1/users` REST API endpoint
 * Read-only access to users who can be attributed to a post via the `authorship/v1/users` REST API endpoint
 * Ability to specify attributed authors in WP-CLI with the `--authorship` flag
@@ -94,24 +94,24 @@ Authorship creates a real WordPress user account for each guest author, which pr
 
 ## REST API
 
-The following REST API endpoints are available:
+The following REST API endpoints and fields are available:
 
-## authorship/v1/users endpoint
+### authorship/v1/users endpoint
 
 This endpoint allows:
 
 * Searching all users who can be attributed to content
 * Creating guest authors
 
-## authorship property
+### authorship field
 
-This property is added to the endpoint for all post types that have post type support for `author`. This field is readable and writable and accepts an array of user IDs attributed to the post.
+This field is added to the endpoint for all post types that have post type support for `author`, for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of user IDs attributed to the post.
 
 ## WP-CLI
 
 The following WP-CLI flags are available:
 
-## --authorship flag
+### --authorship flag
 
 When creating or updating posts, the `--authorship` flag can be used to specify the attributed users of the post. The flag accepts a comma-separated list of user IDs. Examples:
 
