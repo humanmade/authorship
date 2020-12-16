@@ -27,55 +27,67 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ## Features
 
-* Multiple authors per post
-* Guest authors (that can be created in place on the post editing screen)
-* A convenient and user-friendly UI that feels like a part of WordPress
-* Works great with the block editor and the classic editor
-* Full CRUD support in the REST API and WP-CLI
-* Full support in RSS and Atom feeds
-* Fine-grained user permission controls
-* Plenty of filters and actions
+* [X] Multiple authors per post
+* [X] Guest authors (that can be created in place on the post editing screen)
+* [X] A convenient and user-friendly UI that feels like a part of WordPress
+* [X] Works with the block editor
+* [ ] Works with the classic editor
+* [X] Full CRUD support in the REST API and WP-CLI
+* [ ] Full support in RSS and Atom feeds
+* [ ] Fine-grained user permission controls
+* [ ] Plenty of filters and actions
+
+_Features without a checkmark are still work in progress._
+
+## Installation
+
+* Clone this repo into your plugins directory
+* Install the dependencies:  
+  `composer install && npm install`
+* Start the dev server:  
+  `npm run start`
 
 ## Design decisions
 
 Why another multi-author plugin? What about Co-Authors Plus or Bylines or PublishPress Authors?
 
-Firstly, those plugins are all great and have served us well over the years, however the existing solutions mostly suffer from similar problems:
+Firstly, those plugins are great and have served us well over the years, however they all suffer from similar problems:
 
-* API: Lack of support for exposing author data beyond the theme, for example via the REST API and in feeds
-* UI: Limited or custom UI that doesn't feel like a natural part of WordPress
+* API: Lack of support for exposing author data beyond the theme, for example via the REST API, WP-CLI, and feeds
+* UI: Limited or custom UI that doesn't feel like a part of WordPress
 * Users: An unnecessary distinction between guest authors and actual WordPress users
 
 Let's look at these points in detail and explain how Authorship addresses them:
 
 ### API design decisions
 
-There's a lot more to a WordPress website than just its theme. Services can both consume and create data via its feeds and APIs, so these need to be treated as first-class citizens when exposing information about the multiple authors and guest authors of posts.
+There's a lot more to a WordPress site than just its theme. Data can be consumed via its APIs and feeds, so these need to be treated as first-class citizens when exposing the attributed authors of posts.
 
 Authorship provides:
 
-* Full CRUD support via WP-CLI
-* Full CRUD support for guest authors via a custom REST API endpoint
-* Full CRUD support for author association via a property on the default post endpoints
-* Full support for RSS and Atom feed output
+* Read and write access to attributed authors via an `authorship` property on the default `wp/v2/posts` REST API endpoints
+* Ability to create guest authors via the `authorship/v1/users` REST API endpoint
+* Read-only access to users who can be attributed to a post via the `authorship/v1/users` REST API endpoint
+* Ability to specify attributed authors in WP-CLI with the `--authorship` flag
 
 On the roadmap:
 
+* Full support for RSS and Atom feed output
 * Support for XML-RPC
 * Support for WPGraphQL
 
 ### UI design decisions
 
-We'd love it if you activated Authorship and then forgot that its features are provided by a plugin. The UI feels just like native WordPress but provides convenient functionality without looking out of place, both in the block editor and the classic editor.
+We'd love it if you activated Authorship and then forgot that its features are provided by a plugin. The UI provides convenient functionality without looking out of place, both in the block editor and the classic editor.
 
 ### User design decisions
 
 Existing plugins that provide guest author functionality make a distinction between a guest author and a real WordPress user. A guest author exists only as a taxonomy term, which complicates the UX and creates inconsistencies and duplication in the data.
 
-Authorship creates a real WordPress user account for each guest author, and this provides several advantages:
+Authorship creates a real WordPress user account for each guest author, which provides several advantages:
 
-* Familiar UI and UX - no custom administration screens for managing the details of a guest author differently from a regular user
-* Third party plugins that customise user profile functionality just work
+* No custom administration screens for managing guest authors separately from regular users
+* Plugins that customise user profiles work for guest authors too
 * Consistent data structure - you only ever deal with `WP_User` objects
 * No need to keep data in sync between a user and their "author" profile
 * Promoting a guest author to a functional user is done just by changing their user role
@@ -88,16 +100,16 @@ The following REST API endpoints are available:
 
 This endpoint allows:
 
-* Searching all users who can be assigned to content
+* Searching all users who can be attributed to content
 * Creating guest authors
 
 ## authorship property
 
-This property is added to the endpoint for all post types that have post type support for `author`. This field is readable and writable and accepts an array of user IDs assigned to the post.
+This property is added to the endpoint for all post types that have post type support for `author`. This field is readable and writable and accepts an array of user IDs attributed to the post.
 
 ## WP-CLI
 
-The following WP-CLI commands and flags are available:
+The following WP-CLI flags are available:
 
 ## --authorship flag
 
@@ -137,3 +149,4 @@ If the Authorship plugin doesn't suit your needs, try these alternatives:
 
 * [PublishPress Authors](https://wordpress.org/plugins/publishpress-authors/)
 * [Co-Authors Plus](https://wordpress.org/plugins/co-authors-plus/)
+* [Guest Author](https://wordpress.org/plugins/guest-author/)
