@@ -1,9 +1,9 @@
-/build
-/composer.lock
-/lib
-/node_modules
-/package-lock.json
+/build/
+/lib/
+/node_modules/
+/tests/cache/
+/tests/wordpress/
 /tests/.env
-/tests/cache
-/tests/wordpress
-/vendor
+/vendor/
+/composer.lock
+/package-lock.json
