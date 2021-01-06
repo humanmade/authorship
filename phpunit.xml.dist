@@ -11,6 +11,11 @@
 	<php>
 		<env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-tests-config.php" />
 	</php>
+	<filter>
+		<whitelist processUncoveredFilesFromWhitelist="true">
+			<directory suffix=".php">inc</directory>
+		</whitelist>
+	</filter>
 	<testsuites>
 		<testsuite name="main">
 			<directory prefix="test-" suffix=".php">./tests/phpunit/</directory>
