@@ -6,7 +6,7 @@
   "main": "src/index.tsx",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "lint": "concurrently \"npm run lint:js\" \"npm run lint:css\"",
+    "lint": "concurrently -n CSS,JS -c cyan.bold,yellow.bold \"npm run lint:css\" \"npm run lint:js\"",
     "lint:css": "stylelint src/",
     "lint:js": "eslint src/",
     "start": "webpack-dev-server --config=.config/webpack.config.dev.js",
