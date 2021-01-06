@@ -60,8 +60,8 @@ jobs:
     - name: Install dependencies
       run: |
         npm install
-        composer install --prefer-dist --no-suggest
-        composer require --dev --update-with-dependencies --no-suggest --prefer-dist roots/wordpress="${{ matrix.wp }} || *" wp-phpunit/wp-phpunit="${{ matrix.wp }} || *"
+        composer install --prefer-dist --no-progress --no-suggest --no-interaction
+        composer require --dev --prefer-dist --no-progress --no-suggest --no-interaction --update-with-dependencies roots/wordpress="${{ matrix.wp }} || *" wp-phpunit/wp-phpunit="${{ matrix.wp }} || *"
 
     - name: Run the tests
       run: composer test
