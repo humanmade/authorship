@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Authorship\Admin;
 
+use WP_Post;
+
 use function Authorship\get_authors;
 
 const COLUMN_NAME = 'authorship';

@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Authorship;
 
+use Exception;
+use stdClass;
 use WP;
 use WP_Error;
 use WP_Http;

@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Authorship;
 
+use Exception;
 use WP_Post;
 use WP_Term;
 use WP_User;
