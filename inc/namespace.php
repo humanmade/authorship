@@ -25,11 +25,12 @@ use WP_User;
 
 use function Asset_Loader\enqueue_asset;
 
-const POSTS_PARAM = 'authorship';
-const REST_LINK_ID = 'wp:authorship';
-const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
-const REST_PARAM = 'authorship';
 const GUEST_ROLE = 'guest-author';
+const POSTS_PARAM = 'authorship';
+const REST_CURIE_TEMPLATE = 'https://authorship.hmn.md/{rel}';
+const REST_LINK_ID = 'wp:authorship';
+const REST_PARAM = 'authorship';
+const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
 const SCRIPT_HANDLE = 'authorship-js';
 const STYLE_HANDLE = 'authorship-css';
 const TAXONOMY = 'authorship';
@@ -445,7 +446,7 @@ function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_R
 function filter_rest_response_link_curies( array $additional ) : array {
 	$additional[] = [
 		'name'      => REST_PARAM,
-		'href'      => 'https://authorship.hmn.md/{rel}',
+		'href'      => REST_CURIE_TEMPLATE,
 		'templated' => true,
 	];
 
