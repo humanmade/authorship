@@ -122,9 +122,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 	switch ( $cap ) {
 		case 'delete_post':
 		case 'delete_page':
-			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
-				return ! in_array( $cap, $remove['delete'], true );
-			} );
+			$caps = array_diff( $caps, $remove['delete'] );
 
 			// If the post is published or scheduled...
 			if ( in_array( $post->post_status, [ 'publish', 'future' ], true ) ) {
@@ -143,9 +141,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 			break;
 		case 'edit_post':
 		case 'edit_page':
-			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
-				return ! in_array( $cap, $remove['edit'], true );
-			} );
+			$caps = array_diff( $caps, $remove['edit'] );
 
 			// If the post is published or scheduled...
 			if ( in_array( $post->post_status, [ 'publish', 'future' ], true ) ) {
@@ -164,9 +160,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 			break;
 		case 'read_post':
 		case 'read_page':
-			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
-				return ! in_array( $cap, $remove['read'], true );
-			} );
+			$caps = array_diff( $caps, $remove['read'] );
 
 			$caps[] = $post_type_cap->read;
 			break;
