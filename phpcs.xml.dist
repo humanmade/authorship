@@ -19,6 +19,12 @@
 
 		<!-- Exclude short description sniff so short `@var` notation can be used -->
 		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
+
+		<!-- This sniff has been removed in the most recent PSR2R standard, but it is still included in the HM one -->
+		<exclude name="PSR2R.Namespaces.UseInAlphabeticalOrder.Order"/>
+
+		<!-- This sniff does not respect references in comments and documentation -->
+		<exclude name="PSR2R.Namespaces.UnusedUseStatement.UnusedUse"/>
 	</rule>
 
 	<rule ref="Squiz.Commenting">
