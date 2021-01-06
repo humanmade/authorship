@@ -7,7 +7,7 @@
  * @param {number} to    The new position for the element.
  * @returns {T[]} The updated array.
  */
-export default function arrayMove<T>( array: T[], from: number, to: number ) : T[] {
+export default function arrayMove<T>( array: T[], from: number, to: number ): T[] {
 	array = array.slice();
 	array.splice( to < 0 ? array.length + to : to, 0, array.splice( from, 1 )[0] );
 
