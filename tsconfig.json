@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
     "declaration": true,
     "declarationMap": true,
     "jsx": "react",
-    "module": "commonjs",
-    "outDir": "./build/",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "build",
     "sourceMap": true,
-    "alwaysStrict": true,
     "target": "es2017"
   },
   "exclude": [
