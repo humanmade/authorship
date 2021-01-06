@@ -2,6 +2,8 @@ import * as React from 'react';
 import { components } from 'react-select';
 import { SortableElement } from 'react-sortable-hoc';
 
+const { MultiValue } = components;
+
 const MultiValueElement = props => {
 	// This prevents the menu from being opened/closed when the user clicks
 	// on a value to begin dragging it.
@@ -16,7 +18,7 @@ const MultiValueElement = props => {
 			e.stopPropagation();
 		},
 	};
-	return <components.MultiValue { ...props } innerProps={ innerProps } />;
+	return <MultiValue { ...props } innerProps={ innerProps } />;
 };
 
 export { MultiValueElement };
