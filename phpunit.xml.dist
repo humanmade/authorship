@@ -1,13 +1,15 @@
 <phpunit
-	bootstrap="tests/phpunit/includes/bootstrap.php"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.0/phpunit.xsd"
 	backupGlobals="false"
+	beStrictAboutOutputDuringTests="true"
+	beStrictAboutTestsThatDoNotTestAnything="true"
+	bootstrap="tests/phpunit/includes/bootstrap.php"
 	colors="true"
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
-	beStrictAboutTestsThatDoNotTestAnything="true"
-	beStrictAboutOutputDuringTests="true"
-	>
+>
 	<php>
 		<env name="WP_PHPUNIT__TESTS_CONFIG" value="tests/wp-tests-config.php" />
 	</php>
