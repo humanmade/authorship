@@ -20,7 +20,8 @@
 	</filter>
 	<testsuites>
 		<testsuite name="main">
-			<directory prefix="test-" suffix=".php">./tests/phpunit/</directory>
+			<directory suffix=".php">tests/phpunit</directory>
+			<exclude>tests/phpunit/includes</exclude>
 		</testsuite>
 	</testsuites>
 </phpunit>
