@@ -27,12 +27,10 @@ function bootstrap() : void {
  * Fires as an admin screen or script is being initialized.
  */
 function init_admin_cols() : void {
-	$post_types = get_post_types_by_support( 'author' );
-
-	array_map( function( string $post_type ) {
+	foreach ( get_post_types_by_support( 'author' ) as $post_type ) {
 		add_filter( "manage_{$post_type}_posts_columns", __NAMESPACE__ . '\\filter_post_columns' );
 		add_action( "manage_{$post_type}_posts_custom_column", __NAMESPACE__ . '\\action_author_column', 10, 2 );
-	}, $post_types );
+	}
 }
 
 /**
