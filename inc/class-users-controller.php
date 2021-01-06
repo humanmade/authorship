@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API controller for fetching users for authorship and greating guest authors.
+ * REST API controller for fetching users for authorship and creating guest authors.
  *
  * @package authorship
  */
