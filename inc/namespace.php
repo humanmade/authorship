@@ -204,12 +204,11 @@ function filter_map_meta_cap_for_users( array $caps, string $cap, int $user_id, 
  * @param WP $wp Current WordPress environment instance.
  */
 function action_wp( WP $wp ) : void {
-	global $wp_query;
-
-	if ( $wp_query->is_author() ) {
-		$GLOBALS['authordata'] = get_userdata( $wp_query->get( 'author' ) );
+	if ( is_author() ) {
+		$GLOBALS['authordata'] = get_userdata( get_query_var( 'author' ) );
 	}
 }
+
 /**
  * Fires after WordPress has finished loading but before any headers are sent.
  */
