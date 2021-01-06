@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { ActionMeta, components } from 'react-select';
+import { ActionMeta } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
+import { SortableContainer } from 'react-sortable-hoc';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
@@ -9,6 +9,7 @@ import type {
 
 import { addQueryArgs } from '@wordpress/url';
 
+import SortableMultiValueElement from './SortableMultiValueElement';
 import arrayMove from '../utils/arrayMove';
 
 declare const authorshipData: authorshipDataFromWP;
@@ -88,23 +89,6 @@ const AuthorsSelect = args => {
 			<div>{ option.label }</div>
 		</div>
 	);
-
-	const SortableMultiValueElement = SortableElement( props => {
-		// This prevents the menu from being opened/closed when the user clicks
-		// on a value to begin dragging it.
-		const innerProps = {
-			/**
-			 * Stops event propagation when sorting options.
-			 *
-			 * @param {Event} e The event.
-			 */
-			onMouseDown: ( e: Event ) => {
-				e.preventDefault();
-				e.stopPropagation();
-			},
-		};
-		return <components.MultiValue { ...props } innerProps={ innerProps } />;
-	} );
 
 	/**
 	 * Handles changes to the selected authors.
