@@ -14,11 +14,11 @@
 
 	<rule ref="HM">
 		<!-- Exclude filename related sniffs -->
-		<exclude name="HM.Files" />
-		<exclude name="WordPress.Files" />
+		<exclude name="HM.Files"/>
+		<exclude name="WordPress.Files"/>
 
 		<!-- Exclude short description sniff so short `@var` notation can be used -->
-		<exclude name="Generic.Commenting.DocComment.MissingShort" />
+		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
 	</rule>
 
 	<rule ref="Squiz.Commenting">
