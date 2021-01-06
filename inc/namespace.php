@@ -23,6 +23,8 @@ use WP_REST_Server;
 use WP_Term;
 use WP_User;
 
+use function Asset_Loader\enqueue_asset;
+
 const POSTS_PARAM = 'authorship';
 const REST_LINK_ID = 'wp:authorship';
 const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
@@ -580,7 +582,7 @@ function enqueue_assets() : void {
 function enqueue_assets_for_post() : void {
 	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
 
-	\Asset_Loader\enqueue_asset(
+	enqueue_asset(
 		$manifest,
 		'main.js',
 		[
@@ -597,7 +599,8 @@ function enqueue_assets_for_post() : void {
 			],
 		]
 	);
-	\Asset_Loader\enqueue_asset(
+
+	enqueue_asset(
 		$manifest,
 		'style.css',
 		[
