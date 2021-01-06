@@ -46,7 +46,7 @@ function action_author_column( string $column_name, int $post_id ) : void {
 		return;
 	}
 
-	/** @var \WP_Post */
+	/** @var WP_Post */
 	$post = get_post( $post_id );
 
 	$authors = get_authors( $post );

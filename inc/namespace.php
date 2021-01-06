@@ -97,7 +97,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 		return $caps;
 	}
 
-	/** @var \stdClass */
+	/** @var stdClass */
 	$post_type_cap = $post_type->cap;
 
 	// Remove the following from `$caps`.
@@ -205,7 +205,7 @@ function filter_map_meta_cap_for_users( array $caps, string $cap, int $user_id, 
  *
  * @link https://core.trac.wordpress.org/ticket/44183
  *
- * @param \WP $wp Current WordPress environment instance.
+ * @param WP $wp Current WordPress environment instance.
  */
 function action_wp( WP $wp ) : void {
 	global $wp_query;
@@ -224,8 +224,8 @@ function register_roles_and_caps() : void {
 /**
  * Filters the REST API response.
  *
- * @param \WP_HTTP_Response $result Result to send to the client. Usually a `\WP_REST_Response`.
- * @return \WP_HTTP_Response Result to send to the client. Usually a `\WP_REST_Response`.
+ * @param WP_HTTP_Response $result Result to send to the client. Usually a `WP_REST_Response`.
+ * @return WP_HTTP_Response Result to send to the client. Usually a `WP_REST_Response`.
  */
 function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Response {
 	if ( ! ( $result instanceof WP_REST_Response ) ) {
@@ -262,9 +262,9 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 	/**
 	 * Fires once a post has been saved.
 	 *
-	 * @param int      $post_ID Post ID.
-	 * @param \WP_Post $post    Post object.
-	 * @param bool     $update  Whether this is an existing post being updated.
+	 * @param int     $post_ID Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @param bool    $update  Whether this is an existing post being updated.
 	 */
 	add_action( 'wp_insert_post', function( int $post_ID, WP_Post $post, bool $update ) use ( $unsanitized_postarr ) : void {
 		if ( isset( $unsanitized_postarr['tax_input'] ) && ! empty( $unsanitized_postarr['tax_input'][ TAXONOMY ] ) ) {
@@ -291,7 +291,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 
 		try {
 			set_authors( $post, wp_parse_id_list( $authors ) );
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			// Nothing at the moment.
 		}
 	}, 10, 3 );
@@ -302,7 +302,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 /**
  * Adds the authorship field to the REST API for post objects.
  *
- * @param \WP_REST_Server $server Server object.
+ * @param WP_REST_Server $server Server object.
  */
 function register_rest_api_fields( WP_REST_Server $server ) : void {
 	$post_types = get_post_types_by_support( 'author' );
@@ -316,11 +316,11 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
 /**
  * Validates a passed argument for the list of authors.
  *
- * @param mixed            $authors   The passed value.
- * @param \WP_REST_Request $request   The REST API request object.
- * @param string           $param     The param name.
- * @param string           $post_type The post type name.
- * @return \WP_Error True if the validation passes, `\WP_Error` instance otherwise.
+ * @param mixed           $authors   The passed value.
+ * @param WP_REST_Request $request   The REST API request object.
+ * @param string          $param     The param name.
+ * @param string          $post_type The post type name.
+ * @return WP_Error|null Null if the validation passes, `WP_Error` instance otherwise.
  */
 function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ) :? WP_Error {
 	$schema_validation = rest_validate_request_arg( $authors, $request, $param );
@@ -335,7 +335,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		return null;
 	}
 
-	/** @var \stdClass */
+	/** @var stdClass */
 	$caps = $post_type_object->cap;
 
 	if ( ! current_user_can( $caps->edit_others_posts ) ) {
@@ -354,7 +354,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	// we need to allow for that here.
 	$authors = wp_parse_id_list( $authors );
 
-	/** @var \WP_User[] */
+	/** @var WP_User[] */
 	$users = get_users( [
 		'include' => $authors,
 		'orderby' => 'include',
@@ -394,7 +394,7 @@ function register_rest_api_field( string $post_type ) : void {
 		'update_callback' => function( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
 			try {
 				set_authors( $post, wp_parse_id_list( $value ) );
-			} catch ( \Exception $e ) {
+			} catch ( Exception $e ) {
 				return new WP_Error( 'authorship', $e->getMessage(), [
 					'status' => WP_Http::BAD_REQUEST,
 				] );
@@ -425,12 +425,12 @@ function register_rest_api_field( string $post_type ) : void {
  *
  * This also adds a new `authorship:action-assign-authorship` rel so custom clients can refer to this.
  *
- * @param \WP_REST_Response $response The response object.
- * @param \WP_Post          $post     Post object.
- * @param \WP_REST_Request  $request  Request object.
- * @return \WP_REST_Response The response object.
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     Post object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
  */
-function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : \WP_REST_Response {
+function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : WP_REST_Response {
 	$links = $response->get_links();
 
 	if ( isset( $links['https://api.w.org/action-assign-author'] ) ) {
@@ -567,7 +567,7 @@ function init_taxonomy() : void {
  * Fires after block assets have been enqueued for the editing interface.
  */
 function enqueue_assets() : void {
-	/** @var \WP_Post */
+	/** @var WP_Post */
 	$post = get_post();
 
 	enqueue_assets_for_post();
@@ -609,7 +609,7 @@ function enqueue_assets_for_post() : void {
 /**
  * Preloads author data for the post editing screen.
  *
- * @param \WP_Post $post The post being edited.
+ * @param WP_Post $post The post being edited.
  */
 function preload_author_data( WP_Post $post ) : void {
 	$authors = get_authors( $post );
@@ -648,7 +648,7 @@ function preload_author_data( WP_Post $post ) : void {
  * This is used to override author-related query vars with a corresponding taxonomy query and
  * then add a second filter that resets the vars after the query has run.
  *
- * @param \WP_Query $query The \WP_Query instance.
+ * @param WP_Query $query The WP_Query instance.
  */
 function action_pre_get_posts( WP_Query $query ) : void {
 	$post_type = $query->get( 'post_type' );
@@ -689,7 +689,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	$user_id = 0;
 
 	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
-	// as \WP_Query will handle the validation before constructing its query.
+	// as WP_Query will handle the validation before constructing its query.
 	if ( ! empty( $stored_values['author'] ) ) {
 		$user_id = (int) $stored_values['author'];
 	} elseif ( ! empty( $stored_values['author_name'] ) ) {
@@ -723,8 +723,8 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 *
 	 * This allows the query vars to be reset to their original values.
 	 *
-	 * @param \WP_Post[]|null $posts Array of post objects. Passed by reference.
-	 * @param \WP_Query       $query The \WP_Query instance.
+	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
+	 * @param WP_Query       $query The WP_Query instance.
 	 */
 	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_id ) : ?array {
 		if ( empty( $stored_values ) ) {
