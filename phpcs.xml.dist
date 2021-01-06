@@ -2,6 +2,7 @@
 <ruleset name="Authorship">
 	<config name="testVersion" value="7.2-"/>
 	<arg name="extensions" value="php"/>
+	<arg value="s"/>
 
 	<exclude-pattern>/build/*</exclude-pattern>
 	<exclude-pattern>/lib/*</exclude-pattern>

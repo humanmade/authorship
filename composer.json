@@ -46,7 +46,7 @@
       "@test:ut"
     ],
     "test:phpcs": [
-      "phpcs -ps --cache=tests/cache/phpcs ."
+      "phpcs -p --cache=tests/cache/phpcs ."
     ],
     "test:phpstan": [
       "phpstan analyze"
