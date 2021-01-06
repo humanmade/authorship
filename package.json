@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "concurrently \"npm run lint:js\" \"npm run lint:css\"",
     "lint:css": "stylelint src/",
-    "lint:js": "eslint src/",
+    "lint:js": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "start": "webpack-dev-server --config=.config/webpack.config.dev.js",
     "build": "webpack --config=.config/webpack.config.prod.js",
     "jq": "jq"
