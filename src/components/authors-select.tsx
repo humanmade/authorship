@@ -182,7 +182,7 @@ const AuthorsSelect = args => {
 
 export { AuthorsSelect };
 
-export const mapDispatchToProps = dispatch => ( {
+export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, CallableFunction> => ( {
 	onUpdate( value: number[] ) {
 		dispatch( 'core/editor' ).editPost( {
 			authorship: value,
@@ -193,7 +193,7 @@ export const mapDispatchToProps = dispatch => ( {
 	},
 } );
 
-export const mapSelectToProps = select => ( {
+export const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
 	hasAssignAuthorAction: get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],
