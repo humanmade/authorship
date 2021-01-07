@@ -31,7 +31,7 @@ interface AuthorsSelectProps {
  * @param {AuthorsSelectProps} props Component props.
  * @returns {ReactElement} An element.
  */
-const AuthorsSelect = ( props: AuthorsSelectProps ) => {
+const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	const currentAuthors = authorshipData.authors;
 	const { hasAssignAuthorAction, onError, onUpdate } = props;
 
@@ -44,7 +44,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 	 * @param {string} search The search string.
 	 * @returns {Promise<Option[]>} A promise that fulfils the options.
 	 */
-	const loadOptions = ( search: string ) : Promise<Option[]> => {
+	const loadOptions = ( search: string ): Promise<Option[]> => {
 		const path = addQueryArgs(
 			'/authorship/v1/users/',
 			{
