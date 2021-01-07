@@ -64,6 +64,7 @@
 			}
 
 			&__input {
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
 				display: none !important;
 			}
 
