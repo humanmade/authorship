@@ -1,7 +1,5 @@
 import { get } from 'lodash';
 import React, { ReactElement, useState } from 'react';
-import AsyncCreatableSelect from 'react-select/async-creatable';
-import { SortableContainer } from 'react-sortable-hoc';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
@@ -15,7 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
-import SortableMultiValueElement from './SortableMultiValueElement';
+import SortableSelectContainer from './SortableSelectContainer';
 
 declare const authorshipData: authorshipDataFromWP;
 
@@ -75,32 +73,6 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	} );
 
 	/**
-	 * Overrides the default option display with our custom one.
-	 *
-	 * @param {Option} option The option data.
-	 * @returns {ReactElement} The element.
-	 */
-	const formatOptionLabel = ( option: Option ) => (
-		<div style={ {
-			display: 'flex',
-			alignItems: 'center',
-		} }>
-			{ option.avatar && (
-				<div style={ {
-					flex: '0 0 24px',
-					marginRight: '5px',
-				} }>
-					<img alt="" src={ option.avatar } style={ {
-						width: '24px',
-						height: '24px',
-					} } />
-				</div>
-			) }
-			<div>{ option.label }</div>
-		</div>
-	);
-
-	/**
 	 * Handles changes to the selected authors.
 	 *
 	 * @param {Option[]} [options] The selected options.
@@ -146,41 +118,18 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 		onUpdate( value.map( option => option.value ) );
 	};
 
-	/**
-	 * Returns the base author selector control.
-	 *
-	 * @returns {ReactElement} An element.
-	 */
-	const Select = () => (
-		<AsyncCreatableSelect
-			cacheOptions
-			className="authorship-select-container"
-			classNamePrefix="authorship-select"
-			components={ {
-				MultiValue: SortableMultiValueElement,
-			} }
-			defaultValue={ currentAuthors }
-			formatOptionLabel={ formatOptionLabel }
-			isClearable={ false }
-			isDisabled={ isDisabled }
-			isMulti
-			isValidNewOption={ ( value: string ) => value.length >= 2 }
-			loadOptions={ loadOptions }
-			value={ selected }
-			onChange={ changeValue }
-			onCreateOption={ onCreateOption }
-		/>
-	);
-
-	const SortableSelectContainer = SortableContainer( Select );
-
 	return (
 		<SortableSelectContainer
 			axis="y"
 			distance={ 4 }
 			helperContainer={ () => document.getElementsByClassName( 'authorship-select-container' )[0] as HTMLElement }
+			isDisabled={ isDisabled }
+			loadOptions={ loadOptions }
 			lockAxis="y"
 			lockToContainerEdges
+			value={ selected }
+			onChange={ changeValue }
+			onCreateOption={ onCreateOption }
 			onSortEnd={ onSortEnd }
 		/>
 	);
