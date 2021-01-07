@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import * as React from 'react';
+import React, { useState } from 'react';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import { SortableContainer } from 'react-sortable-hoc';
 import type {
@@ -35,7 +35,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 	const currentAuthors = authorshipData.authors;
 	const { hasAssignAuthorAction, onError, onUpdate } = props;
 
-	const [ selected, setSelected ] = React.useState( currentAuthors );
+	const [ selected, setSelected ] = useState( currentAuthors );
 	const isDisabled = ! hasAssignAuthorAction;
 
 	/**
