@@ -9,9 +9,11 @@
 				border-radius: 2px;
 			}
 
-			&--is-focused,
-			&--is-focused:hover {
-				box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var( --wp-admin-theme-color );
+			&--is-focused {
+				&,
+				&:hover {
+					box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var( --wp-admin-theme-color );
+				}
 			}
 		}
 
