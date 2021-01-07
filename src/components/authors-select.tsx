@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import * as React from 'react';
 import { ActionMeta } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
@@ -7,6 +8,8 @@ import type {
 	WP_REST_API_User,
 } from 'wp-types';
 
+import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
 import SortableMultiValueElement from './SortableMultiValueElement';
@@ -177,4 +180,27 @@ const AuthorsSelect = args => {
 	);
 };
 
-export default AuthorsSelect;
+export { AuthorsSelect };
+
+export default compose( [
+	withDispatch( dispatch => ( {
+		onUpdate( value: number[] ) {
+			dispatch( 'core/editor' ).editPost( {
+				authorship: value,
+			} );
+		},
+		onError( message: string ) {
+			dispatch( 'core/notices' ).createErrorNotice( message );
+		},
+	} ) ),
+	withSelect( select => {
+		const post = select( 'core/editor' ).getCurrentPost();
+		return {
+			hasAssignAuthorAction: get(
+				post,
+				[ '_links', 'authorship:action-assign-authorship' ],
+				false
+			),
+		};
+	} ),
+] )( AuthorsSelect );
