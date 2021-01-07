@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import * as React from 'react';
+import React, { ReactElement } from 'react';
 
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -34,7 +34,7 @@ export const name = 'authorship';
 
 export const settings = {
 	icon: null,
-	render() {
+	render(): ReactElement {
 		return (
 			<PluginPostStatusInfo>
 				<Select/>
