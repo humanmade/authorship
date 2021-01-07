@@ -23,6 +23,18 @@ interface AuthorsSelectProps {
 	onUpdate: ( value: number[] ) => void,
 }
 
+/**
+ * Creates an option from a REST API user response.
+ *
+ * @param {WP_REST_API_User} user The user object.
+ * @returns {Option} The option object.
+ */
+const createOption = ( user: WP_REST_API_User ): Option => ( {
+	value: user.id,
+	label: user.name,
+	avatar: user?.avatar_urls?.[48] || null,
+} );
+
 const getHelperContainer = (): HTMLElement => document.querySelector( `.${ containerClassName}` );
 
 /**
@@ -61,18 +73,6 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			return [];
 		} );
 	};
-
-	/**
-	 * Creates an option from a REST API user response.
-	 *
-	 * @param {WP_REST_API_User} user The user object.
-	 * @returns {Option} The option object.
-	 */
-	const createOption = ( user: WP_REST_API_User ): Option => ( {
-		value: user.id,
-		label: user.name,
-		avatar: user.avatar_urls ? user.avatar_urls[48] : null,
-	} );
 
 	/**
 	 * Handles changes to the selected authors.
