@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 
 import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
-import AuthorsSelect from './components/authors-select';
+import AuthorsSelect from './components/AuthorsSelect';
 
 export const name = 'authorship';
 
