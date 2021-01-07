@@ -44,14 +44,14 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
-	const currentAuthors = authorshipData.authors;
 	const { hasAssignAuthorAction, onError, onUpdate } = props;
 
-	const [ selected, setSelected ] = useState( currentAuthors );
 	const isDisabled = ! hasAssignAuthorAction;
 
+	const [ selected, setSelected ] = useState( authorshipData.authors );
+
 	/**
-	 * Asynchronously loads the options for the control based on the search paramter.
+	 * Asynchronously loads the options for the control based on the search parameter.
 	 *
 	 * @param {string} search The search string.
 	 * @returns {Promise<Option[]>} A promise that fulfils the options.
@@ -97,7 +97,10 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			}
 		);
 
-		const api: Promise<WP_REST_API_User> = apiFetch( { path, method: 'POST' } );
+		const api: Promise<WP_REST_API_User> = apiFetch( {
+			method: 'POST',
+			path,
+		} );
 
 		return api.then( user => {
 			const options = [ ...selected, createOption( user ) ];
