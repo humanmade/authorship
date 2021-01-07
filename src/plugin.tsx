@@ -30,14 +30,15 @@ const Select = compose( [
 	} ),
 ] )( AuthorsSelect );
 
-const render = () => (
-	<PluginPostStatusInfo>
-		<Select/>
-	</PluginPostStatusInfo>
-);
-
 export const name = 'authorship';
 
 export const settings = {
-	render,
+	icon: null,
+	render() {
+		return (
+			<PluginPostStatusInfo>
+				<Select/>
+			</PluginPostStatusInfo>
+		);
+	},
 };
