@@ -1,6 +1,5 @@
 import { get } from 'lodash';
 import * as React from 'react';
-import { ActionMeta } from 'react-select';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import { SortableContainer } from 'react-sortable-hoc';
 import type {
@@ -98,10 +97,9 @@ const AuthorsSelect = args => {
 	/**
 	 * Handles changes to the selected authors.
 	 *
-	 * @param {Option[]|null} options The selected options.
-	 * @param {ActionMeta}    action  The action performed that triggered the value change.
+	 * @param {Option[]} [options] The selected options.
 	 */
-	const changeValue = ( options: Option[]|null, action: ActionMeta<any> ) => {
+	const changeValue = ( options?: Option[] ) => {
 		setSelected( options || [] );
 		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
 	};
