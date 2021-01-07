@@ -12,8 +12,10 @@ import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
-import SortableMultiValueElement from './SortableMultiValueElement';
+import { authorshipDataFromWP, Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
+
+import SortableMultiValueElement from './SortableMultiValueElement';
 
 declare const authorshipData: authorshipDataFromWP;
 declare const wp: any;

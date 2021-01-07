@@ -1,4 +1,4 @@
-interface Option {
+export interface Option {
 	/**
 	 * The option value.
 	 */
@@ -13,7 +13,7 @@ interface Option {
 	avatar: string | null;
 }
 
-interface SortedOption {
+export interface SortedOption {
 	/**
 	 * The old index position.
 	 */
@@ -24,6 +24,6 @@ interface SortedOption {
 	newIndex: number;
 }
 
-interface authorshipDataFromWP {
+export interface authorshipDataFromWP {
 	authors: Option[];
 }

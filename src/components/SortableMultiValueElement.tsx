@@ -2,6 +2,8 @@ import React, { ReactElement } from 'react';
 import { components, MultiValueProps } from 'react-select';
 import { SortableElement } from 'react-sortable-hoc';
 
+import { Option } from '../types';
+
 const { MultiValue } = components;
 
 const MultiValueElement = ( props: MultiValueProps<Option> ): ReactElement => {
