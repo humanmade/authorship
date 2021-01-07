@@ -6,13 +6,19 @@ import { Option } from '../types';
 
 import SortableMultiValueElement from './SortableMultiValueElement';
 
+const components = {
+	MultiValue: SortableMultiValueElement,
+};
+
+const isValidNewOption = ( value: string ) => value.length >= 2;
+
 /**
  * Overrides the default option display with our custom one.
  *
  * @param {Option} option The option data.
  * @returns {ReactElement} The element.
  */
-const formatOptionLabel = ( option: Option ) => (
+const formatOptionLabel = ( option: Option ): ReactElement => (
 	<div style={ {
 		display: 'flex',
 		alignItems: 'center',
@@ -43,13 +49,11 @@ const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement 
 		cacheOptions
 		className="authorship-select-container"
 		classNamePrefix="authorship-select"
-		components={ {
-			MultiValue: SortableMultiValueElement,
-		} }
+		components={ components }
 		formatOptionLabel={ formatOptionLabel }
 		isClearable={ false }
 		isMulti
-		isValidNewOption={ ( value: string ) => value.length >= 2 }
+		isValidNewOption={ isValidNewOption }
 		{ ...props }
 	/>
 );
