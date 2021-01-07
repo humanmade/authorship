@@ -19,15 +19,21 @@ import SortableMultiValueElement from './SortableMultiValueElement';
 declare const authorshipData: authorshipDataFromWP;
 declare const wp: any;
 
+interface AuthorsSelectProps {
+	hasAssignAuthorAction: boolean,
+	onError: ( message: string ) => void,
+	onUpdate: ( value: number[] ) => void,
+}
+
 /**
  * Returns the author selector control.
  *
- * @param {object} args Arguments.
+ * @param {AuthorsSelectProps} props Component props.
  * @returns {JSX.Element} An element.
  */
-const AuthorsSelect = args => {
+const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 	const currentAuthors = authorshipData.authors;
-	const { hasAssignAuthorAction, onUpdate, onError } = args;
+	const { hasAssignAuthorAction, onError, onUpdate } = props;
 
 	const [ selected, setSelected ] = React.useState( currentAuthors );
 	const isDisabled = ! hasAssignAuthorAction;
@@ -183,13 +189,13 @@ const AuthorsSelect = args => {
 export { AuthorsSelect };
 
 export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, CallableFunction> => ( {
+	onError( message: string ) {
+		dispatch( 'core/notices' ).createErrorNotice( message );
+	},
 	onUpdate( value: number[] ) {
 		dispatch( 'core/editor' ).editPost( {
 			authorship: value,
 		} );
-	},
-	onError( message: string ) {
-		dispatch( 'core/notices' ).createErrorNotice( message );
 	},
 } );
 
