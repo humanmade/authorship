@@ -12,6 +12,8 @@ const components = {
 
 const isValidNewOption = ( value: string ) => value.length >= 2;
 
+export const className = 'authorship-select-container';
+
 /**
  * Overrides the default option display with our custom one.
  *
@@ -47,7 +49,7 @@ const formatOptionLabel = ( option: Option ): ReactElement => (
 const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement => (
 	<AsyncCreatableSelect
 		cacheOptions
-		className="authorship-select-container"
+		className={ className }
 		classNamePrefix="authorship-select"
 		components={ components }
 		formatOptionLabel={ formatOptionLabel }

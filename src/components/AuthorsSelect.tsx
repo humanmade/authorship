@@ -13,7 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
-import SortableSelectContainer from './SortableSelectContainer';
+import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
 
 declare const authorshipData: authorshipDataFromWP;
 
@@ -22,6 +22,8 @@ interface AuthorsSelectProps {
 	onError: ( message: string ) => void,
 	onUpdate: ( value: number[] ) => void,
 }
+
+const getHelperContainer = (): HTMLElement => document.querySelector( `.${ containerClassName}` );
 
 /**
  * Returns the author selector control.
@@ -122,7 +124,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 		<SortableSelectContainer
 			axis="y"
 			distance={ 4 }
-			helperContainer={ () => document.getElementsByClassName( 'authorship-select-container' )[0] as HTMLElement }
+			helperContainer={ getHelperContainer }
 			isDisabled={ isDisabled }
 			loadOptions={ loadOptions }
 			lockAxis="y"
