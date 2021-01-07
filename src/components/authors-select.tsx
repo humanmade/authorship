@@ -1,5 +1,5 @@
 import { get } from 'lodash';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 import { SortableContainer } from 'react-sortable-hoc';
 import type {
@@ -29,7 +29,7 @@ interface AuthorsSelectProps {
  * Returns the author selector control.
  *
  * @param {AuthorsSelectProps} props Component props.
- * @returns {JSX.Element} An element.
+ * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 	const currentAuthors = authorshipData.authors;
@@ -78,7 +78,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 	 * Overrides the default option display with our custom one.
 	 *
 	 * @param {Option} option The option data.
-	 * @returns {JSX.Element} The element.
+	 * @returns {ReactElement} The element.
 	 */
 	const formatOptionLabel = ( option: Option ) => (
 		<div style={ {
@@ -149,7 +149,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 	/**
 	 * Returns the base author selector control.
 	 *
-	 * @returns {JSX.Element} An element.
+	 * @returns {ReactElement} An element.
 	 */
 	const Select = () => (
 		<AsyncCreatableSelect
