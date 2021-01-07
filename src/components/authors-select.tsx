@@ -182,25 +182,26 @@ const AuthorsSelect = args => {
 
 export { AuthorsSelect };
 
+export const mapDispatchToProps = dispatch => ( {
+	onUpdate( value: number[] ) {
+		dispatch( 'core/editor' ).editPost( {
+			authorship: value,
+		} );
+	},
+	onError( message: string ) {
+		dispatch( 'core/notices' ).createErrorNotice( message );
+	},
+} );
+
+export const mapSelectToProps = select => ( {
+	hasAssignAuthorAction: get(
+		select( 'core/editor' ).getCurrentPost(),
+		[ '_links', 'authorship:action-assign-authorship' ],
+		false
+	),
+} );
+
 export default compose( [
-	withDispatch( dispatch => ( {
-		onUpdate( value: number[] ) {
-			dispatch( 'core/editor' ).editPost( {
-				authorship: value,
-			} );
-		},
-		onError( message: string ) {
-			dispatch( 'core/notices' ).createErrorNotice( message );
-		},
-	} ) ),
-	withSelect( select => {
-		const post = select( 'core/editor' ).getCurrentPost();
-		return {
-			hasAssignAuthorAction: get(
-				post,
-				[ '_links', 'authorship:action-assign-authorship' ],
-				false
-			),
-		};
-	} ),
+	withDispatch( mapDispatchToProps ),
+	withSelect( mapSelectToProps ),
 ] )( AuthorsSelect );
