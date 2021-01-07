@@ -7,6 +7,7 @@ import type {
 	WP_REST_API_User,
 } from 'wp-types';
 
+import apiFetch from '@wordpress/api-fetch';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
@@ -17,7 +18,6 @@ import arrayMove from '../utils/arrayMove';
 import SortableMultiValueElement from './SortableMultiValueElement';
 
 declare const authorshipData: authorshipDataFromWP;
-declare const wp: any;
 
 interface AuthorsSelectProps {
 	hasAssignAuthorAction: boolean,
@@ -52,7 +52,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 			}
 		);
 
-		const api: Promise<WP_REST_API_User[]> = wp.apiFetch( { path } );
+		const api: Promise<WP_REST_API_User[]> = apiFetch( { path } );
 
 		return api.then( users =>
 			users.map( createOption )
@@ -123,7 +123,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ) => {
 			}
 		);
 
-		const api: Promise<WP_REST_API_User> = wp.apiFetch( { path, method: 'POST' } );
+		const api: Promise<WP_REST_API_User> = apiFetch( { path, method: 'POST' } );
 
 		return api.then( user => {
 			const options = [ ...selected, createOption( user ) ];
