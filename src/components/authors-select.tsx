@@ -194,11 +194,11 @@ export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string,
 } );
 
 export const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
-	hasAssignAuthorAction: get(
+	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],
 		false
-	),
+	) ),
 } );
 
 export default compose( [
