@@ -2,6 +2,8 @@ import React, { ReactElement } from 'react';
 import AsyncCreatableSelect, { Props as AsyncCreatableSelectProps } from 'react-select/async-creatable';
 import { SortableContainer } from 'react-sortable-hoc';
 
+import { __ } from '@wordpress/i18n';
+
 import { Option } from '../types';
 
 import SortableMultiValueElement from './SortableMultiValueElement';
@@ -11,6 +13,8 @@ const components = {
 };
 
 const isValidNewOption = ( value: string ) => value.length >= 2;
+
+const placeholder = __( 'Select authors…', 'authorship' );
 
 export const className = 'authorship-select-container';
 
@@ -56,6 +60,7 @@ const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement 
 		isClearable={ false }
 		isMulti
 		isValidNewOption={ isValidNewOption }
+		placeholder={ placeholder }
 		{ ...props }
 	/>
 );
