@@ -20,6 +20,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 - [Features](#features)
 - [Installation](#installation)
 - [Design Decisions](#design-decisions)
+- [Template Functions](#template-functions)
 - [REST API](#rest-api)
 - [WP-CLI](#wp-cli)
 - [Accessibility](#accessibility)
@@ -97,6 +98,17 @@ Authorship creates a real WordPress user account for each guest author, which pr
 * Consistent data structure - you only ever deal with `WP_User` objects
 * No need to keep data in sync between a user and their "author" profile
 * Promoting a guest author to a functional user is done just by changing their user role
+
+## Template Functions
+
+The following template functions are available for use in your theme to get the author(s) of a post:
+
+* `\Authorship\get_author_names( $post )`
+  - Returns a comma-separated list of the names of the author(s)
+* `\Authorship\get_author_names_sentence( $post )`
+  - Returns a sentence stating the names of the author(s), localised to the current language
+* `\Authorship\get_author_names_list( $post )`
+  - Returns an unordered HTML list of the names of the author(s)
 
 ## REST API
 
