@@ -13,7 +13,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 /**
- * Base test case for the plugin.
+ * REST API test class for the plugin.
  */
 abstract class RESTAPITestCase extends TestCase {
 	public function setUp() {
