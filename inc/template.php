@@ -15,7 +15,7 @@ use WP_Term;
 use WP_User;
 
 /**
- * Gets the user IDs for the authors of the given post.
+ * Returns the user IDs for the authors of the given post.
  *
  * @param WP_Post $post The post object.
  * @return int[] Array of user IDs.
@@ -36,7 +36,7 @@ function get_author_ids( WP_Post $post ) : array {
 }
 
 /**
- * Gets the user objects for the authors of the given post.
+ * Returns the user objects for the authors of the given post.
  *
  * @param WP_Post $post The post object.
  * @return WP_User[] Array of user objects.
@@ -54,6 +54,42 @@ function get_authors( WP_Post $post ) : array {
 	] );
 
 	return $users;
+}
+
+/**
+ * Returns a comma-separated list of the names of the author(s) of the given post.
+ *
+ * Example:
+ *
+ *     John Lennon, Paul McCartney, George Harrison, Ringo Starr
+ *
+ * @param WP_Post $post The post object.
+ * @return string List of the names of the authors.
+ */
+function get_author_names( WP_Post $post ) : string {
+	$authors = get_authors( $post );
+
+	return implode( ', ', array_column( $authors, 'display_name' ) );
+}
+
+/**
+ * Returns a sentence stating the names of the author(s) of the given post, localised
+ * to the current language.
+ *
+ * Example:
+ *
+ *     Mick Jagger, Keith Richards, Charlie Watts, and Ronnie Wood
+ *
+ * @param WP_Post $post The post object.
+ * @return string List of the names of the authors.
+ */
+function get_author_names_sentence( WP_Post $post ) : string {
+	$authors = get_authors( $post );
+
+	return wp_sprintf(
+		'%l',
+		array_column( $authors, 'display_name' )
+	);
 }
 
 /**

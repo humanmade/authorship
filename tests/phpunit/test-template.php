@@ -12,6 +12,8 @@ namespace Authorship\Tests;
 use const Authorship\POSTS_PARAM;
 
 use function Authorship\get_author_ids;
+use function Authorship\get_author_names;
+use function Authorship\get_author_names_sentence;
 use function Authorship\user_is_author;
 
 use WP_User;
@@ -88,6 +90,50 @@ class TestTemplate extends TestCase {
 		$post = $factory->create_and_get( $args );
 
 		$this->assertSame( $expected, get_author_ids( $post ) );
+	}
+
+	public function testAuthorNames() : void {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, Author, and Admin.
+		$post = $factory->create_and_get( [
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+				self::$users['author']->ID,
+				self::$users['admin']->ID,
+			],
+		] );
+
+		$expected = sprintf(
+			'%1$s, %2$s, %3$s',
+			self::$users['editor']->display_name,
+			self::$users['author']->display_name,
+			self::$users['admin']->display_name
+		);
+
+		$this->assertSame( $expected, get_author_names( $post ) );
+	}
+
+	public function testAuthorNamesInSentence() : void {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, Author, and Admin.
+		$post = $factory->create_and_get( [
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+				self::$users['author']->ID,
+				self::$users['admin']->ID,
+			],
+		] );
+
+		$expected = sprintf(
+			'%1$s, %2$s, and %3$s',
+			self::$users['editor']->display_name,
+			self::$users['author']->display_name,
+			self::$users['admin']->display_name
+		);
+
+		$this->assertSame( $expected, get_author_names_sentence( $post ) );
 	}
 
 	/**

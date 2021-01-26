@@ -71,13 +71,7 @@ function filter_the_author_for_rss( ?string $display_name ) : ?string {
 		return $display_name;
 	}
 
-	$authors = get_authors( $post );
-
-	if ( ! $authors ) {
-		return $display_name;
-	}
-
-	return implode( ', ', array_column( $authors, 'display_name' ) );
+	return get_author_names( $post );
 }
 
 /**
