@@ -64,6 +64,8 @@ jobs:
         composer require --dev --prefer-dist --no-progress --no-suggest --no-interaction --update-with-dependencies roots/wordpress="${{ matrix.wp }} || *" wp-phpunit/wp-phpunit="${{ matrix.wp }} || *"
 
     - name: Run the tests
-      run: composer test
+      run: |
+        npm run lint
+        composer test
       env:
         WP_TESTS_DB_HOST: 127.0.0.1:${{ job.services.mysql.ports['3306'] }}
