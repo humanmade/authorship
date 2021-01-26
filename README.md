@@ -17,11 +17,17 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ---
 
- * [Features](#features)
- * [Design decisions](#design-decisions)
- * [Team](#team)
- * [License](#license)
- * [Alternatives](#alternatives)
+- [Features](#features)
+- [Installation](#installation)
+- [Design Decisions](#design-decisions)
+- [REST API](#rest-api)
+- [WP-CLI](#wp-cli)
+- [Accessibility](#accessibility)
+- [Privacy & Security](#privacy--security)
+- [Contributing](#contributing)
+- [Team](#team)
+- [License](#license)
+- [Alternatives](#alternatives)
 
 ---
 
@@ -47,7 +53,7 @@ _Features without a checkmark are still work in progress._
 * Start the dev server:  
   `npm run start`
 
-## Design decisions
+## Design Decisions
 
 Why another multi-author plugin? What about Co-Authors Plus or Bylines or PublishPress Authors?
 
@@ -113,23 +119,37 @@ The following WP-CLI flags are available:
 
 ### --authorship flag
 
-When creating or updating posts, the `--authorship` flag can be used to specify the attributed users of the post. The flag accepts a comma-separated list of user IDs. Examples:
+When creating or updating posts the `--authorship` flag can be used to specify the attributed users of the post. The flag accepts a comma-separated list of user IDs. Examples:
 
 * `wp post create --post_title="My New Post" --authorship=4,11`
 * `wp post update 220 --authorship=13`
 
-When this flag is *not* set:
+If this flag is *not* set:
 
 * When creating a new post, if the `--post_author` flag is set then it will be used for authorship
 * When updating an existing post, no change will be made to authorship
+
+## Accessibility
+
+@TODO
+
+## Privacy & Security
+
+@TODO
+
+## Contributing
+
+@TODO Add CONTRIBUTING.md and link it here
 
 ## Team
 
 Authorship is developed and maintained by [Human Made](https://humanmade.com) and [Altis](https://www.altis-dxp.com). Its initial development was funded by [Siemens](https://www.siemens.com).
 
-[<img src="assets/images/hm-logo.png" width="207" height="86" alt="">](https://humanmade.com)
-[<img src="assets/images/altis-logo.png" width="207" height="86" alt="">](https://www.altis-dxp.com)
-[<img src="assets/images/siemens-logo.png" width="215" height="86" alt="">](https://www.siemens.com)
+<p align="center">
+	<a href="https://humanmade.com"><img src="assets/images/hm-logo.png" width="207" height="86" alt="Human Made"></a>
+	<a href="https://www.altis-dxp.com"><img src="assets/images/altis-logo.png" width="207" height="86" alt="Altis DXP"></a>
+	<a href="https://www.siemens.com"><img src="assets/images/siemens-logo.png" width="215" height="86" alt="Siemens"></a>
+</p>
 
 ## License
 
