@@ -29,4 +29,5 @@ tests_add_filter( 'muplugins_loaded', function() use ( $_plugin_dir ) : void {
 
 require_once $_tests_dir . '/includes/bootstrap.php';
 require_once __DIR__ . '/testcase.php';
+require_once __DIR__ . '/feed-testcase.php';
 require_once __DIR__ . '/restapi-testcase.php';

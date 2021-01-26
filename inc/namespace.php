@@ -51,6 +51,33 @@ function bootstrap() : void {
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_editing', 10, 4 );
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_users', 10, 4 );
 	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
+	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
+}
+
+/**
+ * Filters the display name of the current post's author for RSS feeds.
+ *
+ * @param string|null $display_name The author's display name.
+ * @return string|null The author's display name.
+ */
+function filter_the_author_for_rss( ?string $display_name ) : ?string {
+	if ( ! is_feed( 'rss2' ) ) {
+		return $display_name;
+	}
+
+	$post = get_post();
+
+	if ( ! $post ) {
+		return $display_name;
+	}
+
+	$authors = get_authors( $post );
+
+	if ( ! $authors ) {
+		return $display_name;
+	}
+
+	return implode( ', ', array_column( $authors, 'display_name' ) );
 }
 
 /**
