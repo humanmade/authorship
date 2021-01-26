@@ -8,6 +8,7 @@ parameters:
   scanFiles:
     - plugin.php
     - inc/namespace.php
+    - inc/taxonomy.php
     - inc/class-users-controller.php
     - inc/template.php
     - inc/admin.php
