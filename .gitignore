@@ -1,9 +1,14 @@
+# Directories:
+
 /build/
 /lib/
 /node_modules/
 /tests/cache/
 /tests/wordpress/
-/tests/.env
 /vendor/
+
+# Files:
+
 /composer.lock
 /package-lock.json
+/tests/.env
