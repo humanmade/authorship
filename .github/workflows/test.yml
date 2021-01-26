@@ -66,6 +66,7 @@ jobs:
     - name: Run the tests
       run: |
         npm run lint
+        npm run build
         composer test
       env:
         WP_TESTS_DB_HOST: 127.0.0.1:${{ job.services.mysql.ports['3306'] }}
