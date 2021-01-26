@@ -13,6 +13,7 @@ use const Authorship\POSTS_PARAM;
 
 use function Authorship\get_author_ids;
 use function Authorship\get_author_names;
+use function Authorship\get_author_names_list;
 use function Authorship\get_author_names_sentence;
 use function Authorship\user_is_author;
 
@@ -134,6 +135,36 @@ class TestTemplate extends TestCase {
 		);
 
 		$this->assertSame( $expected, get_author_names_sentence( $post ) );
+	}
+
+	public function testAuthorNamesInList() : void {
+		$factory = self::factory()->post;
+
+		// Attributed to Editor, Author, and Admin.
+		$post = $factory->create_and_get( [
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+				self::$users['author']->ID,
+				self::$users['admin']->ID,
+			],
+		] );
+
+		$output = <<<'HTML'
+<ul>
+	<li>%1$s</li>
+	<li>%2$s</li>
+	<li>%3$s</li>
+</ul>
+HTML;
+
+		$expected = sprintf(
+			$output,
+			self::$users['editor']->display_name,
+			self::$users['author']->display_name,
+			self::$users['admin']->display_name
+		);
+
+		$this->assertSame( $expected, get_author_names_list( $post ) );
 	}
 
 	/**

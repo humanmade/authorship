@@ -86,10 +86,45 @@ function get_author_names( WP_Post $post ) : string {
 function get_author_names_sentence( WP_Post $post ) : string {
 	$authors = get_authors( $post );
 
+	if ( empty( $authors ) ) {
+		return '';
+	}
+
 	return wp_sprintf(
 		'%l',
 		array_column( $authors, 'display_name' )
 	);
+}
+
+/**
+ * Returns an unordered HTML list of the names of the author(s) of the given post.
+ *
+ * Example:
+ *
+ *     <ul>
+ *         <li>Annie Lennox</li>
+ *         <li>Dave Stewart</li>
+ *     </ul>
+ *
+ * @param WP_Post $post The post object.
+ * @return string List of the names of the authors.
+ */
+function get_author_names_list( WP_Post $post ) : string {
+	$authors = get_authors( $post );
+
+	if ( empty( $authors ) ) {
+		return '';
+	}
+
+	$names = implode( "</li>\n\t<li>", array_column( $authors, 'display_name' ) );
+
+	$output = <<<HTML
+<ul>
+	<li>{$names}</li>
+</ul>
+HTML;
+
+	return $output;
 }
 
 /**
