@@ -13,6 +13,7 @@ parameters:
     - inc/template.php
     - inc/admin.php
     - tests/phpunit/includes/testcase.php
+    - tests/phpunit/includes/feed-testcase.php
     - tests/phpunit/includes/restapi-testcase.php
   scanDirectories:
     - inc

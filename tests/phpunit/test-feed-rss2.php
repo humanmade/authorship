@@ -12,7 +12,7 @@ namespace Authorship\Tests;
 use const Authorship\POSTS_PARAM;
 
 class TestRSS2 extends FeedTestCase {
-	public function testMultipleAuthorNamesAreListed() {
+	public function testMultipleAuthorNamesAreListed() : void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor and Author, owned by Admin.

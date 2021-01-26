@@ -22,7 +22,14 @@ use WP_Http;
 use WP_REST_Request;
 
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
+	/**
+	 * @var string
+	 */
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
+
+	/**
+	 * @var string
+	 */
 	protected static $user_route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE . '/%d';
 
 	public function testGuestAuthorCanBeCreatedWithJustAName() : void {
