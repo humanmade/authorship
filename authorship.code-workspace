@@ -17,6 +17,7 @@
   },
   "settings": {
     "files.associations": {
+      ".env.dist": "dotenv",
       "*.neon.dist": "neon",
       "*.xml.dist": "xml"
     },
