@@ -15,7 +15,7 @@ use WP_Term;
 use WP_User;
 
 /**
- * Returns the user IDs for the authors of the given post.
+ * Returns the user IDs for the attributed author(s) of the given post.
  *
  * @param WP_Post $post The post object.
  * @return int[] Array of user IDs.
@@ -36,7 +36,7 @@ function get_author_ids( WP_Post $post ) : array {
 }
 
 /**
- * Returns the user objects for the authors of the given post.
+ * Returns the user objects for the attributed author(s) of the given post.
  *
  * @param WP_Post $post The post object.
  * @return WP_User[] Array of user objects.
@@ -57,7 +57,7 @@ function get_authors( WP_Post $post ) : array {
 }
 
 /**
- * Returns a comma-separated list of the names of the author(s) of the given post.
+ * Returns a comma-separated list of the names of the attributed author(s) of the given post.
  *
  * Example:
  *
@@ -73,7 +73,7 @@ function get_author_names( WP_Post $post ) : string {
 }
 
 /**
- * Returns a sentence stating the names of the author(s) of the given post, localised
+ * Returns a sentence stating the names of the attributed author(s) of the given post, localised
  * to the current language.
  *
  * Example:
@@ -97,7 +97,7 @@ function get_author_names_sentence( WP_Post $post ) : string {
 }
 
 /**
- * Returns an unordered HTML list of the names of the author(s) of the given post.
+ * Returns an unordered HTML list of the names of the attributed author(s) of the given post.
  *
  * Example:
  *
@@ -128,7 +128,7 @@ HTML;
 }
 
 /**
- * Sets the authors for the given post.
+ * Sets the attributed authors for the given post.
  *
  * @param WP_Post $post    The post object.
  * @param int[]   $authors Array of user IDs.
@@ -164,11 +164,11 @@ function set_authors( WP_Post $post, array $authors ) : array {
 }
 
 /**
- * Determines if the given user is an author of the given post.
+ * Determines if the given user is an attributed author of the given post.
  *
  * @param WP_User $user The user object.
  * @param WP_Post $post The post object.
- * @return bool If the user is an author of the post.
+ * @return bool If the user is an attributed author of the post.
  */
 function user_is_author( WP_User $user, WP_Post $post ) : bool {
 	if ( ! post_type_supports( $post->post_type, 'author' ) ) {

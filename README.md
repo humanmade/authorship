@@ -11,7 +11,7 @@ A modern approach to author attribution in WordPress.
 
 ## Description
 
-Authorship is a modern approach to author attribution in WordPress. It supports multiple authors and guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
+Authorship is a modern approach to author attribution in WordPress. It supports attributing posts to multiple authors and to guest authors, provides a great UI, and treats API access to author data as a first-class citizen.
 
 Authorship is currently geared toward developers who are implementing custom solutions on WordPress. For example, it doesn't provide an option to automatically display author profiles at the bottom of a post. In the future it will include wider support for existing themes and useful features for implementors and site builders.
 
@@ -40,7 +40,8 @@ Authorship is currently geared toward developers who are implementing custom sol
 * [X] Works with the block editor
 * [ ] Works with the classic editor
 * [X] Full CRUD support in the REST API and WP-CLI
-* [ ] Full support in RSS and Atom feeds
+* [X] Full support in RSS feeds
+* [ ] Full support in Atom feeds
 * [ ] Fine-grained user permission controls
 * [ ] Plenty of filters and actions
 
@@ -79,7 +80,6 @@ Authorship provides:
 
 On the roadmap:
 
-* Full support for RSS and Atom feed output
 * Support for XML-RPC
 * Support for WPGraphQL
 
@@ -101,45 +101,45 @@ Authorship creates a real WordPress user account for each guest author, which pr
 
 ## Template Functions
 
-The following template functions are available for use in your theme to get the author(s) of a post:
+The following template functions are available for use in your theme to get the attributed author(s) of a post:
 
 * `\Authorship\get_author_names( $post )`
-  - Returns a comma-separated list of the names of the author(s)
+  - Returns a comma-separated list of the names of the attributed author(s)
 * `\Authorship\get_author_names_sentence( $post )`
-  - Returns a sentence stating the names of the author(s), localised to the current language
+  - Returns a sentence stating the names of the attributed author(s), localised to the current language
 * `\Authorship\get_author_names_list( $post )`
-  - Returns an unordered HTML list of the names of the author(s)
+  - Returns an unordered HTML list of the names of the attributed author(s)
 
 ## REST API
 
 The following REST API endpoints and fields are available:
 
-### authorship/v1/users endpoint
+### `authorship/v1/users` endpoint
 
 This endpoint allows:
 
 * Searching all users who can be attributed to content
 * Creating guest authors
 
-### authorship field
+### `authorship` field
 
-This field is added to the endpoint for all post types that have post type support for `author`, for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of user IDs attributed to the post.
+This field is added to the endpoint for all post types that have post type support for `author`, for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of IDs of users attributed to the post.
 
 ## WP-CLI
 
 The following WP-CLI flags are available:
 
-### --authorship flag
+### `--authorship` flag
 
-When creating or updating posts the `--authorship` flag can be used to specify the attributed users of the post. The flag accepts a comma-separated list of user IDs. Examples:
+When creating or updating posts the `--authorship` flag can be used to specify the IDs of users attributed to the post. The flag accepts a comma-separated list of user IDs. Examples:
 
 * `wp post create --post_title="My New Post" --authorship=4,11`
 * `wp post update 220 --authorship=13`
 
 If this flag is *not* set:
 
-* When creating a new post, if the `--post_author` flag is set then it will be used for authorship
-* When updating an existing post, no change will be made to authorship
+* When creating a new post, if the `--post_author` flag is set then it will be used for attributed authors
+* When updating an existing post, no change will be made to attributed authors
 
 ## Accessibility
 
