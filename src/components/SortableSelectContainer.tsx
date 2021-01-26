@@ -50,7 +50,7 @@ const formatOptionLabel = ( option: Option ): ReactElement => (
  * @param {AsyncCreatableSelectProps} props Component props.
  * @returns {ReactElement} An element.
  */
-const Select = ( props: AsyncCreatableSelectProps<Option> ): ReactElement => (
+const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement => (
 	<AsyncCreatableSelect
 		cacheOptions
 		className={ className }
