@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API controller for fetching users for authorship and greating guest authors.
+ * REST API controller for fetching users for authorship and creating guest authors.
  *
  * @package authorship
  */
@@ -11,6 +11,8 @@ namespace Authorship;
 
 use WP_Error;
 use WP_Http;
+use WP_REST_Request;
+use WP_REST_Response;
 use WP_REST_Server;
 use WP_REST_Users_Controller;
 
@@ -87,8 +89,8 @@ class Users_Controller extends WP_REST_Users_Controller {
 	/**
 	 * Permissions check for getting all users.
 	 *
-	 * @param \WP_REST_Request $request Full details about the request.
-	 * @return true|\WP_Error True if the request has read access, otherwise WP_Error object.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, otherwise WP_Error object.
 	 */
 	public function get_items_permissions_check( $request ) {
 		if ( ! current_user_can( 'list_users' ) ) {
@@ -133,8 +135,8 @@ class Users_Controller extends WP_REST_Users_Controller {
 	/**
 	 * Checks if a given request has access to read a user.
 	 *
-	 * @param \WP_REST_Request $request Full details about the request.
-	 * @return true|\WP_Error True if the request has read access for the item, otherwise \WP_Error object.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access for the item, otherwise WP_Error object.
 	 */
 	public function get_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'list_users' ) ) {
@@ -169,8 +171,8 @@ class Users_Controller extends WP_REST_Users_Controller {
 	/**
 	 * Checks if a given request has access to create users.
 	 *
-	 * @param \WP_REST_Request $request Full details about the request.
-	 * @return true|\WP_Error True if the request has access to create items, \WP_Error object otherwise.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'create_guest_authors' ) ) {
@@ -212,8 +214,8 @@ class Users_Controller extends WP_REST_Users_Controller {
 	/**
 	 * Creates a single user.
 	 *
-	 * @param \WP_REST_Request $request Full details about the request.
-	 * @return \WP_REST_Response|\WP_Error Response object on success, or \WP_Error object on failure.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
 		$username = sanitize_title( sanitize_user( $request->get_param( 'name' ), true ) );
@@ -227,14 +229,14 @@ class Users_Controller extends WP_REST_Users_Controller {
 		 * @param array $result {
 		 *     The array of user name, email, and the error messages.
 		 *
-		 *     @type string    $user_name     Sanitized and unique username.
-		 *     @type string    $orig_username Original username.
-		 *     @type string    $user_email    User email address.
-		 *     @type \WP_Error $errors        \WP_Error object containing any errors found.
+		 *     @type string   $user_name     Sanitized and unique username.
+		 *     @type string   $orig_username Original username.
+		 *     @type string   $user_email    User email address.
+		 *     @type WP_Error $errors        WP_Error object containing any errors found.
 		 * }
 		 */
 		add_filter( 'wpmu_validate_user_signup', function( array $result ) : array {
-			/** @var \WP_Error $errors */
+			/** @var WP_Error $errors */
 			$errors = $result['errors'];
 			$errors->remove( 'user_email' );
 
@@ -247,7 +249,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	/**
 	 * Prepares a single user for creation or update.
 	 *
-	 * @param \WP_REST_Request $request Request object.
+	 * @param WP_REST_Request $request Request object.
 	 * @return object User object.
 	 */
 	protected function prepare_item_for_database( $request ) {

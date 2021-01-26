@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Authorship;
 
+use Exception;
+use stdClass;
 use WP;
 use WP_Error;
 use WP_Http;
@@ -21,11 +23,14 @@ use WP_REST_Server;
 use WP_Term;
 use WP_User;
 
-const POSTS_PARAM = 'authorship';
-const REST_LINK_ID = 'wp:authorship';
-const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
-const REST_PARAM = 'authorship';
+use function Asset_Loader\enqueue_asset;
+
 const GUEST_ROLE = 'guest-author';
+const POSTS_PARAM = 'authorship';
+const REST_CURIE_TEMPLATE = 'https://authorship.hmn.md/{rel}';
+const REST_LINK_ID = 'wp:authorship';
+const REST_PARAM = 'authorship';
+const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
 const SCRIPT_HANDLE = 'authorship-js';
 const STYLE_HANDLE = 'authorship-css';
 const TAXONOMY = 'authorship';
@@ -95,7 +100,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 		return $caps;
 	}
 
-	/** @var \stdClass */
+	/** @var stdClass */
 	$post_type_cap = $post_type->cap;
 
 	// Remove the following from `$caps`.
@@ -118,9 +123,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 	switch ( $cap ) {
 		case 'delete_post':
 		case 'delete_page':
-			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
-				return ! in_array( $cap, $remove['delete'], true );
-			} );
+			$caps = array_diff( $caps, $remove['delete'] );
 
 			// If the post is published or scheduled...
 			if ( in_array( $post->post_status, [ 'publish', 'future' ], true ) ) {
@@ -139,9 +142,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 			break;
 		case 'edit_post':
 		case 'edit_page':
-			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
-				return ! in_array( $cap, $remove['edit'], true );
-			} );
+			$caps = array_diff( $caps, $remove['edit'] );
 
 			// If the post is published or scheduled...
 			if ( in_array( $post->post_status, [ 'publish', 'future' ], true ) ) {
@@ -160,9 +161,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 			break;
 		case 'read_post':
 		case 'read_page':
-			$caps = array_filter( $caps, function( string $cap ) use ( $remove ) : bool {
-				return ! in_array( $cap, $remove['read'], true );
-			} );
+			$caps = array_diff( $caps, $remove['read'] );
 
 			$caps[] = $post_type_cap->read;
 			break;
@@ -203,15 +202,14 @@ function filter_map_meta_cap_for_users( array $caps, string $cap, int $user_id, 
  *
  * @link https://core.trac.wordpress.org/ticket/44183
  *
- * @param \WP $wp Current WordPress environment instance.
+ * @param WP $wp Current WordPress environment instance.
  */
 function action_wp( WP $wp ) : void {
-	global $wp_query;
-
-	if ( $wp_query->is_author() ) {
-		$GLOBALS['authordata'] = get_userdata( $wp_query->get( 'author' ) );
+	if ( is_author() ) {
+		$GLOBALS['authordata'] = get_userdata( get_query_var( 'author' ) );
 	}
 }
+
 /**
  * Fires after WordPress has finished loading but before any headers are sent.
  */
@@ -222,8 +220,8 @@ function register_roles_and_caps() : void {
 /**
  * Filters the REST API response.
  *
- * @param \WP_HTTP_Response $result Result to send to the client. Usually a `\WP_REST_Response`.
- * @return \WP_HTTP_Response Result to send to the client. Usually a `\WP_REST_Response`.
+ * @param WP_HTTP_Response $result Result to send to the client. Usually a `WP_REST_Response`.
+ * @return WP_HTTP_Response Result to send to the client. Usually a `WP_REST_Response`.
  */
 function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Response {
 	if ( ! ( $result instanceof WP_REST_Response ) ) {
@@ -260,9 +258,9 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 	/**
 	 * Fires once a post has been saved.
 	 *
-	 * @param int      $post_ID Post ID.
-	 * @param \WP_Post $post    Post object.
-	 * @param bool     $update  Whether this is an existing post being updated.
+	 * @param int     $post_ID Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @param bool    $update  Whether this is an existing post being updated.
 	 */
 	add_action( 'wp_insert_post', function( int $post_ID, WP_Post $post, bool $update ) use ( $unsanitized_postarr ) : void {
 		if ( isset( $unsanitized_postarr['tax_input'] ) && ! empty( $unsanitized_postarr['tax_input'][ TAXONOMY ] ) ) {
@@ -289,7 +287,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 
 		try {
 			set_authors( $post, wp_parse_id_list( $authors ) );
-		} catch ( \Exception $e ) {
+		} catch ( Exception $e ) {
 			// Nothing at the moment.
 		}
 	}, 10, 3 );
@@ -300,12 +298,12 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 /**
  * Adds the authorship field to the REST API for post objects.
  *
- * @param \WP_REST_Server $server Server object.
+ * @param WP_REST_Server $server Server object.
  */
 function register_rest_api_fields( WP_REST_Server $server ) : void {
 	$post_types = get_post_types_by_support( 'author' );
 
-	array_map( __NAMESPACE__ . '\\register_rest_api_field', $post_types );
+	array_walk( $post_types, __NAMESPACE__ . '\\register_rest_api_field' );
 
 	$users_controller = new Users_Controller;
 	$users_controller->register_routes();
@@ -314,11 +312,11 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
 /**
  * Validates a passed argument for the list of authors.
  *
- * @param mixed            $authors   The passed value.
- * @param \WP_REST_Request $request   The REST API request object.
- * @param string           $param     The param name.
- * @param string           $post_type The post type name.
- * @return \WP_Error True if the validation passes, `\WP_Error` instance otherwise.
+ * @param mixed           $authors   The passed value.
+ * @param WP_REST_Request $request   The REST API request object.
+ * @param string          $param     The param name.
+ * @param string          $post_type The post type name.
+ * @return WP_Error|null Null if the validation passes, `WP_Error` instance otherwise.
  */
 function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ) :? WP_Error {
 	$schema_validation = rest_validate_request_arg( $authors, $request, $param );
@@ -333,7 +331,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		return null;
 	}
 
-	/** @var \stdClass */
+	/** @var stdClass */
 	$caps = $post_type_object->cap;
 
 	if ( ! current_user_can( $caps->edit_others_posts ) ) {
@@ -352,7 +350,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	// we need to allow for that here.
 	$authors = wp_parse_id_list( $authors );
 
-	/** @var \WP_User[] */
+	/** @var WP_User[] */
 	$users = get_users( [
 		'include' => $authors,
 		'orderby' => 'include',
@@ -392,7 +390,7 @@ function register_rest_api_field( string $post_type ) : void {
 		'update_callback' => function( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
 			try {
 				set_authors( $post, wp_parse_id_list( $value ) );
-			} catch ( \Exception $e ) {
+			} catch ( Exception $e ) {
 				return new WP_Error( 'authorship', $e->getMessage(), [
 					'status' => WP_Http::BAD_REQUEST,
 				] );
@@ -423,12 +421,12 @@ function register_rest_api_field( string $post_type ) : void {
  *
  * This also adds a new `authorship:action-assign-authorship` rel so custom clients can refer to this.
  *
- * @param \WP_REST_Response $response The response object.
- * @param \WP_Post          $post     Post object.
- * @param \WP_REST_Request  $request  Request object.
- * @return \WP_REST_Response The response object.
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     Post object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
  */
-function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : \WP_REST_Response {
+function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : WP_REST_Response {
 	$links = $response->get_links();
 
 	if ( isset( $links['https://api.w.org/action-assign-author'] ) ) {
@@ -448,7 +446,7 @@ function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_R
 function filter_rest_response_link_curies( array $additional ) : array {
 	$additional[] = [
 		'name'      => REST_PARAM,
-		'href'      => 'https://authorship.hmn.md/{rel}',
+		'href'      => REST_CURIE_TEMPLATE,
 		'templated' => true,
 	];
 
@@ -506,66 +504,63 @@ function init_taxonomy() : void {
 		]
 	);
 
-	array_map( function( string $post_type ) {
+	$user_id = get_current_user_id();
+
+	$term = get_term_by( 'slug', $user_id, TAXONOMY );
+	if ( $term instanceof WP_Term ) {
+		$count = $term->count;
+
+		$text = sprintf(
+			/* translators: %s: Number of posts. */
+			_nx(
+				'Mine <span class="count">(%s)</span>',
+				'Mine <span class="count">(%s)</span>',
+				$count,
+				'posts',
+				'authorship'
+			),
+			number_format_i18n( $count )
+		);
+	} else {
+		$text = '';
+	}
+
+	foreach ( $post_types as $post_type ) {
 		/**
 		 * Filters the list of available list table views.
 		 *
 		 * @param string[] $views An array of available list table views.
 		 * @return string[] An array of available list table views.
 		 */
-		add_filter( "views_edit-{$post_type}", function( array $views ) use ( $post_type ) : array {
-			unset( $views['mine'] );
+		add_filter( "views_edit-{$post_type}", function( array $views ) use ( $post_type, $text, $user_id ) : array {
+			if ( ! $text ) {
+				unset( $views['mine'] );
 
-			$user_id = get_current_user_id();
-			$term = get_term_by( 'slug', $user_id, TAXONOMY );
-
-			if ( ! ( $term instanceof WP_Term ) ) {
 				return $views;
 			}
 
-			$count = $term->count;
 			$args = [
 				'post_type' => $post_type,
 				'author'    => $user_id,
 			];
 			$link = add_query_arg( $args, admin_url( 'edit.php' ) );
-			$text = sprintf(
-				/* translators: %s: Number of posts. */
-				_nx(
-					'Mine <span class="count">(%s)</span>',
-					'Mine <span class="count">(%s)</span>',
-					$count,
-					'posts',
-					'authorship'
-				),
-				number_format_i18n( $count )
-			);
-			$mine = sprintf(
+
+			$views['mine'] = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				$link,
 				$text
 			);
-			$new_views = [];
 
-			foreach ( $views as $key => $value ) {
-				$new_views[ $key ] = $value;
-
-				if ( 'all' === $key ) {
-					// Always insert the 'Mine' view after the 'All' view.
-					$new_views['mine'] = $mine;
-				}
-			}
-
-			return $new_views;
+			return $views;
 		} );
-	}, $post_types );
+	}//end foreach
 }
 
 /**
  * Fires after block assets have been enqueued for the editing interface.
  */
 function enqueue_assets() : void {
-	/** @var \WP_Post */
+	/** @var WP_Post */
 	$post = get_post();
 
 	enqueue_assets_for_post();
@@ -578,7 +573,7 @@ function enqueue_assets() : void {
 function enqueue_assets_for_post() : void {
 	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
 
-	\Asset_Loader\enqueue_asset(
+	enqueue_asset(
 		$manifest,
 		'main.js',
 		[
@@ -595,7 +590,8 @@ function enqueue_assets_for_post() : void {
 			],
 		]
 	);
-	\Asset_Loader\enqueue_asset(
+
+	enqueue_asset(
 		$manifest,
 		'style.css',
 		[
@@ -607,7 +603,7 @@ function enqueue_assets_for_post() : void {
 /**
  * Preloads author data for the post editing screen.
  *
- * @param \WP_Post $post The post being edited.
+ * @param WP_Post $post The post being edited.
  */
 function preload_author_data( WP_Post $post ) : void {
 	$authors = get_authors( $post );
@@ -646,7 +642,7 @@ function preload_author_data( WP_Post $post ) : void {
  * This is used to override author-related query vars with a corresponding taxonomy query and
  * then add a second filter that resets the vars after the query has run.
  *
- * @param \WP_Query $query The \WP_Query instance.
+ * @param WP_Query $query The WP_Query instance.
  */
 function action_pre_get_posts( WP_Query $query ) : void {
 	$post_type = $query->get( 'post_type' );
@@ -687,7 +683,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	$user_id = 0;
 
 	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
-	// as \WP_Query will handle the validation before constructing its query.
+	// as WP_Query will handle the validation before constructing its query.
 	if ( ! empty( $stored_values['author'] ) ) {
 		$user_id = (int) $stored_values['author'];
 	} elseif ( ! empty( $stored_values['author_name'] ) ) {
@@ -721,8 +717,8 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 *
 	 * This allows the query vars to be reset to their original values.
 	 *
-	 * @param \WP_Post[]|null $posts Array of post objects. Passed by reference.
-	 * @param \WP_Query       $query The \WP_Query instance.
+	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
+	 * @param WP_Query       $query The WP_Query instance.
 	 */
 	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_id ) : ?array {
 		if ( empty( $stored_values ) ) {
