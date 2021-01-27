@@ -363,13 +363,13 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 	$caps = $post_type_object->cap;
 
 	if ( ! current_user_can( $caps->edit_others_posts ) ) {
-		return new WP_Error( 'authorship', __( 'You are not allowed to set the authorship for this post.', 'authorship' ), [
+		return new WP_Error( 'authorship', __( 'You are not allowed to set the attributed authors of this post.', 'authorship' ), [
 			'status' => WP_Http::FORBIDDEN,
 		] );
 	}
 
 	if ( ! post_type_supports( $post_type, 'author' ) ) {
-		return new WP_Error( 'authorship', __( 'This post type does not support specifying authorship.', 'authorship' ), [
+		return new WP_Error( 'authorship', __( 'This post type does not support attributed authors.', 'authorship' ), [
 			'status' => WP_Http::BAD_REQUEST,
 		] );
 	}
