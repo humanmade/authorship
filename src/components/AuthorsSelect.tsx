@@ -16,6 +16,7 @@ import arrayMove from '../utils/arrayMove';
 import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
 
 interface AuthorsSelectProps {
+	currentAuthors: number[],
 	hasAssignAuthorAction: boolean,
 	onError: ( message: string ) => void,
 	onUpdate: ( value: number[] ) => void,
@@ -42,11 +43,11 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
-	const { hasAssignAuthorAction, onError, onUpdate } = props;
+	const { currentAuthors, hasAssignAuthorAction, onError, onUpdate } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
 
-	const [ selected, setSelected ] = useState( authorshipData.authors );
+	const [ selected, setSelected ] = useState( currentAuthors );
 
 	/**
 	 * Asynchronously loads the options for the control based on the search parameter.
@@ -78,8 +79,9 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	 * @param {Option[]} [options] The selected options.
 	 */
 	const changeValue = ( options?: Option[] ) => {
-		setSelected( options || [] );
-		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
+		const save = options ? ( options.map( option => option.value ) ) : [];
+		setSelected( save );
+		onUpdate( save );
 	};
 
 	/**
@@ -101,10 +103,10 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 		} );
 
 		return api.then( user => {
-			const options = [ ...selected, createOption( user ) ];
+			const options = [ ...selected, createOption( user ).value ];
 
 			setSelected( options );
-			onUpdate( options.map( option => option.value ) );
+			onUpdate( options );
 		} ).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
 		} );
@@ -152,6 +154,7 @@ export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string,
 } );
 
 export const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
+	currentAuthors: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
 	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],
