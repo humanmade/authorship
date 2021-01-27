@@ -49,7 +49,7 @@ function bootstrap() : void {
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
 	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_editing', 10, 4 );
-	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_users', 10, 4 );
+	add_filter( 'user_has_cap', __NAMESPACE__ . '\\filter_user_has_cap', 10, 4 );
 	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 }
@@ -190,26 +190,37 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 }
 
 /**
- * Filters the primitive capabilities required of the given user to perform the action given in `$cap`.
+ * Filters a user's capabilities so they can be altered at runtime.
  *
- * @param string[] $caps    Array of the user's capabilities.
- * @param string   $cap     Capability being checked.
- * @param int      $user_id The user ID.
- * @param mixed[]  $args    The context for the cap, typically with the object ID as the first element.
- * @return string[] Array of the user's capabilities.
+ * @param bool[]   $user_caps     Array of key/value pairs where keys represent a capability name and boolean values
+ *                                represent whether the user has that capability.
+ * @param string[] $required_caps Array of required primitive capabilities for the requested capability.
+ * @param mixed[]  $args {
+ *     Arguments that accompany the requested capability check.
+ *
+ *     @type string    $0 Requested capability.
+ *     @type int       $1 Concerned user ID.
+ *     @type mixed  ...$2 Optional second and further parameters.
+ * }
+ * @param WP_User  $user          Concerned user object.
+ * @return bool[] Array of concerned user's capabilities.
  */
-function filter_map_meta_cap_for_users( array $caps, string $cap, int $user_id, array $args ) : array {
+function filter_user_has_cap( array $user_caps, array $required_caps, array $args, WP_User $user ) : array {
+	$cap = $args[0];
+
 	switch ( $cap ) {
 
 		case 'create_guest_authors':
-			$caps = [
-				'edit_others_posts',
-			];
+			if ( array_key_exists( $cap, $user_caps ) ) {
+				$user_caps[ $cap ] = $user_caps[ $cap ];
+			} else {
+				$user_caps[ $cap ] = user_can( $user->ID, 'edit_others_posts' );
+			}
 			break;
 
 	}
 
-	return $caps;
+	return $user_caps;
 }
 
 /**
