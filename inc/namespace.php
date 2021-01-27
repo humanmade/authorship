@@ -199,17 +199,15 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
  * @return string[] Array of the user's capabilities.
  */
 function filter_map_meta_cap_for_users( array $caps, string $cap, int $user_id, array $args ) : array {
-	$concerns = [
-		'create_guest_authors',
-	];
+	switch ( $cap ) {
 
-	if ( ! in_array( $cap, $concerns, true ) ) {
-		return $caps;
+		case 'create_guest_authors':
+			$caps = [
+				'edit_others_posts',
+			];
+			break;
+
 	}
-
-	$caps = [
-		'edit_others_posts',
-	];
 
 	return $caps;
 }
