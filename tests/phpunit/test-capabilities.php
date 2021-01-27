@@ -248,6 +248,62 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
+	 * @dataProvider dataRolesAndCustomCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testGuestAuthorCreationCanBeGranted( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+
+		self::$users[ $role ]->add_cap( 'create_guest_authors', true );
+
+		$this->assertTrue( user_can( $user_id, 'create_guest_authors' ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCustomCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testGuestAuthorCreationCanBeDenied( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+
+		self::$users[ $role ]->add_cap( 'create_guest_authors', false );
+
+		$this->assertFalse( user_can( $user_id, 'create_guest_authors' ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCustomCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testGuestPostAttributionCanBeGranted( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+
+		self::$users[ $role ]->add_cap( 'attribute_post_type', true );
+
+		$this->assertTrue( user_can( $user_id, 'attribute_post_type', 'post' ) );
+	}
+
+	/**
+	 * @dataProvider dataRolesAndCustomCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testGuestPostAttributionCanBeDenied( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+
+		self::$users[ $role ]->add_cap( 'attribute_post_type', false );
+
+		$this->assertFalse( user_can( $user_id, 'attribute_post_type', 'post' ) );
+	}
+
+	/**
 	 * @return mixed[]
 	 */
 	public function dataRolesAndPostCaps() : array {
