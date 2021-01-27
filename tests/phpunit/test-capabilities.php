@@ -18,7 +18,7 @@ use const Authorship\POSTS_PARAM;
 
 class TestCapabilities extends TestCase {
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -43,7 +43,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -68,7 +68,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -95,7 +95,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -120,7 +120,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -146,7 +146,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -171,7 +171,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -196,7 +196,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -218,7 +218,7 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
-	 * @dataProvider dataRolesAndCaps
+	 * @dataProvider dataRolesAndPostCaps
 	 *
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
@@ -237,7 +237,7 @@ class TestCapabilities extends TestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataRolesAndCaps() : array {
+	public function dataRolesAndPostCaps() : array {
 		return [
 			[
 				'editor',
