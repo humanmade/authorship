@@ -451,6 +451,13 @@ class TestCapabilities extends TestCase {
 	public function dataRolesAndCustomCaps() : array {
 		return [
 			[
+				'admin',
+				[
+					'create_guest_authors' => true,
+					'attribute_post_type'  => true,
+				],
+			],
+			[
 				'editor',
 				[
 					'create_guest_authors' => true,
