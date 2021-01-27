@@ -97,13 +97,14 @@ function get_author_names_sentence( WP_Post $post ) : string {
 }
 
 /**
- * Returns an unordered HTML list of the names of the attributed author(s) of the given post.
+ * Returns an unordered HTML list of the names of the attributed author(s) of the given post,
+ * linked to their author archive.
  *
  * Example:
  *
  *     <ul>
- *         <li>Annie Lennox</li>
- *         <li>Dave Stewart</li>
+ *         <li><a href="/author/annie-lennox/">Annie Lennox</a></li>
+ *         <li><a href="/author/dave-stewart/">Dave Stewart</a></li>
  *     </ul>
  *
  * @param WP_Post $post The post object.
@@ -116,11 +117,16 @@ function get_author_names_list( WP_Post $post ) : string {
 		return '';
 	}
 
-	$names = implode( "</li>\n\t<li>", array_column( $authors, 'display_name' ) );
+	$list = array_reduce( $authors, function( string $carry, WP_User $author ) {
+		return "{$carry}\n\t" . sprintf(
+			'<li><a href="%1$s">%2$s</a></li>',
+			esc_url( get_author_posts_url( $author->ID ) ),
+			esc_html( $author->display_name )
+		);
+	}, '' );
 
 	$output = <<<HTML
-<ul>
-	<li>{$names}</li>
+<ul>{$list}
 </ul>
 HTML;
 
