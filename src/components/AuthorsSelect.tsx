@@ -10,12 +10,10 @@ import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
-import { authorshipDataFromWP, Option, SortedOption } from '../types';
+import { Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
 import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
-
-declare const authorshipData: authorshipDataFromWP;
 
 interface AuthorsSelectProps {
 	hasAssignAuthorAction: boolean,
