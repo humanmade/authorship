@@ -338,7 +338,7 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
 }
 
 /**
- * Validates a passed argument for the list of authors.
+ * Validates a passed REST API argument for the list of authors.
  *
  * @param mixed           $authors   The passed value.
  * @param WP_REST_Request $request   The REST API request object.
