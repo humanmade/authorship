@@ -151,16 +151,19 @@ class TestTemplate extends TestCase {
 
 		$output = <<<'HTML'
 <ul>
-	<li>%1$s</li>
-	<li>%2$s</li>
-	<li>%3$s</li>
+	<li><a href="%1$s">%2$s</a></li>
+	<li><a href="%3$s">%4$s</a></li>
+	<li><a href="%5$s">%6$s</a></li>
 </ul>
 HTML;
 
 		$expected = sprintf(
 			$output,
+			get_author_posts_url( self::$users['editor']->ID ),
 			self::$users['editor']->display_name,
+			get_author_posts_url( self::$users['author']->ID ),
 			self::$users['author']->display_name,
+			get_author_posts_url( self::$users['admin']->ID ),
 			self::$users['admin']->display_name
 		);
 
