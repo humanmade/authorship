@@ -235,6 +235,19 @@ class TestCapabilities extends TestCase {
 	}
 
 	/**
+	 * @dataProvider dataRolesAndCustomCaps
+	 *
+	 * @param string $role Role name
+	 * @param mixed[] $caps Caps
+	 */
+	public function testDefaultCustomCapMappingIsCorrect( string $role, array $caps ) : void {
+		$user_id = self::$users[ $role ]->ID;
+
+		$this->assertSame( $caps['create_guest_authors'], user_can( $user_id, 'create_guest_authors' ) );
+		$this->assertSame( $caps['attribute_post_type'], user_can( $user_id, 'attribute_post_type', 'post' ) );
+	}
+
+	/**
 	 * @return mixed[]
 	 */
 	public function dataRolesAndPostCaps() : array {
@@ -427,6 +440,42 @@ class TestCapabilities extends TestCase {
 						'read_post'    => true,
 						'delete_post'  => false,
 					],
+				],
+			],
+		];
+	}
+
+	/**
+	 * @return mixed[]
+	 */
+	public function dataRolesAndCustomCaps() : array {
+		return [
+			[
+				'editor',
+				[
+					'create_guest_authors' => true,
+					'attribute_post_type'  => true,
+				],
+			],
+			[
+				'author',
+				[
+					'create_guest_authors' => false,
+					'attribute_post_type'  => false,
+				],
+			],
+			[
+				'contributor',
+				[
+					'create_guest_authors' => false,
+					'attribute_post_type'  => false,
+				],
+			],
+			[
+				'subscriber',
+				[
+					'create_guest_authors' => false,
+					'attribute_post_type'  => false,
 				],
 			],
 		];
