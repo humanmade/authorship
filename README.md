@@ -17,6 +17,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ---
 
+- [Current Status](#current-status)
 - [Features](#features)
 - [Installation](#installation)
 - [Design Decisions](#design-decisions)
@@ -31,6 +32,10 @@ Authorship is currently geared toward developers who are implementing custom sol
 - [Alternatives](#alternatives)
 
 ---
+
+## Current Status
+
+Alpha. Generally very functional several features are still in development.
 
 ## Features
 
