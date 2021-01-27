@@ -218,7 +218,31 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
 			}
 			break;
 
-	}
+		case 'attribute_post_type':
+			if ( empty( $args[2] ) ) {
+				$user_caps[ $cap ] = false;
+				break;
+			}
+
+			$post_type_object = get_post_type_object( $args[2] );
+
+			if ( ! $post_type_object ) {
+				$user_caps[ $cap ] = false;
+				break;
+			}
+
+			if ( array_key_exists( $cap, $user_caps ) ) {
+				$user_caps[ $cap ] = $user_caps[ $cap ];
+				break;
+			}
+
+			/** @var stdClass */
+			$post_type_caps = $post_type_object->cap;
+
+			$user_caps[ $cap ] = user_can( $user->ID, $post_type_caps->edit_others_posts );
+			break;
+
+	}//end switch
 
 	return $user_caps;
 }
@@ -353,16 +377,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		return $schema_validation;
 	}
 
-	$post_type_object = get_post_type_object( $post_type );
-
-	if ( ! $post_type_object ) {
-		return null;
-	}
-
-	/** @var stdClass */
-	$caps = $post_type_object->cap;
-
-	if ( ! current_user_can( $caps->edit_others_posts ) ) {
+	if ( ! current_user_can( 'attribute_post_type', $post_type ) ) {
 		return new WP_Error( 'authorship', __( 'You are not allowed to set the attributed authors of this post.', 'authorship' ), [
 			'status' => WP_Http::FORBIDDEN,
 		] );
