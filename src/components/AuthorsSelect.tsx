@@ -47,7 +47,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	const isDisabled = ! hasAssignAuthorAction;
 
-	const [ selected, setSelected ] = useState( currentAuthors );
+	const [ selected, setSelected ] : [ Option[], ( option: Option[] ) => void ] = useState( [] );
 
 	/**
 	 * Asynchronously loads the options for the control based on the search parameter.
@@ -79,9 +79,8 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	 * @param {Option[]} [options] The selected options.
 	 */
 	const changeValue = ( options?: Option[] ) => {
-		const save = options ? ( options.map( option => option.value ) ) : [];
-		setSelected( save );
-		onUpdate( save );
+		setSelected( options || [] );
+		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
 	};
 
 	/**
@@ -103,10 +102,11 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 		} );
 
 		return api.then( user => {
-			const options = [ ...selected, createOption( user ).value ];
+			const options = [ ...selected, createOption( user ) ];
+			const ids = options.map( option => option.value );
 
 			setSelected( options );
-			onUpdate( options );
+			onUpdate( ids );
 		} ).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
 		} );
@@ -118,9 +118,11 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	 * @param {SortedOption} option Sorting information for the option.
 	 */
 	const onSortEnd = ( option: SortedOption ) => {
-		const value = arrayMove( selected, option.oldIndex, option.newIndex );
-		setSelected( value );
-		onUpdate( value.map( option => option.value ) );
+		const options = arrayMove( selected, option.oldIndex, option.newIndex );
+		const ids = options.map( option => option.value );
+
+		setSelected( options );
+		onUpdate( ids );
 	};
 
 	return (
