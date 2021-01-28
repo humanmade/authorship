@@ -51,9 +51,10 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	if ( currentAuthorIDs.length && ! selected.length ) {
 		const path = addQueryArgs(
-			'/wp/v2/users/',
+			'/authorship/v1/users/',
 			{
 				include: currentAuthorIDs,
+				orderby: 'include',
 			}
 		);
 
