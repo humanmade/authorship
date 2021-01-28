@@ -16,7 +16,7 @@ import arrayMove from '../utils/arrayMove';
 import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
 
 interface AuthorsSelectProps {
-	currentAuthors: number[],
+	currentAuthorIDs: number[],
 	hasAssignAuthorAction: boolean,
 	onError: ( message: string ) => void,
 	onUpdate: ( value: number[] ) => void,
@@ -43,7 +43,7 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
-	const { currentAuthors, hasAssignAuthorAction, onError, onUpdate } = props;
+	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
 
@@ -156,7 +156,7 @@ export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string,
 } );
 
 export const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
-	currentAuthors: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
+	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
 	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],
