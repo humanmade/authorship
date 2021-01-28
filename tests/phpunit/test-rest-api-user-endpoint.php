@@ -118,7 +118,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
-		$request->set_param( 'search', 'testing' );
 		$request->set_param( $param, 'testing' );
 
 		$response = self::rest_do_request( $request );
@@ -131,7 +130,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
-		$request->set_param( 'search', 'testing' );
 		$request->set_param( 'context', 'edit' );
 
 		$response = self::rest_do_request( $request );
@@ -165,24 +163,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::UNAUTHORIZED, $response->get_status(), $message );
 	}
 
-	public function testSearchParameterIsRequiredWhenListingUsers() : void {
-		wp_set_current_user( self::$users['admin']->ID );
-
-		$request = new WP_REST_Request( 'GET', self::$route );
-		$response = self::rest_do_request( $request );
-
-		$this->assertTrue( $response->is_error() );
-
-		/** @var \WP_Error */
-		$error = $response->as_error();
-		$data = $error->get_error_data();
-		$message = self::get_message( $response );
-
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
-		$this->assertArrayHasKey( 'params', $data );
-		$this->assertContains( 'search', $data['params'] );
-	}
-
 	/**
 	 * @dataProvider dataAllowedOrderby
 	 *
@@ -192,7 +172,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
-		$request->set_param( 'search', 'testing' );
 		$request->set_param( 'orderby', $orderby );
 
 		$response = self::rest_do_request( $request );
@@ -210,7 +189,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
-		$request->set_param( 'search', 'testing' );
 		$request->set_param( 'orderby', $orderby );
 
 		$response = self::rest_do_request( $request );
@@ -292,9 +270,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	public function dataDisallowedOrderby() : array {
 		return [
 			[
-				'include',
-			],
-			[
 				'registered_date',
 			],
 			[
@@ -317,12 +292,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 */
 	public function dataDisallowedFilters() : array {
 		return [
-			[
-				'include',
-			],
-			[
-				'exclude',
-			],
 			[
 				'roles',
 			],

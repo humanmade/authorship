@@ -104,11 +104,9 @@ class Users_Controller extends WP_REST_Users_Controller {
 		}
 
 		if (
-			$request->get_param( 'include' ) ||
 			$request->get_param( 'slug' ) ||
 			$request->get_param( 'who' ) ||
-			$request->get_param( 'roles' ) ||
-			$request->get_param( 'exclude' )
+			$request->get_param( 'roles' )
 		) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -299,17 +297,15 @@ class Users_Controller extends WP_REST_Users_Controller {
 
 		$query_params['orderby']['enum'] = [
 			'id',
+			'include',
 			'name',
 		];
-		$query_params['search']['required'] = true;
 
 		unset(
 			$query_params['context'],
-			$query_params['include'],
 			$query_params['slug'],
 			$query_params['who'],
-			$query_params['roles'],
-			$query_params['exclude']
+			$query_params['roles']
 		);
 
 		return $query_params;
