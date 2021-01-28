@@ -53,6 +53,7 @@ function bootstrap() : void {
 	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
+	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 }
 
 /**
@@ -714,6 +715,38 @@ function filter_comment_moderation_recipients( array $emails, int $comment_id ) 
 	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
 		return $user->user_email;
 	}, $moderators ) );
+
+	return array_unique( array_merge( $emails, $additional_emails ) );
+}
+
+/**
+ * Filters the list of email addresses to receive a comment notification.
+ *
+ * @param string[] $emails     An array of email addresses to receive a comment notification.
+ * @param int      $comment_id The comment ID.
+ * @return string[] An array of email addresses to receive a comment notification.
+ */
+function filter_comment_notification_recipients( array $emails, int $comment_id ) : array {
+	/** @var \WP_Comment */
+	$comment = get_comment( $comment_id );
+	$post_id = (int) $comment->comment_post_ID;
+
+	if ( ! $post_id ) {
+		return $emails;
+	}
+
+	$post = get_post( $post_id );
+
+	if ( ! ( $post instanceof WP_Post ) ) {
+		return $emails;
+	}
+
+	$authors = get_authors( $post );
+
+	/** @var string[] */
+	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
+		return $user->user_email;
+	}, $authors ) );
 
 	return array_unique( array_merge( $emails, $additional_emails ) );
 }
