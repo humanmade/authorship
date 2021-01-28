@@ -118,10 +118,9 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 		return api.then( user => {
 			const options = [ ...selected, createOption( user ) ];
-			const ids = options.map( option => option.value );
 
 			setSelected( options );
-			onUpdate( ids );
+			onUpdate( options.map( option => option.value ) );
 		} ).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
 		} );
@@ -133,11 +132,9 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	 * @param {SortedOption} option Sorting information for the option.
 	 */
 	const onSortEnd = ( option: SortedOption ) => {
-		const options = arrayMove( selected, option.oldIndex, option.newIndex );
-		const ids = options.map( option => option.value );
-
-		setSelected( options );
-		onUpdate( ids );
+		const value = arrayMove( selected, option.oldIndex, option.newIndex );
+		setSelected( value );
+		onUpdate( value.map( option => option.value ) );
 	};
 
 	return (
