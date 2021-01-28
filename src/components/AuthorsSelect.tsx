@@ -47,7 +47,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	const isDisabled = ! hasAssignAuthorAction;
 
-	const [ selected, setSelected ] : [ Option[], ( option: Option[] ) => void ] = useState( [] );
+	const [ selected, setSelected ] = useState<Option[]>( [] );
 
 	if ( currentAuthorIDs.length && ! selected.length ) {
 		const path = addQueryArgs(
