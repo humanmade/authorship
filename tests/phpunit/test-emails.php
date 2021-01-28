@@ -62,7 +62,7 @@ class TestEmails extends EmailTestCase {
 
 		$comment_id = self::factory()->comment->create( [
 			'comment_post_ID'  => $post->ID,
-			'comment_approved' => '0',
+			'comment_approved' => '1',
 		] );
 
 		wp_notify_postauthor( $comment_id );
