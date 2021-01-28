@@ -49,6 +49,21 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	const [ selected, setSelected ] : [ Option[], ( option: Option[] ) => void ] = useState( [] );
 
+	if ( currentAuthorIDs.length && ! selected.length ) {
+		const path = addQueryArgs(
+			'/wp/v2/users/',
+			{
+				include: currentAuthorIDs,
+			}
+		);
+
+		const api: Promise<WP_REST_API_User[]> = apiFetch( { path } );
+
+		api.then( users => {
+			setSelected( users.map( createOption ) );
+		} );
+	}
+
 	/**
 	 * Asynchronously loads the options for the control based on the search parameter.
 	 *
