@@ -43,6 +43,35 @@ class TestEmails extends EmailTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
+	public function testCommentModerationEmailDoesNotDuplicateRecipients() : void {
+		// Attributed to the site admin:
+		$post_id = self::factory()->post->create( [
+			'post_author' => 1,
+			POSTS_PARAM   => [
+				1,
+			],
+		] );
+
+		$comment_id = self::factory()->comment->create( [
+			'comment_post_ID'  => $post_id,
+			'comment_approved' => '0',
+		] );
+
+		wp_new_comment_notify_moderator( $comment_id );
+
+		$expected = [
+			get_option( 'admin_email' ),
+		];
+
+		$actual = [];
+
+		foreach ( $this->mailer->mock_sent as $i => $mock_sent ) {
+			$actual[] = $this->mailer->get_recipient( 'to', $i )->address;
+		}
+
+		$this->assertSame( $expected, $actual );
+	}
+
 	public function testCommentNotificationEmailIsSentToAllAttributedAuthors() : void {
 		// Attributed to one user of each role:
 		$post_id = self::factory()->post->create( [
