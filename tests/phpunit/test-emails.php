@@ -14,16 +14,14 @@ use const Authorship\POSTS_PARAM;
 
 class TestEmails extends EmailTestCase {
 	public function testCommentModerationEmailIsSentToUsersWhoCanModerateIt() : void {
-		$factory = self::factory()->post;
-
 		// Attributed to one user of each role:
-		$post = $factory->create_and_get( [
+		$post_id = self::factory()->post->create( [
 			'post_author' => self::$users['editor']->ID,
 			POSTS_PARAM   => array_column( self::$users, 'ID' ),
 		] );
 
 		$comment_id = self::factory()->comment->create( [
-			'comment_post_ID'  => $post->ID,
+			'comment_post_ID'  => $post_id,
 			'comment_approved' => '0',
 		] );
 
@@ -46,16 +44,14 @@ class TestEmails extends EmailTestCase {
 	}
 
 	public function testCommentNotificationEmailIsSentToAllAttributedAuthors() : void {
-		$factory = self::factory()->post;
-
 		// Attributed to one user of each role:
-		$post = $factory->create_and_get( [
+		$post_id = self::factory()->post->create( [
 			'post_author' => self::$users['editor']->ID,
 			POSTS_PARAM   => array_column( self::$users, 'ID' ),
 		] );
 
 		$comment_id = self::factory()->comment->create( [
-			'comment_post_ID'  => $post->ID,
+			'comment_post_ID'  => $post_id,
 			'comment_approved' => '1',
 		] );
 
