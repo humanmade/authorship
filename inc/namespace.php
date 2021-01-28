@@ -52,6 +52,7 @@ function bootstrap() : void {
 	add_filter( 'user_has_cap', __NAMESPACE__ . '\\filter_user_has_cap', 10, 4 );
 	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
+	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 }
 
 /**
@@ -680,4 +681,39 @@ function action_pre_get_posts( WP_Query $query ) : void {
 
 		return $posts;
 	}, 999, 2 );
+}
+
+/**
+ * Filters the list of recipients for comment moderation emails.
+ *
+ * @param string[] $emails     List of email addresses to notify for comment moderation.
+ * @param int      $comment_id Comment ID.
+ * @return string[] List of email addresses to notify for comment moderation.
+ */
+function filter_comment_moderation_recipients( array $emails, int $comment_id ) : array {
+	/** @var \WP_Comment */
+	$comment = get_comment( $comment_id );
+	$post_id = (int) $comment->comment_post_ID;
+
+	if ( ! $post_id ) {
+		return $emails;
+	}
+
+	$post = get_post( $post_id );
+
+	if ( ! ( $post instanceof WP_Post ) ) {
+		return $emails;
+	}
+
+	$authors = get_authors( $post );
+
+	$moderators = array_filter( $authors, function( WP_User $user ) use ( $comment ) : bool {
+		return user_can( $user->ID, 'edit_comment', $comment->comment_ID );
+	} );
+
+	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
+		return $user->user_email;
+	}, $moderators ) );
+
+	return array_unique( array_merge( $emails, $additional_emails ) );
 }
