@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
+use const Authorship\GUEST_ROLE;
+
 /**
  * Base test case for the plugin.
  */
@@ -32,13 +34,16 @@ abstract class TestCase extends \WP_UnitTestCase {
 			'author'      => 'author',
 			'contributor' => 'contributor',
 			'subscriber'  => 'subscriber',
+			GUEST_ROLE    => GUEST_ROLE,
 			'no_role'     => '',
 		];
 
 		foreach ( $roles as $name => $role ) {
+			$display = ( $role ) ? $role : 'none';
 			self::$users[ $name ] = $factory->user->create_and_get( [
 				'role' => $role,
-				'display_name' => $role,
+				'display_name' => $display,
+				'user_email' => "{$display}.role@example.org",
 			] );
 		}
 	}
