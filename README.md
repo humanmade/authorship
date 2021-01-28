@@ -24,6 +24,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 - [Template Functions](#template-functions)
 - [REST API](#rest-api)
 - [WP-CLI](#wp-cli)
+- [Email Notifications](#email-notifications)
 - [Accessibility](#accessibility)
 - [Privacy & Security](#privacy--security)
 - [Contributing](#contributing)
@@ -145,6 +146,15 @@ If this flag is *not* set:
 
 * When creating a new post, if the `--post_author` flag is set then it will be used for attributed authors
 * When updating an existing post, no change will be made to attributed authors
+
+## Email Notifications
+
+Authorship does not send any email notifications itself, but it does instruct WordPress core to additionally send its emails to attributed authors when appropriate.
+
+* When a comment on a post is held for moderation, the comment moderation email also gets sent to all attributed authors who have the ability to moderate the comment and have valid email address
+* When a comment on a post is published, the comment notification email also gets sent to all attributed authors who have a valid email address
+
+This plugin only adjusts the list of email addresses to which these emails get sent. If you want to disable these emails entirely, see the "Email me whenever" section of the Settings -> Discussion screen in WordPress.
 
 ## Accessibility
 
