@@ -12,8 +12,6 @@ namespace Authorship\Tests;
 use const Authorship\GUEST_ROLE;
 use const Authorship\POSTS_PARAM;
 
-use MockPHPMailer;
-
 class TestEmails extends EmailTestCase {
 	public function testCommentModerationEmailIsSentToUsersWhoCanModerateIt() : void {
 		$factory = self::factory()->post;
@@ -38,14 +36,10 @@ class TestEmails extends EmailTestCase {
 			self::$users['author']->user_email,
 		];
 
-		/**
-		 * @var MockPHPMailer
-		 */
-		$mailer = tests_retrieve_phpmailer_instance();
 		$actual = [];
 
-		foreach ( $mailer->mock_sent as $i => $mock_sent ) {
-			$actual[] = $mailer->get_recipient( 'to', $i )->address;
+		foreach ( $this->mailer->mock_sent as $i => $mock_sent ) {
+			$actual[] = $this->mailer->get_recipient( 'to', $i )->address;
 		}
 
 		$this->assertSame( $expected, $actual );
@@ -77,14 +71,10 @@ class TestEmails extends EmailTestCase {
 			self::$users['no_role']->user_email,
 		];
 
-		/**
-		 * @var MockPHPMailer
-		 */
-		$mailer = tests_retrieve_phpmailer_instance();
 		$actual = [];
 
-		foreach ( $mailer->mock_sent as $i => $mock_sent ) {
-			$actual[] = $mailer->get_recipient( 'to', $i )->address;
+		foreach ( $this->mailer->mock_sent as $i => $mock_sent ) {
+			$actual[] = $this->mailer->get_recipient( 'to', $i )->address;
 		}
 
 		$this->assertSame( $expected, $actual );
