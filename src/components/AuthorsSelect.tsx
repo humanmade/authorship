@@ -10,14 +10,13 @@ import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
-import { authorshipDataFromWP, Option, SortedOption } from '../types';
+import { Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
 import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
 
-declare const authorshipData: authorshipDataFromWP;
-
 interface AuthorsSelectProps {
+	currentAuthorIDs: number[],
 	hasAssignAuthorAction: boolean,
 	onError: ( message: string ) => void,
 	onUpdate: ( value: number[] ) => void,
@@ -44,11 +43,27 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
-	const { hasAssignAuthorAction, onError, onUpdate } = props;
+	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
 
-	const [ selected, setSelected ] = useState( authorshipData.authors );
+	const [ selected, setSelected ] = useState<Option[]>( [] );
+
+	if ( currentAuthorIDs.length && ! selected.length ) {
+		const path = addQueryArgs(
+			'/authorship/v1/users/',
+			{
+				include: currentAuthorIDs,
+				orderby: 'include',
+			}
+		);
+
+		const api: Promise<WP_REST_API_User[]> = apiFetch( { path } );
+
+		api.then( users => {
+			setSelected( users.map( createOption ) );
+		} );
+	}
 
 	/**
 	 * Asynchronously loads the options for the control based on the search parameter.
@@ -154,6 +169,7 @@ export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string,
 } );
 
 export const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
+	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
 	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],
