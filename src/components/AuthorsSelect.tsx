@@ -11,10 +11,12 @@ import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
-import { Option, SortedOption } from '../types';
+import { authorshipDataFromWP, Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
 import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
+
+declare const authorshipData: authorshipDataFromWP;
 
 interface AuthorsSelectProps {
 	currentAuthorIDs: number[],

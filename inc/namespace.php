@@ -514,6 +514,7 @@ function enqueue_assets() : void {
 	$post = get_post();
 
 	enqueue_assets_for_post();
+	preload_author_data( $post );
 }
 
 /**
@@ -545,6 +546,42 @@ function enqueue_assets_for_post() : void {
 		'style.css',
 		[
 			'handle' => STYLE_HANDLE,
+		]
+	);
+}
+
+/**
+ * Preloads author data for the post editing screen.
+ *
+ * @param WP_Post $post The post being edited.
+ */
+function preload_author_data( WP_Post $post ) : void {
+	$authors = get_authors( $post );
+
+	if ( empty( $authors ) ) {
+		$authors = [
+			wp_get_current_user(),
+		];
+	}
+
+	$authors = array_map( function( WP_User $user ) {
+		$avatar = get_avatar_url( $user->ID );
+
+		return [
+			'value'  => $user->ID,
+			'label'  => $user->display_name,
+			'avatar' => $avatar ? $avatar : null,
+		];
+	}, $authors );
+
+	// @TODO replace this with data from the preloaded REST API response for the post
+	// that's included on the post editing screen. Need to enable the user objects to
+	// be embedded for that, we've only got the list of user IDs at the moment.
+	wp_localize_script(
+		SCRIPT_HANDLE,
+		'authorshipData',
+		[
+			'authors' => $authors,
 		]
 	);
 }
