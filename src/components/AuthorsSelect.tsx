@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, isEqual } from 'lodash';
 import React, { ReactElement, useState } from 'react';
 import { Styles } from 'react-select';
 import type {
@@ -24,6 +24,7 @@ interface AuthorsSelectProps {
 	onError: ( message: string ) => void,
 	onUpdate: ( value: number[] ) => void,
 	postType: string,
+	preloadedAuthorOptions: authorshipDataFromWP,
 }
 
 /**
@@ -47,13 +48,18 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
-	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate, postType } = props;
+	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate, postType, preloadedAuthorOptions } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
 
 	const [ selected, setSelected ] = useState<Option[]>( [] );
 
-	if ( currentAuthorIDs.length && ! selected.length ) {
+	const preloadedAuthorIDs = preloadedAuthorOptions.authors.map( author => author.value );
+
+	if ( ! selected.length && isEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
+		setSelected( preloadedAuthorOptions.authors );
+	} else if ( currentAuthorIDs.length && ! selected.length ) {
+
 		const path = addQueryArgs(
 			'/authorship/v1/users/',
 			{
@@ -188,6 +194,7 @@ const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, Callab
 const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
 	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
 	postType: select( 'core/editor' ).getCurrentPostType(),
+	preloadedAuthorOptions: authorshipData,
 	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],

@@ -574,9 +574,6 @@ function preload_author_data( WP_Post $post ) : void {
 		];
 	}, $authors );
 
-	// @TODO replace this with data from the preloaded REST API response for the post
-	// that's included on the post editing screen. Need to enable the user objects to
-	// be embedded for that, we've only got the list of user IDs at the moment.
 	wp_localize_script(
 		SCRIPT_HANDLE,
 		'authorshipData',
