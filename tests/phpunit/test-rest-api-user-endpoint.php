@@ -27,11 +27,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 */
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
 
-	/**
-	 * @var string
-	 */
-	protected static $user_route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE . '/%d';
-
 	public function testGuestAuthorCanBeCreatedWithJustAName() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
@@ -62,29 +57,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$message = self::get_message( $response );
 
 		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
-	}
-
-	public function testUserOutputFieldsAreRestrictedWhenFetchingUser() : void {
-		wp_set_current_user( self::$users['admin']->ID );
-
-		$request = new WP_REST_Request( 'GET', sprintf(
-			self::$user_route,
-			self::$users['editor']->ID
-		) );
-
-		$response = self::rest_do_request( $request );
-		$data = $response->get_data();
-		$message = self::get_message( $response );
-		$expected = [
-			'id',
-			'name',
-			'link',
-			'slug',
-			'avatar_urls',
-		];
-
-		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
-		$this->assertEqualSets( $expected, array_keys( $data ) );
 	}
 
 	public function testUserOutputFieldsAreRestrictedWhenListingUsers() : void {
@@ -130,21 +102,6 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
-		$request->set_param( 'context', 'edit' );
-
-		$response = self::rest_do_request( $request );
-		$message = self::get_message( $response );
-
-		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
-	}
-
-	public function testContextCannotBeSetToEditWhenFetchingUser() : void {
-		wp_set_current_user( self::$users['admin']->ID );
-
-		$request = new WP_REST_Request( 'GET', sprintf(
-			self::$user_route,
-			self::$users['editor']->ID
-		) );
 		$request->set_param( 'context', 'edit' );
 
 		$response = self::rest_do_request( $request );

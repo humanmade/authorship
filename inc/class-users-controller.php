@@ -65,25 +65,6 @@ class Users_Controller extends WP_REST_Users_Controller {
 				'schema' => [ $this, 'get_public_item_schema' ],
 			]
 		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
-			[
-				'args'   => [
-					'id' => [
-						'description' => __( 'Unique identifier for the user.', 'authorship' ),
-						'type'        => 'integer',
-					],
-				],
-				[
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_item' ],
-					'permission_callback' => [ $this, 'get_item_permissions_check' ],
-				],
-				'schema' => [ $this, 'get_public_item_schema' ],
-			]
-		);
 	}
 
 	/**
@@ -125,42 +106,6 @@ class Users_Controller extends WP_REST_Users_Controller {
 					'status' => WP_Http::BAD_REQUEST,
 				]
 			);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks if a given request has access to read a user.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has read access for the item, otherwise WP_Error object.
-	 */
-	public function get_item_permissions_check( $request ) {
-		if ( ! current_user_can( 'list_users' ) ) {
-			return new WP_Error(
-				'rest_user_cannot_view',
-				__( 'Sorry, you are not allowed to list users.', 'authorship' ),
-				[
-					'status' => rest_authorization_required_code(),
-				]
-			);
-		}
-
-		if ( 'edit' === $request->get_param( 'context' ) ) {
-			return new WP_Error(
-				'rest_forbidden_context',
-				__( 'Sorry, you are not allowed to edit users.', 'authorship' ),
-				[
-					'status' => WP_Http::BAD_REQUEST,
-				]
-			);
-		}
-
-		$user = $this->get_user( $request['id'] );
-
-		if ( is_wp_error( $user ) ) {
-			return $user;
 		}
 
 		return true;
