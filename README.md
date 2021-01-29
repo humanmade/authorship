@@ -36,7 +36,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ## Current Status
 
-Alpha. Generally very functional several features are still in development.
+Alpha. Generally very functional but several features are still in development.
 
 ## Features
 
@@ -48,8 +48,7 @@ Alpha. Generally very functional several features are still in development.
 * [X] Full CRUD support in the REST API and WP-CLI
 * [X] Full support in RSS feeds
 * [ ] Full support in Atom feeds
-* [ ] Fine-grained user permission controls
-* [ ] Plenty of filters and actions
+* [X] Fine-grained user permission controls
 
 _Features without a checkmark are still work in progress._
 
@@ -158,7 +157,14 @@ This plugin only adjusts the list of email addresses to which these emails get s
 
 ## Accessibility
 
-@TODO
+Authorship aims to conform to Web Content Accessibility Guidelines (WCAG) at level AA but it does not yet achieve this. If full support for keyboard accessibility or assistive technology is a requirement of your application then Authorship may not be a good fit in its current state.
+
+* ✅ The visual styles of the author selection control are inherited from WordPress core and are WCAG AA compliant
+* ✅ The control is fully accessible using only the keyboard
+* 🚫 The keyboard controls are not intuitive
+* 🚫 The control is not fully accessible when using a screen reader
+
+The team are actively investigating either replacing the component used to render the control with a fully accessible one, or fixing the accessibility issues of the current one.
 
 ## Privacy & Security
 
