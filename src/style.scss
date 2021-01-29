@@ -6,7 +6,7 @@
 			&,
 			&:hover {
 				border: none;
-				border-radius: 2px;
+				border-radius: 1px;
 			}
 
 			&--is-focused {
@@ -59,8 +59,28 @@
 			display: none;
 		}
 
-		&__input input[type="text"]:focus {
-			box-shadow: none;
+		&__input {
+			width: 100%;
+
+			input[type="text"] {
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				background: #fff !important;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				border: 1px solid #757575 !important;
+				border-radius: 2px;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				box-sizing: border-box !important;
+				margin: 0;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				padding: 6px 8px !important;
+				line-height: normal;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				width: 100% !important;
+			}
+
+			input[type="text"]:focus {
+				box-shadow: none;
+			}
 		}
 	}
 

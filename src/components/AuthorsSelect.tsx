@@ -1,5 +1,6 @@
 import { get } from 'lodash';
 import React, { ReactElement, useState } from 'react';
+import { Styles } from 'react-select';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
@@ -90,6 +91,16 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	};
 
 	/**
+	 * Declares styles for elements that can't easily be targeted with a CSS selector.
+	 */
+	const styles: Styles<Option, true> = {
+		input: ( provided, state ) => ( {
+			margin: 0,
+			width: '100%',
+		} ),
+	};
+
+	/**
 	 * Handles changes to the selected authors.
 	 *
 	 * @param {Option[]} [options] The selected options.
@@ -147,6 +158,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			loadOptions={ loadOptions }
 			lockAxis="y"
 			lockToContainerEdges
+			styles={ styles }
 			value={ selected }
 			onChange={ changeValue }
 			onCreateOption={ onCreateOption }
