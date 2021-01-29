@@ -34,9 +34,18 @@
 				white-space: initial;
 				color: #1e1e1e;
 				padding: 6px;
+				display: flex;
+				align-items: center;
+			}
+
+			&__avatar {
+				flex: 0 0 24px;
+				margin-right: 5px;
 
 				img {
 					display: block;
+					height: 24px;
+					width: 24px;
 				}
 			}
 

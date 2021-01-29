@@ -17,6 +17,7 @@ const isValidNewOption = ( value: string ) => value.length >= 2;
 const placeholder = __( 'Select authors…', 'authorship' );
 
 export const className = 'authorship-select-container';
+export const classNamePrefix = 'authorship-select';
 
 /**
  * Overrides the default option display with our custom one.
@@ -25,23 +26,14 @@ export const className = 'authorship-select-container';
  * @returns {ReactElement} The element.
  */
 const formatOptionLabel = ( option: Option ): ReactElement => (
-	<div style={ {
-		display: 'flex',
-		alignItems: 'center',
-	} }>
+	<>
 		{ option.avatar && (
-			<div style={ {
-				flex: '0 0 24px',
-				marginRight: '5px',
-			} }>
-				<img alt="" src={ option.avatar } style={ {
-					width: '24px',
-					height: '24px',
-				} } />
+			<div className={ `${classNamePrefix}__multi-value__avatar` }>
+				<img alt="" src={ option.avatar }/>
 			</div>
 		) }
 		<div>{ option.label }</div>
-	</div>
+	</>
 );
 
 /**
@@ -54,7 +46,7 @@ const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement 
 	<AsyncCreatableSelect
 		cacheOptions
 		className={ className }
-		classNamePrefix="authorship-select"
+		classNamePrefix={ classNamePrefix }
 		components={ components }
 		formatOptionLabel={ formatOptionLabel }
 		isClearable={ false }
