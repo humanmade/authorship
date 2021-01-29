@@ -6,13 +6,12 @@
 			&,
 			&:hover {
 				border: none;
-				border-radius: 1px;
 			}
 
 			&--is-focused {
 				&,
 				&:hover {
-					box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var( --wp-admin-theme-color, #0073aa );
+					box-shadow: none;
 				}
 			}
 		}
@@ -67,7 +66,8 @@
 				background: #fff !important;
 				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
 				border: 1px solid #757575 !important;
-				border-radius: 2px;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				border-radius: 2px !important;
 				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
 				box-sizing: border-box !important;
 				margin: 0;
@@ -79,7 +79,12 @@
 			}
 
 			input[type="text"]:focus {
-				box-shadow: none;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				border: 1px solid var( --wp-admin-theme-color, #0073aa ) !important;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #0073aa ) !important;
+				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+				outline: 2px solid transparent !important;
 			}
 		}
 	}
