@@ -284,6 +284,8 @@ class Users_Controller extends WP_REST_Users_Controller {
 			$schema['properties']['url']
 		);
 
+		$this->schema = $schema;
+
 		return $schema;
 	}
 
