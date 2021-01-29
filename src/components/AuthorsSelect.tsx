@@ -169,9 +169,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	);
 };
 
-export { AuthorsSelect };
-
-export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, CallableFunction> => ( {
+const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, CallableFunction> => ( {
 	onError( message: string ) {
 		dispatch( 'core/notices' ).createErrorNotice( message );
 	},
@@ -182,7 +180,7 @@ export const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string,
 	},
 } );
 
-export const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
+const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
 	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
 	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
