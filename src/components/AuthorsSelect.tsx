@@ -63,6 +63,8 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 		api.then( users => {
 			setSelected( users.map( createOption ) );
+		} ).catch( ( error: WP_REST_API_Error ) => {
+			onError( error.message );
 		} );
 	}
 
