@@ -64,7 +64,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 	}
 
-	public function testUserOutputFieldsAreRestrictedWhenListingUsers() : void {
+	public function testUserOutputFieldsAreRestrictedWhenFetchingUser() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', sprintf(
@@ -87,7 +87,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertEqualSets( $expected, array_keys( $data ) );
 	}
 
-	public function testUserOutputFieldsAreRestrictedWhenFetchingUser() : void {
+	public function testUserOutputFieldsAreRestrictedWhenListingUsers() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
