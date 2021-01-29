@@ -82,6 +82,20 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertEqualSets( $expected, array_keys( $data[0] ) );
 	}
 
+	public function testAllUsersAreListedWhenListingUsers() : void {
+		wp_set_current_user( self::$users['editor']->ID );
+
+		$request = new WP_REST_Request( 'GET', self::$route );
+		$request->set_param( 'post_type', 'post' );
+
+		$response = self::rest_do_request( $request );
+		$data = $response->get_data();
+		$message = self::get_message( $response );
+
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
+		$this->assertCount( count( self::$users ) + 1, $data );
+	}
+
 	/**
 	 * @dataProvider dataDisallowedFilters
 	 *

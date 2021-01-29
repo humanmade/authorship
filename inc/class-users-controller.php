@@ -112,6 +112,35 @@ class Users_Controller extends WP_REST_Users_Controller {
 	}
 
 	/**
+	 * Retrieves all users.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_items( $request ) {
+		add_filter( 'rest_user_query', [ $this, 'filter_rest_user_query' ], 10, 2 );
+
+		$items = parent::get_items( $request );
+
+		remove_filter( 'rest_user_query', [ $this, 'filter_rest_user_query' ] );
+
+		return $items;
+	}
+
+	/**
+	 * Filters WP_User_Query arguments when querying users via the REST API.
+	 *
+	 * @param array            $prepared_args Array of arguments for WP_User_Query.
+	 * @param \WP_REST_Request $request       The current request.
+	 * @return array Array of arguments for WP_User_Query.
+	 */
+	function filter_rest_user_query( array $prepared_args, \WP_REST_Request $request ) : array {
+		unset( $prepared_args['has_published_posts'] );
+
+		return $prepared_args;
+	}
+
+	/**
 	 * Checks if a given request has access to create users.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
