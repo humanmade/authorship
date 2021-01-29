@@ -194,6 +194,37 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 		$this->assertCount( 2, $links[ REST_LINK_ID ] );
 	}
 
+	public function testAuthorshipLinksAreEmbeddable() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$authors = [
+			self::$users['author']->ID,
+			self::$users['editor']->ID,
+		];
+
+		$post = self::factory()->post->create_and_get( [
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			POSTS_PARAM   => $authors,
+		] );
+
+		$request = new WP_REST_Request( 'GET', sprintf(
+			'/wp/v2/posts/%d',
+			$post->ID
+		) );
+
+		// This is as close as we can get to mocking a `?_embed` request:
+		$data = rest_get_server()->response_to_data( self::rest_do_request( $request ), true );
+		$embedded = $data['_embedded'];
+
+		$this->assertArrayHasKey( REST_LINK_ID, $embedded );
+		$this->assertCount( 2, $embedded[ REST_LINK_ID ] );
+		$this->assertSame( self::$users['author']->ID, $embedded[ REST_LINK_ID ][0]['id'] );
+		$this->assertSame( self::$users['editor']->ID, $embedded[ REST_LINK_ID ][1]['id'] );
+		$this->assertSame( self::$users['author']->display_name, $embedded[ REST_LINK_ID ][0]['name'] );
+		$this->assertSame( self::$users['editor']->display_name, $embedded[ REST_LINK_ID ][1]['name'] );
+	}
+
 	public function testRelLinksArePresent() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 

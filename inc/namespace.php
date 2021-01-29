@@ -290,10 +290,16 @@ function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Respons
 
 	/** @var int $author */
 	foreach ( $data[ REST_PARAM ] as $author ) {
-		$result->add_link( REST_LINK_ID, sprintf(
-			rest_url( 'wp/v2/users/%d' ),
-			$author
-		) );
+		$result->add_link(
+			REST_LINK_ID,
+			sprintf(
+				rest_url( 'wp/v2/users/%d' ),
+				$author
+			),
+			[
+				'embeddable' => true,
+			]
+		);
 	}
 
 	return $result;
