@@ -74,7 +74,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 * @return true|WP_Error True if the request has read access, otherwise WP_Error object.
 	 */
 	public function get_items_permissions_check( $request ) {
-		if ( ! current_user_can( 'list_users' ) ) {
+		if ( ! current_user_can( 'attribute_post_type', $request->get_param( 'post_type' ) ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
 				__( 'Sorry, you are not allowed to list users.', 'authorship' ),
@@ -246,6 +246,15 @@ class Users_Controller extends WP_REST_Users_Controller {
 			'id',
 			'include',
 			'name',
+		];
+
+		$query_params['post_type'] = [
+			'description' => __( 'Post type name.', 'authorship' ),
+			'type'        => 'string',
+			'enum'        => get_post_types( [
+				'show_in_rest' => true,
+			] ),
+			'required'    => true,
 		];
 
 		unset(

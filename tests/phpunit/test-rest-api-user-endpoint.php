@@ -64,6 +64,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'editor' );
+		$request->set_param( 'post_type', 'post' );
 
 		$response = self::rest_do_request( $request );
 		$data = $response->get_data();
@@ -110,9 +111,27 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
+	public function testPostTypeIsRequiredWhenListingUsers() : void {
+		wp_set_current_user( self::$users['admin']->ID );
+
+		$request = new WP_REST_Request( 'GET', self::$route );
+
+		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
+
+		/** @var \WP_Error */
+		$error = $response->as_error();
+		$data = $error->get_error_data();
+
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
+		$this->assertArrayHasKey( 'params', $data );
+		$this->assertSame( [ 'post_type' ], $data['params'] );
+	}
+
 	public function testEndpointRequiresAuthentication() : void {
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'testing' );
+		$request->set_param( 'post_type', 'post' );
 
 		$response = self::rest_do_request( $request );
 		$message = self::get_message( $response );
@@ -130,6 +149,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'orderby', $orderby );
+		$request->set_param( 'post_type', 'post' );
 
 		$response = self::rest_do_request( $request );
 		$message = self::get_message( $response );
@@ -147,6 +167,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'orderby', $orderby );
+		$request->set_param( 'post_type', 'post' );
 
 		$response = self::rest_do_request( $request );
 		$message = self::get_message( $response );

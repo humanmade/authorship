@@ -21,6 +21,7 @@ interface AuthorsSelectProps {
 	hasAssignAuthorAction: boolean,
 	onError: ( message: string ) => void,
 	onUpdate: ( value: number[] ) => void,
+	postType: string,
 }
 
 /**
@@ -44,7 +45,7 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @returns {ReactElement} An element.
  */
 const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
-	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate } = props;
+	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate, postType } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
 
@@ -56,6 +57,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			{
 				include: currentAuthorIDs,
 				orderby: 'include',
+				post_type: postType,
 			}
 		);
 
@@ -79,6 +81,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			'/authorship/v1/users/',
 			{
 				search,
+				post_type: postType,
 			}
 		);
 
@@ -182,6 +185,7 @@ const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, Callab
 
 const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
 	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
+	postType: select( 'core/editor' ).getCurrentPostType(),
 	hasAssignAuthorAction: Boolean( get(
 		select( 'core/editor' ).getCurrentPost(),
 		[ '_links', 'authorship:action-assign-authorship' ],
