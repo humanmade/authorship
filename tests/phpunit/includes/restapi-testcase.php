@@ -53,7 +53,6 @@ abstract class RESTAPITestCase extends TestCase {
 
 	protected static function rest_do_request( WP_REST_Request $request ) : WP_REST_Response {
 		$response = rest_do_request( $request );
-		$response = apply_filters( 'rest_post_dispatch', $response, rest_get_server(), $request );
 
 		return $response;
 	}

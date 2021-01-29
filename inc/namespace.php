@@ -47,7 +47,7 @@ function bootstrap() : void {
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
-	add_filter( 'rest_post_dispatch', __NAMESPACE__ . '\\filter_rest_post_dispatch' );
+	add_filter( 'rest_request_after_callbacks', __NAMESPACE__ . '\\filter_rest_request_after_callbacks', 10, 3 );
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_editing', 10, 4 );
 	add_filter( 'user_has_cap', __NAMESPACE__ . '\\filter_user_has_cap', 10, 4 );
 	add_filter( 'rest_response_link_curies', __NAMESPACE__ . '\\filter_rest_response_link_curies' );
@@ -272,12 +272,14 @@ function register_roles_and_caps() : void {
 }
 
 /**
- * Filters the REST API response.
+ * Filters the response immediately after executing any REST API callbacks.
  *
- * @param WP_HTTP_Response $result Result to send to the client. Usually a `WP_REST_Response`.
- * @return WP_HTTP_Response Result to send to the client. Usually a `WP_REST_Response`.
+ * @param WP_REST_Response|WP_HTTP_Response|WP_Error|mixed $result  Result to send to the client. Usually a WP_REST_Response or WP_Error.
+ * @param mixed[]                                          $handler Route handler used for the request.
+ * @param WP_REST_Request                                  $request Request used to generate the response.
+ * @return WP_REST_Response|WP_HTTP_Response|WP_Error|mixed Result to send to the client. Usually a WP_REST_Response or WP_Error.
  */
-function filter_rest_post_dispatch( WP_HTTP_Response $result ) : WP_HTTP_Response {
+function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_Request $request ) {
 	if ( ! ( $result instanceof WP_REST_Response ) ) {
 		return $result;
 	}
