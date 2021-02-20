@@ -512,7 +512,7 @@ function filter_rest_response_link_curies( array $additional ) : array {
 function enqueue_assets() : void {
 	/** @var WP_Post */
 	$post = get_post();
-	
+
 	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
 		return;
 	}
