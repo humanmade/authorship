@@ -513,6 +513,10 @@ function enqueue_assets() : void {
 	/** @var WP_Post */
 	$post = get_post();
 
+	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+		return;
+	}
+
 	enqueue_assets_for_post();
 }
 
