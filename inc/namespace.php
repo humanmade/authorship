@@ -578,7 +578,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 
 	$stored_values = [];
 
-	// Different query args and their default values
+	// Different query args and their default values.
 	$concerns = [
 		'author_name' => '',
 		'author' => '',
@@ -642,7 +642,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		'taxonomy' => TAXONOMY,
 		'terms'    => array_map( 'absint', $user_ids ),
 		'field'    => 'slug',
-		// negative values meant NOT IN rather than IN
+		// negative values meant NOT IN rather than IN.
 		'operator' => current( $user_ids ) >= 0 ? 'IN' : 'NOT IN',
 	];
 
