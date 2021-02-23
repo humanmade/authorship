@@ -600,7 +600,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		return;
 	}
 
-	$user_ids = [0];
+	$user_ids = [ 0 ];
 
 	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
 	// as WP_Query will handle the validation before constructing its query.
