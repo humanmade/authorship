@@ -600,7 +600,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		return;
 	}
 
-	$user_ids = [];
+	$user_ids = [0];
 
 	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
 	// as WP_Query will handle the validation before constructing its query.
@@ -622,10 +622,6 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		$user_ids = array_map( function( int $id ) : int {
 			return $id * -1;
 		}, array_map( 'intval', $stored_values['author__not_in'] ) );
-	}
-
-	if ( empty( $user_ids ) ) {
-		return;
 	}
 
 	$tax_query = $query->get( 'tax_query' );
