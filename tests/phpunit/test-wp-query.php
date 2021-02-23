@@ -52,9 +52,11 @@ class TestWPQuery extends TestCase {
 			'order'       => 'ASC',
 		];
 
+		// Positive queries, IN, name, and equality
 		$test_args = [
 			'author_name' => self::$users['editor']->user_nicename,
 			'author'      => self::$users['editor']->ID,
+			'author__in'  => [ self::$users['editor']->ID ],
 		];
 
 		foreach ( $test_args as $test_key => $test_value ) {
@@ -68,7 +70,29 @@ class TestWPQuery extends TestCase {
 			$this->assertSame(
 				[ $yes1->ID, $yes2->ID ],
 				$posts,
-				"Post IDs for {$test_key} query are incorrect."
+				"Post IDs for positive {$test_key} query are incorrect."
+			);
+		}
+
+		// Negative queries, NOT IN and negative integers
+		$test_args = [
+			'author'         => -1 * self::$users['editor']->ID,
+			'author__in'     => [ -1 * self::$users['editor']->ID ],
+			'author__not_in' => [ self::$users['editor']->ID ],
+		];
+
+		foreach ( $test_args as $test_key => $test_value ) {
+			$args = array_merge( $common_args, [
+				$test_key => $test_value,
+			] );
+
+			$query = new WP_Query();
+			$posts = $query->query( $args );
+
+			$this->assertSame(
+				[ $no1->ID, $no2->ID ],
+				$posts,
+				"Post IDs for negative {$test_key} query are incorrect."
 			);
 		}
 	}
@@ -230,6 +254,32 @@ class TestWPQuery extends TestCase {
 		$this->assertSame( '', $query->get( 'tax_query' ) );
 		$this->assertSame( self::$users['author']->user_nicename, $query->get( 'author_name' ) );
 		$this->assertSame( self::$users['author']->ID, $query->get( 'author' ) );
+
+		$args = [
+			'author__in'  => [ self::$users['author']->ID ],
+			'post_type'   => 'post',
+			'fields'      => 'ids',
+			'orderby'     => 'ID',
+			'order'       => 'ASC',
+		];
+
+		$query = new WP_Query( $args );
+
+		$this->assertSame( '', $query->get( 'tax_query' ) );
+		$this->assertSame( [ self::$users['author']->ID ], $query->get( 'author__in' ) );
+
+		$args = [
+			'author__not_in' => [ self::$users['author']->ID ],
+			'post_type'      => 'post',
+			'fields'         => 'ids',
+			'orderby'        => 'ID',
+			'order'          => 'ASC',
+		];
+
+		$query = new WP_Query( $args );
+
+		$this->assertSame( '', $query->get( 'tax_query' ) );
+		$this->assertSame( [ self::$users['author']->ID ], $query->get( 'author__not_in' ) );
 	}
 
 	public function testSubsequentQueriesAreUnaffected() : void {
