@@ -578,17 +578,20 @@ function action_pre_get_posts( WP_Query $query ) : void {
 
 	$stored_values = [];
 
+	// Different query args and their default values
 	$concerns = [
-		'author_name',
-		'author',
+		'author_name' => '',
+		'author' => '',
+		'author__in' => [],
+		'author__not_in' => [],
 	];
 
 	// Record the original values of concerned query vars and remove them from the query.
-	foreach ( $concerns as $concern ) {
+	foreach ( $concerns as $concern => $concern_default_value ) {
 		$value = $query->get( $concern );
-		if ( '' !== $value ) {
+		if ( ! empty( $value ) ) {
 			$stored_values[ $concern ] = $value;
-			$query->set( $concern, '' );
+			$query->set( $concern, $concern_default_value );
 		}
 	}
 
@@ -597,18 +600,32 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		return;
 	}
 
-	$user_id = 0;
+	$user_ids = [];
 
 	// Get a user ID from either `author` or `author_name`. The ID doesn't have to be valid
 	// as WP_Query will handle the validation before constructing its query.
 	if ( ! empty( $stored_values['author'] ) ) {
-		$user_id = (int) $stored_values['author'];
+		if ( is_string( $stored_values['author'] ) ) {
+			$user_ids = array_map( 'intval', explode( ',', $stored_values['author'] ) );
+		} elseif ( is_numeric( $stored_values['author'] ) ) {
+			$user_ids = [ (int) $stored_values['author'] ];
+		}
 	} elseif ( ! empty( $stored_values['author_name'] ) ) {
 		$user = get_user_by( 'slug', $stored_values['author_name'] );
 
 		if ( $user ) {
-			$user_id = $user->ID;
+			$user_ids = [ $user->ID ];
 		}
+	} elseif ( ! empty( $stored_values['author__in'] ) ) {
+		$user_ids = array_map( 'intval', $stored_values['author__in'] );
+	} elseif ( ! empty( $stored_values['author__not_in'] ) ) {
+		$user_ids = array_map( function( int $id ) : int {
+			return $id * -1;
+		}, array_map( 'intval', $stored_values['author__not_in'] ) );
+	}
+
+	if ( empty( $user_ids ) ) {
+		return;
 	}
 
 	$tax_query = $query->get( 'tax_query' );
@@ -623,8 +640,10 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	// Add a corresponding tax query that queries for posts with terms with a slug matching the requested user ID.
 	$tax_query[] = [
 		'taxonomy' => TAXONOMY,
-		'terms'    => $user_id,
+		'terms'    => array_map( 'absint', $user_ids ),
 		'field'    => 'slug',
+		// negative values meant NOT IN rather than IN
+		'operator' => current( $user_ids ) >= 0 ? 'IN' : 'NOT IN',
 	];
 
 	$query->set( 'tax_query', $tax_query );
@@ -637,7 +656,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
 	 * @param WP_Query       $query The WP_Query instance.
 	 */
-	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_id ) : ?array {
+	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_ids ) : ?array {
 		if ( empty( $stored_values ) ) {
 			return $posts;
 		}
@@ -649,7 +668,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 
 		// Specifically set `author` when `author_name` is in use as WP_Query also sets `author` internally.
 		if ( ! empty( $stored_values['author_name'] ) ) {
-			$query->set( 'author', $user_id );
+			$query->set( 'author', $user_ids[0] );
 		}
 
 		// Clear the recorded values so subsequent queries are not affected.
