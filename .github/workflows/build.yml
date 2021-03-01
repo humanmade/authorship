@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'release'
+      - 'issue-50/release-scripts'
 
 jobs:
   wordpress:
