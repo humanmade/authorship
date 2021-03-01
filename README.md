@@ -114,6 +114,10 @@ The following template functions are available for use in your theme to get the 
   - Returns a sentence stating the names of the attributed author(s), localised to the current language
 * `\Authorship\get_author_names_list( $post )`
   - Returns an unordered HTML list of the names of the attributed author(s)
+* `\Authorship\get_authors( $post )`
+  - Returns a list of user objects of the attributed authors
+* `\Authorship\get_author_ids( $post )`
+  - Returns a list of user ids of the attributed authors
 
 ## REST API
 
