@@ -57,7 +57,7 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
         git checkout -b "release/$VERSION"
-        git add -f assets/*
+        git add -f build/*
         git add -f lib/*
         git commit -m "Release $VERSION"
         git tag "$VERSION"
