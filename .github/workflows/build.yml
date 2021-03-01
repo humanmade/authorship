@@ -13,6 +13,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Install PHP
+      uses: shivammathur/setup-php@2.7.0
+      with:
+        php-version: 7.4
+        extensions: mysqli, xmlwriter
+        coverage: none
+        tools: composer:v1
+
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
