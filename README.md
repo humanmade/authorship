@@ -1,11 +1,11 @@
 # Authorship
 
-Stable tag: 0.1.0  
-Requires at least: 5.4  
-Tested up to: 5.6  
-Requires PHP: 7.2  
-License: GPL v3 or later  
-Contributors: johnbillion, humanmade  
+Stable tag: 0.1.0
+Requires at least: 5.4
+Tested up to: 5.6
+Requires PHP: 7.2
+License: GPL v3 or later
+Contributors: johnbillion, humanmade
 
 A modern approach to author attribution in WordPress.
 
@@ -55,9 +55,9 @@ _Features without a checkmark are still work in progress._
 ## Installation
 
 * Clone this repo into your plugins directory
-* Install the dependencies:  
+* Install the dependencies:
   `composer install && npm install`
-* Start the dev server:  
+* Start the dev server:
   `npm run start`
 
 ## Design Decisions
@@ -172,7 +172,7 @@ The team are actively investigating either replacing the component used to rende
 
 ## Contributing
 
-@TODO Add CONTRIBUTING.md and link it here
+Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md]((https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md)) for more details.
 
 ## Team
 
