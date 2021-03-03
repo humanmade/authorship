@@ -78,7 +78,7 @@ These are the steps to take to release a new version of Authorship (for contribu
 
 ### For Release
 
-1. Bump the plugin version number in plugin.php and package.json
+1. Bump the plugin version number in `plugin.php` and `package.json`
 1. Commit the version number changes
 1. `git push origin develop`
 1. Wait until (and ensure that) [the build passes](https://github.com/humanmade/authorship/actions)
