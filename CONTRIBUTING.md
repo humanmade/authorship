@@ -78,9 +78,9 @@ These are the steps to take to release a new version of Authorship (for contribu
 1. Commit the version number changes
 1. `git push origin develop`
 1. Wait until (and ensure that) [the build passes](https://github.com/humanmade/authorship/actions)
-1. `git checkout master`
+1. `git checkout main`
 1. `git merge develop`
-1. `git push origin master`
-1. `git push origin master:release`
+1. `git push origin main`
+1. `git push origin main:release`
 1. Wait for [the Build Release action](https://github.com/humanmade/authorship/actions?query=workflow%3A%22Build+Release%22) to complete
 1. Enter the changelog into [the release on GitHub](https://github.com/humanmade/authorship/releases) and publish it.
