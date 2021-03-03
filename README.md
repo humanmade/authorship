@@ -1,6 +1,6 @@
 # Authorship
 
-Stable tag: 0.1.0  
+Stable tag: 0.2.1  
 Requires at least: 5.4  
 Tested up to: 5.6  
 Requires PHP: 7.2  
@@ -176,7 +176,7 @@ The team are actively investigating either replacing the component used to rende
 
 ## Contributing
 
-@TODO Add CONTRIBUTING.md and link it here
+Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md) for more details.
 
 ## Team
 

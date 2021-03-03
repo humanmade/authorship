@@ -9,7 +9,7 @@
  *
  * Plugin Name:  Authorship
  * Description:  Authorship
- * Version:      0.1.0
+ * Version:      0.2.1
  * Plugin URI:   https://github.com/humanmade/authorship
  * Author:       Human Made
  * Author URI:   https://humanmade.com/
@@ -35,7 +35,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/lib/asset-loader/asset-loader.php';
+// Only load asset-loader if it's not loaded already.
+if ( ! defined( 'Asset_Loader\\LOADED' ) ) {
+	require_once __DIR__ . '/lib/asset-loader/asset-loader.php';
+}
+
 require_once __DIR__ . '/inc/namespace.php';
 require_once __DIR__ . '/inc/taxonomy.php';
 require_once __DIR__ . '/inc/class-users-controller.php';
