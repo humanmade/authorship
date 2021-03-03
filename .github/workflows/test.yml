@@ -6,7 +6,7 @@ jobs:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     strategy:
       matrix:
-        php: ['7.2', 7.4']
+        php: ['7.2', '7.4']
         wp: ['*', 'dev-nightly']
       fail-fast: false
     name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }}
@@ -24,25 +24,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v1
 
-    - name: Composer cache
-      uses: actions/cache@v1
-      env:
-        cache-name: composer
-      with:
-        path: ~/.composer/cache
-        key: ${{ matrix.php }}-${{ env.cache-name }}-${{ hashFiles('composer.json') }}
-
-    - name: PHPCS cache
-      uses: actions/cache@v1
-      env:
-        cache-name: phpcs
-      with:
-        path: tests/cache
-        # This uses the hash of plugin.php in its cache key because Actions doesn't support
-        # always pulling in a cache file and simultaneously always updating it, unlike Travis.
-        # This way we always pull in a cache file and refresh it with each new version of the plugin.
-        key: ${{ matrix.php }}-${{ env.cache-name }}-${{ hashFiles('plugin.php') }}
-
     - name: Install PHP
       uses: shivammathur/setup-php@2.7.0
       with:
@@ -56,12 +37,48 @@ jobs:
         php --version
         php -m
         composer --version
+        node -v
+        npm -v
 
-    - name: Install dependencies
+    - name: Get Composer Cache Directory
+      id: composer-cache-dir
       run: |
-        npm install
+        echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Cache PHP Dependencies
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.composer-cache-dir.outputs.dir }}
+        key: ${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+
+    - name: Install PHP Dependencies
+      run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction
         composer require --dev --prefer-dist --no-progress --no-suggest --no-interaction --update-with-dependencies roots/wordpress="${{ matrix.wp }} || *" wp-phpunit/wp-phpunit="${{ matrix.wp }} || *"
+
+    - name: Get npm cache directory
+      id: npm-cache-dir
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+        echo "::set-output name=npm-version::$(npm -v)"
+        echo "::set-output name=node-version::$(node-v)"
+
+    - name: Cache JS Dependencies
+      id: npm-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('**/package-lock.json') }}
+
+    - name: Install JS Dependencies
+      run: npm install
+
+    - name: PHPCS cache
+      uses: actions/cache@v2
+      with:
+        path: tests/cache
+        key: ${{ matrix.php }}-phpcs-${{ hashFiles('plugin.php') }}
 
     - name: Run the tests
       run: |
