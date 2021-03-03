@@ -66,7 +66,7 @@ These are the steps to take to release a new version of Authorship (for contribu
 1. Check [the milestone on GitHub](https://github.com/humanmade/authorship/milestones) for open issues or PRs. Fix or reassign as necessary.
 1. If this is a non-patch release, check issues and PRs assigned to the patch or minor milestones that will get skipped. Reassign as necessary.
 1. Ensure you're on the `develop` branch and all the changes for this release have been merged in.
-1. Ensure both `README.md` and `readme.txt` contain up to date descriptions, "Tested up to" versions, FAQs, screenshots, etc.
+1. Ensure `README.md` contains an up to date description, "Tested up to" version, FAQs, screenshots, etc.
    - This is currently a manual process while I decide whether I want to sync parts of these files.
 1. Run `composer test` and ensure everything passes.
 1. Prepare a changelog for [the Releases page on GitHub](https://github.com/humanmade/authorship/releases).
