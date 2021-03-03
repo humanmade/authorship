@@ -51,7 +51,6 @@ jobs:
         key: ${{ runner.os }}-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('**/package-lock.json') }}
 
     - name: Install JS Dependencies
-      if: steps.npm-cache.outputs.cache-hit != 'true'
       run: npm install
 
     - name: Build Assets
