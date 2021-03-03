@@ -174,7 +174,7 @@ function set_authors( WP_Post $post, array $authors ) : array {
  *
  * @param WP_User $user The user object.
  * @param WP_Post $post The post object.
- * @return bool If the user is an attributed author of the post.
+ * @return bool Whether the user is an attributed author of the post.
  */
 function user_is_author( WP_User $user, WP_Post $post ) : bool {
 	if ( ! post_type_supports( $post->post_type, 'author' ) ) {

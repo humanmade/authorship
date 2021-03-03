@@ -26,7 +26,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 - [WP-CLI](#wp-cli)
 - [Email Notifications](#email-notifications)
 - [Accessibility](#accessibility)
-- [Privacy & Security](#privacy--security)
+- [Security, Privileges, and Privacy](#security-privileges-and-privacy)
 - [Contributing](#contributing)
 - [Team](#team)
 - [License](#license)
@@ -36,7 +36,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ## Current Status
 
-Alpha. Generally very functional but several features are still in development.
+**Alpha**. Generally very functional but several features are still in development.
 
 ## Features
 
@@ -74,19 +74,14 @@ Let's look at these points in detail and explain how Authorship addresses them:
 
 ### API design decisions
 
-There's a lot more to a WordPress site than just its theme. Data can be consumed via its APIs and feeds, so these need to be treated as first-class citizens when exposing the attributed authors of posts.
+There's a lot more to a modern WordPress site than just its theme. Data gets created and consumed via its APIs, so these need to be treated as first-class citizens when working with the attributed authors of posts.
 
 Authorship provides:
 
-* Read and write access to attributed authors via an `authorship` field on the default `wp/v2/posts` REST API endpoints
+* Ability to read and write attributed authors via an `authorship` field on the `wp/v2/posts` REST API endpoints
 * Ability to create guest authors via the `authorship/v1/users` REST API endpoint
 * Read-only access to users who can be attributed to a post via the `authorship/v1/users` REST API endpoint
-* Ability to specify attributed authors in WP-CLI with the `--authorship` flag
-
-On the roadmap:
-
-* Support for XML-RPC
-* Support for WPGraphQL
+* Ability to specify attributed authors when creating or updating posts via WP-CLI with the `--authorship` flag
 
 ### UI design decisions
 
@@ -106,7 +101,7 @@ Authorship creates a real WordPress user account for each guest author, which pr
 
 ## Template Functions
 
-The following template functions are available for use in your theme to get the attributed author(s) of a post:
+The following template functions are available for use in your theme to fetch the attributed author(s) of a post:
 
 * `\Authorship\get_author_names( $post )`
   - Returns a comma-separated list of the names of the attributed author(s)
@@ -161,18 +156,68 @@ This plugin only adjusts the list of email addresses to which these emails get s
 
 ## Accessibility
 
-Authorship aims to conform to Web Content Accessibility Guidelines (WCAG) at level AA but it does not yet achieve this. If full support for keyboard accessibility or assistive technology is a requirement of your application then Authorship may not be a good fit in its current state.
+Authorship aims to conform to Web Content Accessibility Guidelines (WCAG) 2.1 at level AA but it does not yet fully achieve this. If full support for assistive technology is a requirement of your organisation then Authorship may not be a good fit in its current state.
 
-* ✅ The visual styles of the author selection control are inherited from WordPress core and are WCAG AA compliant
+With regard to the author selection control on the post editing screen:
+
+* ✅ The visual styles are inherited from WordPress core and are WCAG 2.1 AA compliant
 * ✅ The control is fully accessible using only the keyboard
-* 🚫 The keyboard controls are not intuitive
+* 🚫 The keyboard controls are not very intuitive
 * 🚫 The control is not fully accessible when using a screen reader
 
 The team are actively investigating either replacing the component used to render the control with a fully accessible one, or fixing the accessibility issues of the current one.
 
-## Privacy & Security
+## Security, Privileges, and Privacy
 
-@TODO
+Great care has been taken to ensure Authorship makes no changes to the user capabilities required to edit content or view sensitive user data on your site. What it *does* do is:
+
+* Grant users who are attributed to a post the ability to edit that post if their capabilities allow it
+* Grant users the ability to create and assign guest authors to a post
+* Allow this behaviour to be changed at a granular level with custom capabilities
+
+### Assigning Attribution
+
+The capability required to change the attribution of a post matches that which is required by WordPress core to change the post author. This means a user needs the `edit_others_post` capability for the post type. The result is no change in behaviour from WordPress core with regard to being able to attribute a post to another user.
+
+* Administrators and Editors can change the attributed authors of a post
+* Authors and Contributors cannot change the attributed authors, and instead see a read-only list when editing a post
+
+Authorship allows the attribution to be changed for any post type that has post type support for `author`, which by default is Posts and Pages.
+
+### Editing Posts
+
+When a user is attributed to a post, that user becomes able to manage that post according to their capabilities as if they were the post author. This means:
+
+* A post that is attributed to a user with a role of Author can be edited, published, and deleted by that user
+* A post that is attributed to a user with a role of Contributor can be edited by that user while in draft, but cannot be not published, and cannot be edited once published
+
+From a practical point of view this feature only affects users with a role of Author or Contributor. Administrators and Editors can edit other users' posts by default and therefore edit, publish, and delete posts regardless of whether they are attributed to it.
+
+### Searching Users
+
+The `authorship/v1/users` REST API endpoint provides a means of searching users on the site in order to attribute them to a post. Access to this endpoint is granted to all users who have the capability to change the attributed authors of the given post type, which means Editors and Administrators by default. The result is no change in behaviour from WordPress core with regard to being able to search users.
+
+In addition, this endpoint has been designed to expose minimal information about users, for example it does not expose email addresses or capabilities. This allows lower level users such as users with a role of Author to be granted the ability to attribute users to a post without unnecessarily exposing sensitive information about those users.
+
+### Creating Guest Authors
+
+The `authorship/v1/users` REST API endpoint provides a means of creating guest authors that can subsequently be attributed to a post. Access to this endpoint is granted to all users who have the ability to edit others' posts, which means Editors and Administrators by default.
+
+More work is still to be done around the ability to subsequently edit guest authors, but it's worth noting that this is the one area where Authorship diverges from the default capabilities of WordPress core. It allows an Editor role user to create a new user account, which they usually cannot do. However it is tightly controlled:
+
+* An email address cannot be provided unless the user has the `create_users` capability, which only Administrators do
+* A user role cannot be provided, it is always set to Guest Author
+
+### Capability Customisation
+
+The following custom user capabilities are used by Authorship. These can be granted to or denied from users or roles in order to adjust user access:
+
+* `attribute_post_type`
+   - Used when attributing users to a given post type
+	 - Maps to the `edit_others_posts` capability of the post type by default
+* `create_guest_authors`
+   - Used when creating a guest author
+   - Maps to `edit_others_posts` by default
 
 ## Contributing
 
