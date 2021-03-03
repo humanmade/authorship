@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 'release'
-      - 'release/**'
 
 jobs:
   wordpress:
@@ -64,7 +63,7 @@ jobs:
         echo "Releasing version $VERSION ..."
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git checkout -b "release/$VERSION"
+        git checkout -b "release-$VERSION"
         git add -f build/*
         git add -f lib/*
         git commit -m "Release $VERSION"
