@@ -31,11 +31,11 @@ You can clone this repo and activate it like a normal WordPress plugin, but you'
 
 ## Building the Assets
 
-To compile the Sass files into CSS:
+To compile the JS and CSS:
 
 	npm run build
 
-To start the file watcher which will watch for changes and automatically compile the Sass:
+To start the file watcher which will watch for changes and automatically build the JS and CSS:
 
 	npm run start
 
@@ -56,6 +56,10 @@ To run just the code sniffer:
 To run just PHP Static Analysis tool:
 
 	composer test:phpstan
+
+To lint the JS and CSS:
+
+	npm run lint
 
 ## Releasing a New Version
 
