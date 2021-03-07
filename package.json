@@ -10,7 +10,10 @@
     "lint:css": "stylelint src/",
     "lint:js": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "start": "webpack-dev-server --config=.config/webpack.config.dev.js",
-    "build": "webpack --config=.config/webpack.config.prod.js"
+    "build": "webpack --config=.config/webpack.config.prod.js",
+    "bump:patch": "bump patch --tag '%s' --commit 'The v%s release' package.json package-lock.json README.md plugin.php",
+    "bump:minor": "bump minor --tag '%s' --commit 'The v%s release' package.json package-lock.json README.md plugin.php",
+    "bump:major": "bump major --tag '%s' --commit 'The v%s release' package.json package-lock.json README.md plugin.php"
   },
   "dependencies": {
     "@types/react-select": "^3.0.26",
