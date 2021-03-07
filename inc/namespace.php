@@ -57,6 +57,22 @@ function bootstrap() : void {
 }
 
 /**
+ * Return list of supported post types, defaulting to those supporting 'author'
+ *
+ * @return array
+ */
+function get_supported_post_types() : array {
+	$post_types = get_post_types_by_support( 'author' );
+
+	/**
+	 * Filters the list of supported post types
+	 *
+	 * @return array $post_types List of post types that support authorship
+	 */
+	return apply_filters( 'authorship_supported_post_types', $post_types );
+}
+
+/**
  * Filters the display name of the current post's author for RSS feeds.
  *
  * @param string|null $display_name The author's display name.
@@ -363,7 +379,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
  * @param WP_REST_Server $server Server object.
  */
 function register_rest_api_fields( WP_REST_Server $server ) : void {
-	$post_types = get_post_types_by_support( 'author' );
+	$post_types = get_supported_post_types();
 
 	array_walk( $post_types, __NAMESPACE__ . '\\register_rest_api_field' );
 
@@ -603,7 +619,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		$post_type = 'post';
 	}
 
-	if ( array_diff( (array) $post_type, get_post_types_by_support( 'author' ) ) ) {
+	if ( array_diff( (array) $post_type, get_supported_post_types() ) ) {
 		// If _any_ of the requested post types don't support `author`, let the default query run.
 		// @TODO I don't think anything can be done about a query for multiple post types where one or
 		// more support `author` and one or more don't.
