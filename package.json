@@ -1,6 +1,6 @@
 {
   "name": "@humanmade/authorship",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Authorship",
   "private": true,
   "main": "src/index.tsx",
