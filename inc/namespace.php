@@ -57,9 +57,9 @@ function bootstrap() : void {
 }
 
 /**
- * Return list of supported post types, defaulting to those supporting 'author'
+ * Return list of supported post types, defaulting to those supporting 'author'.
  *
- * @return string[] List of post types to support
+ * @return string[] List of post types to support.
  */
 function get_supported_post_types() : array {
 	$post_types = get_post_types_by_support( 'author' );
@@ -73,9 +73,9 @@ function get_supported_post_types() : array {
 }
 
 /**
- * Check if a post type is supported by Authorship
+ * Check if a post type is supported by Authorship.
  *
- * @param string $post_type
+ * @param string $post_type Post type to check.
  * @return boolean
  */
 function is_post_type_supported( string $post_type ) : bool {
