@@ -57,9 +57,9 @@ function bootstrap() : void {
 }
 
 /**
- * Return list of supported post types, defaulting to those supporting 'author'
+ * Return list of supported post types, defaulting to those supporting 'author'.
  *
- * @return string[] List of post types to support
+ * @return string[] List of post types to support.
  */
 function get_supported_post_types() : array {
 	$post_types = get_post_types_by_support( 'author' );
@@ -70,6 +70,16 @@ function get_supported_post_types() : array {
 	 * @return array $post_types List of post types that support authorship
 	 */
 	return apply_filters( 'authorship_supported_post_types', $post_types );
+}
+
+/**
+ * Check if a post type is supported by Authorship.
+ *
+ * @param string $post_type Post type to check.
+ * @return boolean
+ */
+function is_post_type_supported( string $post_type ) : bool {
+	return in_array( $post_type, get_supported_post_types(), true );
 }
 
 /**
@@ -409,7 +419,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		] );
 	}
 
-	if ( ! post_type_supports( $post_type, 'author' ) ) {
+	if ( ! is_post_type_supported( $post_type ) ) {
 		return new WP_Error( 'authorship', __( 'This post type does not support attributed authors.', 'authorship' ), [
 			'status' => WP_Http::BAD_REQUEST,
 		] );
@@ -529,7 +539,7 @@ function enqueue_assets() : void {
 	/** @var WP_Post */
 	$post = get_post();
 
-	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+	if ( ! is_post_type_supported( $post->post_type ) ) {
 		return;
 	}
 
