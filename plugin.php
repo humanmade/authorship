@@ -9,7 +9,7 @@
  *
  * Plugin Name:  Authorship
  * Description:  Authorship
- * Version:      0.2.3
+ * Version:      0.2.4
  * Plugin URI:   https://github.com/humanmade/authorship
  * Author:       Human Made
  * Author URI:   https://humanmade.com/
