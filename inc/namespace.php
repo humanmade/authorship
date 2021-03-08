@@ -59,7 +59,7 @@ function bootstrap() : void {
 /**
  * Return list of supported post types, defaulting to those supporting 'author'
  *
- * @return array
+ * @return string[] List of post types to support
  */
 function get_supported_post_types() : array {
 	$post_types = get_post_types_by_support( 'author' );
