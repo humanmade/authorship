@@ -73,6 +73,16 @@ function get_supported_post_types() : array {
 }
 
 /**
+ * Check if a post type is supported by Authorship
+ *
+ * @param string $post_type
+ * @return boolean
+ */
+function is_post_type_supported( string $post_type ) : bool {
+	return in_array( $post_type, get_supported_post_types(), true );
+}
+
+/**
  * Filters the display name of the current post's author for RSS feeds.
  *
  * @param string|null $display_name The author's display name.
@@ -409,7 +419,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 		] );
 	}
 
-	if ( ! post_type_supports( $post_type, 'author' ) ) {
+	if ( ! is_post_type_supported( $post_type ) ) {
 		return new WP_Error( 'authorship', __( 'This post type does not support attributed authors.', 'authorship' ), [
 			'status' => WP_Http::BAD_REQUEST,
 		] );
@@ -529,7 +539,7 @@ function enqueue_assets() : void {
 	/** @var WP_Post */
 	$post = get_post();
 
-	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+	if ( ! is_post_type_supported( $post->post_type ) ) {
 		return;
 	}
 

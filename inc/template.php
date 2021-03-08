@@ -21,8 +21,12 @@ use WP_User;
  * @return int[] Array of user IDs.
  */
 function get_author_ids( WP_Post $post ) : array {
-	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
-		return [];
+	if ( ! is_post_type_supported( $post->post_type ) ) {
+		if ( post_type_supports( $post->post_type, 'author' ) ) {
+			return [ intval( $post->post_author ) ];
+		} else {
+			return [];
+		}
 	}
 
 	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
@@ -142,7 +146,7 @@ HTML;
  * @return WP_User[] Array of user objects.
  */
 function set_authors( WP_Post $post, array $authors ) : array {
-	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+	if ( ! is_post_type_supported( $post->post_type ) ) {
 		throw new Exception( __( 'This post type does not support authorship.', 'authorship' ) );
 	}
 
@@ -177,7 +181,7 @@ function set_authors( WP_Post $post, array $authors ) : array {
  * @return bool Whether the user is an attributed author of the post.
  */
 function user_is_author( WP_User $user, WP_Post $post ) : bool {
-	if ( ! post_type_supports( $post->post_type, 'author' ) ) {
+	if ( ! is_post_type_supported( $post->post_type ) ) {
 		return ( intval( $post->post_author ) === $user->ID );
 	}
 
