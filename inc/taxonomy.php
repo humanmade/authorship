@@ -17,7 +17,7 @@ const TAXONOMY = 'authorship';
  * Registers the taxonomy that creates a connection between posts and users.
  */
 function init_taxonomy() : void {
-	$post_types = get_post_types_by_support( 'author' );
+	$post_types = get_supported_post_types();
 
 	register_taxonomy(
 		TAXONOMY,

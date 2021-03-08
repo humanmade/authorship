@@ -54,6 +54,12 @@ _Features without a checkmark are still work in progress._
 
 ## Installation
 
+### For normal use
+
+    composer require humanmade/authorship
+
+### For development use
+
 * Clone this repo into your plugins directory
 * Install the dependencies:  
   `composer install && npm install`
@@ -149,7 +155,7 @@ If this flag is *not* set:
 
 Authorship does not send any email notifications itself, but it does instruct WordPress core to additionally send its emails to attributed authors when appropriate.
 
-* When a comment on a post is held for moderation, the comment moderation email also gets sent to all attributed authors who have the ability to moderate the comment and have valid email address
+* When a comment on a post is held for moderation, the comment moderation email also gets sent to all attributed authors who have the ability to moderate the comment and have a valid email address
 * When a comment on a post is published, the comment notification email also gets sent to all attributed authors who have a valid email address
 
 This plugin only adjusts the list of email addresses to which these emails get sent. If you want to disable these emails entirely, see the "Email me whenever" section of the Settings -> Discussion screen in WordPress.
@@ -197,7 +203,7 @@ From a practical point of view this feature only affects users with a role of Au
 
 The `authorship/v1/users` REST API endpoint provides a means of searching users on the site in order to attribute them to a post. Access to this endpoint is granted to all users who have the capability to change the attributed authors of the given post type, which means Editors and Administrators by default. The result is no change in behaviour from WordPress core with regard to being able to search users.
 
-In addition, this endpoint has been designed to expose minimal information about users, for example it does not expose email addresses or capabilities. This allows lower level users such as users with a role of Author to be granted the ability to attribute users to a post without unnecessarily exposing sensitive information about those users.
+In addition, this endpoint has been designed to expose minimal information about users, for example it does not expose email addresses or capabilities. This allows lower level users such as users with a role of Author to be granted the ability to attribute users to a post without unnecessarily exposing sensitive information about other users.
 
 ### Creating Guest Authors
 
@@ -214,7 +220,7 @@ The following custom user capabilities are used by Authorship. These can be gran
 
 * `attribute_post_type`
    - Used when attributing users to a given post type
-	 - Maps to the `edit_others_posts` capability of the post type by default
+   - Maps to the `edit_others_posts` capability of the post type by default
 * `create_guest_authors`
    - Used when creating a guest author
    - Maps to `edit_others_posts` by default

@@ -31,11 +31,11 @@ You can clone this repo and activate it like a normal WordPress plugin, but you'
 
 ## Building the Assets
 
-To compile the Sass files into CSS:
+To compile the JS and CSS:
 
 	npm run build
 
-To start the file watcher which will watch for changes and automatically compile the Sass:
+To start the file watcher which will watch for changes and automatically build the JS and CSS:
 
 	npm run start
 
@@ -57,6 +57,10 @@ To run just PHP Static Analysis tool:
 
 	composer test:phpstan
 
+To lint the JS and CSS:
+
+	npm run lint
+
 ## Releasing a New Version
 
 These are the steps to take to release a new version of Authorship (for contributors who have push access to the GitHub repo).
@@ -74,7 +78,7 @@ These are the steps to take to release a new version of Authorship (for contribu
 
 ### For Release
 
-1. Bump and commit the plugin version number in plugin.php and package.json using `npm run bump:{INCEMENTOR}`, eg: `npm run bump:patch`, `npm run bump:patch`, or `npm run bump:patch`
+1. Bump and commit the plugin version number in `plugin.php` and `package.json` using `npm run bump:{INCEMENTOR}`, eg: `npm run bump:patch`, `npm run bump:patch`, or `npm run bump:patch`
 1. `git push origin develop`
 1. Wait until (and ensure that) [the build passes](https://github.com/humanmade/authorship/actions)
 1. `git checkout main`
