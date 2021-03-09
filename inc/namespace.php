@@ -239,9 +239,7 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
 	switch ( $cap ) {
 
 		case 'create_guest_authors':
-			if ( array_key_exists( $cap, $user_caps ) ) {
-				$user_caps[ $cap ] = $user_caps[ $cap ];
-			} else {
+			if ( ! array_key_exists( $cap, $user_caps ) ) {
 				$user_caps[ $cap ] = user_can( $user->ID, 'edit_others_posts' );
 			}
 			break;
@@ -260,7 +258,6 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
 			}
 
 			if ( array_key_exists( $cap, $user_caps ) ) {
-				$user_caps[ $cap ] = $user_caps[ $cap ];
 				break;
 			}
 
