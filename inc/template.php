@@ -24,9 +24,9 @@ function get_author_ids( WP_Post $post ) : array {
 	if ( ! is_post_type_supported( $post->post_type ) ) {
 		if ( post_type_supports( $post->post_type, 'author' ) ) {
 			return [ intval( $post->post_author ) ];
-		} else {
-			return [];
 		}
+
+		return [];
 	}
 
 	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
