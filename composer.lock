@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "919c28cac712fa8bd5c548468be16384",
+    "content-hash": "044b8336b8820b9a53c422d006cd5b03",
     "packages": [
         {
             "name": "composer/installers",
@@ -152,16 +152,16 @@
         },
         {
             "name": "humanmade/asset-loader",
-            "version": "v0.4.1",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humanmade/asset-loader.git",
-                "reference": "b19fe0be7acbc7459bd832ddbc8b5b9119499a29"
+                "reference": "717ebc20e999affe7c601015221fe76037c011c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humanmade/asset-loader/zipball/b19fe0be7acbc7459bd832ddbc8b5b9119499a29",
-                "reference": "b19fe0be7acbc7459bd832ddbc8b5b9119499a29",
+                "url": "https://api.github.com/repos/humanmade/asset-loader/zipball/717ebc20e999affe7c601015221fe76037c011c4",
+                "reference": "717ebc20e999affe7c601015221fe76037c011c4",
                 "shasum": ""
             },
             "require": {
@@ -178,7 +178,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Utilities to seamlessly consume Webpack-bundled assets in WordPress themes & plugins.",
-            "time": "2020-07-23T20:16:30+00:00"
+            "time": "2021-01-27T15:20:46+00:00"
         }
     ],
     "packages-dev": [
