@@ -53,7 +53,7 @@ To run just the code sniffer:
 
 	composer test:phpcs
 
-To run just PHP Static Analysis tool:
+To run just the PHP Static Analysis tool:
 
 	composer test:phpstan
 
@@ -71,14 +71,13 @@ These are the steps to take to release a new version of Authorship (for contribu
 1. If this is a non-patch release, check issues and PRs assigned to the patch or minor milestones that will get skipped. Reassign as necessary.
 1. Ensure you're on the `develop` branch and all the changes for this release have been merged in.
 1. Ensure `README.md` contains an up to date description, "Tested up to" version, FAQs, screenshots, etc.
-   - This is currently a manual process while I decide whether I want to sync parts of these files.
 1. Run `composer test` and ensure everything passes.
 1. Prepare a changelog for [the Releases page on GitHub](https://github.com/humanmade/authorship/releases).
    - The `git changelog -x` command from [Git Extras](https://github.com/tj/git-extras) is handy for this.
 
 ### For Release
 
-1. Bump and commit the plugin version number in `plugin.php` and `package.json` using `npm run bump:{INCEMENTOR}`, eg: `npm run bump:patch`, `npm run bump:minor`, or `npm run bump:major`
+1. Bump and commit the plugin version number using `npm run bump:{INCEMENTOR}`, eg: `npm run bump:patch`, `npm run bump:minor`, or `npm run bump:major`
 1. `git push origin develop`
 1. Wait until (and ensure that) [the build passes](https://github.com/humanmade/authorship/actions)
 1. `git checkout main`
