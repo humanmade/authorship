@@ -30,7 +30,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
       run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
@@ -47,7 +47,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install JS Dependencies
       run: npm install

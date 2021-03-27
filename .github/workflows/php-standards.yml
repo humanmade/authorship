@@ -39,7 +39,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-composer-7.2-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
       run: |
@@ -49,7 +49,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: tests/cache
-        key: ${{ matrix.php }}-phpcs-${{ hashFiles('plugin.php') }}
+        key: ${{ runner.os }}-phpcs-7.2-${{ hashFiles('plugin.php') }}
 
     - name: Run the tests
       run: |
