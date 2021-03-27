@@ -47,6 +47,7 @@ jobs:
     - name: Install PHP Dependencies
       run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction
+        composer require --dev --update-with-dependencies --prefer-dist roots/wordpress="dev-nightly" wp-phpunit/wp-phpunit="dev-master"
 
     - name: Run the tests
       run: |
