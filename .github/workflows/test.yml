@@ -13,9 +13,8 @@ jobs:
     strategy:
       matrix:
         php: ['7.2', '7.4']
-        wp: ['*', 'dev-nightly']
       fail-fast: false
-    name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }}
+    name: WP 5.7 / PHP ${{ matrix.php }}
     runs-on: ubuntu-18.04
     steps:
     - name: Checkout repository
@@ -51,7 +50,6 @@ jobs:
     - name: Install PHP Dependencies
       run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction
-        composer require --dev --prefer-dist --no-progress --no-suggest --no-interaction --update-with-dependencies roots/wordpress="${{ matrix.wp }} || *" wp-phpunit/wp-phpunit="${{ matrix.wp }} || *"
 
     - name: Run the tests
       run: |
