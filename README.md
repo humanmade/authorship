@@ -72,7 +72,7 @@ Why another multi-author plugin? What about Co-Authors Plus or Bylines or Publis
 
 Firstly, those plugins are great and have served us well over the years, however they all suffer from similar problems:
 
-* API: Lack of support for exposing author data beyond the theme, for example via the REST API, WP-CLI, and feeds
+* API: Lack of support for writing and reading author data via the REST API and WP-CLI
 * UI: Limited or custom UI that doesn't feel like a part of WordPress
 * Users: An unnecessary distinction between guest authors and actual WordPress users
 
@@ -80,7 +80,7 @@ Let's look at these points in detail and explain how Authorship addresses them:
 
 ### API design decisions
 
-There's a lot more to a modern WordPress site than just its theme. Data gets created and consumed via its APIs, so these need to be treated as first-class citizens when working with the attributed authors of posts.
+There's a lot more to a modern WordPress site than just its theme. Data gets written to and read from its APIs, so these need to be treated as first-class citizens when working with the attributed authors of posts.
 
 Authorship provides:
 
@@ -133,7 +133,9 @@ This endpoint allows:
 
 ### `authorship` field
 
-This field is added to the endpoint for all post types that have post type support for `author`, for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of IDs of users attributed to the post.
+This field is added to the endpoint for all suported post types (by default, ones which that have post type support for `author`), for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of IDs of users attributed to the post.
+
+In addition, user objects are embedded in the `_embedded['wp:authorship']` field in the response if `_embed` is set and the authenticated user can list users.
 
 ## WP-CLI
 
@@ -186,7 +188,7 @@ Great care has been taken to ensure Authorship makes no changes to the user capa
 The capability required to change the attribution of a post matches that which is required by WordPress core to change the post author. This means a user needs the `edit_others_post` capability for the post type. The result is no change in behaviour from WordPress core with regard to being able to attribute a post to another user.
 
 * Administrators and Editors can change the attributed authors of a post
-* Authors and Contributors cannot change the attributed authors, and instead see a read-only list when editing a post
+* Authors and Contributors cannot change the attributed authors and see a read-only list when editing a post
 
 Authorship allows the attribution to be changed for any post type that has post type support for `author`, which by default is Posts and Pages.
 

@@ -124,7 +124,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	};
 
 	/**
-	 * Handles the creation of a new option.
+	 * Handles the creation of a new guest author.
 	 *
 	 * @param {string} option The new option.
 	 */
