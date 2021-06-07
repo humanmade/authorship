@@ -6,7 +6,7 @@ parameters:
     - plugin.php
     - inc/
   scanFiles:
-    - lib/asset-loader/asset-loader.php
+    - lib/asset-loader/inc/namespace.php
     - tests/phpunit/includes/testcase.php
     - tests/phpunit/includes/email-testcase.php
     - tests/phpunit/includes/feed-testcase.php
