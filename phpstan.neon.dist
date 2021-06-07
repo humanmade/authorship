@@ -6,17 +6,9 @@ parameters:
     - plugin.php
     - inc
   scanFiles:
-    - plugin.php
-    - inc/namespace.php
-    - inc/taxonomy.php
-    - inc/class-users-controller.php
-    - inc/template.php
-    - inc/admin.php
     - tests/phpunit/includes/testcase.php
     - tests/phpunit/includes/email-testcase.php
     - tests/phpunit/includes/feed-testcase.php
     - tests/phpunit/includes/restapi-testcase.php
   scanDirectories:
-    - inc
-    - lib
-    - vendor/wp-phpunit/wp-phpunit/includes
+    - vendor/wp-phpunit/wp-phpunit/includes/
