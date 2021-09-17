@@ -1,0 +1,18 @@
+{
+    "name": "humanmade/asset-loader",
+    "description": "Utilities to seamlessly consume Webpack-bundled assets in WordPress themes & plugins.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "composer/installers": "~1.0"
+    },
+    "require-dev": {
+        "humanmade/coding-standards": "^1.1.0",
+        "10up/wp_mock": "^0.4.2",
+        "phpunit/phpunit": "^7.5"
+    },
+    "scripts": {
+        "lint": "phpcs .",
+        "test": "phpunit"
+    }
+}
