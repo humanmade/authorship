@@ -293,6 +293,18 @@ class Users_Controller extends WP_REST_Users_Controller {
 			$query_params['roles']
 		);
 
-		return $query_params;
+		/**
+		 * Filters REST API collection parameters for the authorship users controller.
+		 *
+		 * This filter registers the collection parameter, but does not map the
+		 * collection parameter to an internal WP_User_Query parameter.
+		 *
+		 * Mimics the rest_user_collection_params from core's endpoint.
+		 *
+		 * @since 0.2.8
+		 *
+		 * @param array $query_params JSON Schema-formatted collection parameters.
+		 */
+		return apply_filters( 'authorship_rest_user_collection_params', $query_params );
 	}
 }
