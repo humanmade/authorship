@@ -533,7 +533,7 @@ function filter_rest_response_link_curies( array $additional ) : array {
  * Fires after block assets have been enqueued for the editing interface.
  */
 function enqueue_assets() : void {
-	/** @var WP_Post */
+	/** @var WP_Post|null */
 	$post = get_post();
 
 	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
