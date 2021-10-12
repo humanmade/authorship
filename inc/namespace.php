@@ -536,7 +536,7 @@ function enqueue_assets() : void {
 	/** @var WP_Post */
 	$post = get_post();
 
-	if ( ! is_post_type_supported( $post->post_type ) ) {
+	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
 		return;
 	}
 
