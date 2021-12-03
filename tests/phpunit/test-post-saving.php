@@ -114,4 +114,27 @@ class TestPostSaving extends TestCase {
 
 		$this->assertSame( [ self::$users['author']->ID ], $author_ids );
 	}
+
+	public function testPostAuthorshipIsSetToEmptyWhenUpdatingPostWithNoExistingAuthorshipAndFiltered() : void {
+		$factory = self::factory()->post;
+
+		add_filter( 'authorship_default_author', '__return_empty_array' );
+
+		// Owned by Author.
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['author']->ID,
+		] );
+
+		wp_update_post( [
+			'ID'         => $post->ID,
+			'post_title' => 'Updated Title',
+		], true );
+
+		/** @var int[] */
+		$author_ids = wp_list_pluck( get_authors( $post ), 'ID' );
+
+		$this->assertEmpty( $author_ids );
+
+		remove_filter( 'authorship_default_author', '__return_empty_array' );
+	}
 }
