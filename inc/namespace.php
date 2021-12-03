@@ -369,7 +369,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 			 */
 			$authors = array_filter( apply_filters(
 				'authorship_default_author',
-				isset( $unsanitized_postarr['post_author'] ) ? [ $unsanitized_postarr['post_author'] ] : null,
+				[ isset( $unsanitized_postarr['post_author'] ) ? $unsanitized_postarr['post_author'] : null ],
 				$post
 			) );
 		}
