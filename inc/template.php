@@ -52,10 +52,16 @@ function get_authors( WP_Post $post ) : array {
 	}
 
 	/** @var WP_User[] */
-	$users = get_users( [
-		'include' => $author_ids,
-		'orderby' => 'include',
-	] );
+	$users = wp_cache_get( 'authors', 'authorship' );
+
+	if ( ! $users ) {
+		$users = get_users( [
+			'include' => $author_ids,
+			'orderby' => 'include',
+		] );
+
+		wp_cache_add( 'authors', $users, 'authorship', 30 );
+	}
 
 	return $users;
 }
