@@ -56,18 +56,19 @@ function get_author_ids( WP_Post $post ) : array {
  * @return WP_User[] Array of user objects.
  */
 function get_authors( WP_Post $post ) : array {
-
-	/** @var WP_User[] */
-	$users = wp_cache_get( 'authors_' . $post->ID, 'authorship' );
-
-	if ( $users ) {
-		return $users;
-	}
-
 	$author_ids = get_author_ids( $post );
 
 	if ( empty( $author_ids ) ) {
 		return [];
+	}
+
+	// Just a very simple way to convert author IDs into a string that can be used as a cache key.
+	// Could also generate a hash such as hash( 'crc32', json_encode( $author_ids ) );
+	$cache_key = 'author_ids_' . implode( '', $author_ids );
+	$users = wp_cache_get( $cache_key, 'authorship' );
+
+	if ( $users ) {
+		return $users;
 	}
 
 	$users = get_users( [
@@ -75,7 +76,7 @@ function get_authors( WP_Post $post ) : array {
 		'orderby' => 'include',
 	] );
 
-	wp_cache_add( 'authors_' . $post->ID, $users, 'authorship', 30 );
+	wp_cache_set( $cache_key, $users, 'authorship', 30 );
 
 	return $users;
 }
@@ -189,6 +190,8 @@ function set_authors( WP_Post $post, array $authors ) : array {
 	if ( is_wp_error( $terms ) ) {
 		throw new Exception( $terms->get_error_message() );
 	}
+
+	wp_cache_flush();
 
 	return $users;
 }
