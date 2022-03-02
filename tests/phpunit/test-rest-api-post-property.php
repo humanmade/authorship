@@ -18,6 +18,11 @@ use WP_Http;
 use WP_REST_Request;
 
 class TestRESTAPIPostProperty extends RESTAPITestCase {
+
+	public function setUp() {
+		wp_cache_flush();
+	}
+	
 	public function testAuthorshipCanBeSpecifiedWhenCreatingPost() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 
