@@ -62,8 +62,6 @@ function get_authors( WP_Post $post ) : array {
 		return [];
 	}
 
-	// Just a very simple way to convert author IDs into a string that can be used as a cache key.
-	// Could also generate a hash such as hash( 'crc32', json_encode( $author_ids ) ); .
 	$cache_key = 'author_ids_' . implode( '', $author_ids );
 	$users = wp_cache_get( $cache_key, 'authorship' );
 
@@ -191,7 +189,7 @@ function set_authors( WP_Post $post, array $authors ) : array {
 		throw new Exception( $terms->get_error_message() );
 	}
 
-	wp_cache_flush();
+	wp_cache_delete( 'author_ids_' . $post->ID, 'authorship' );
 
 	return $users;
 }
