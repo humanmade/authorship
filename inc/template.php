@@ -21,6 +21,12 @@ use WP_User;
  * @return int[] Array of user IDs.
  */
 function get_author_ids( WP_Post $post ) : array {
+	$author_ids = wp_cache_get( 'author_ids_' . $post->ID, 'authorship' );
+
+	if ( $author_ids ) {
+		return $author_ids;
+	}
+
 	if ( ! is_post_type_supported( $post->post_type ) ) {
 		if ( post_type_supports( $post->post_type, 'author' ) ) {
 			return [ intval( $post->post_author ) ];
@@ -34,9 +40,13 @@ function get_author_ids( WP_Post $post ) : array {
 		return [];
 	}
 
-	return array_map( function ( WP_Term $term ) : int {
+	$author_ids = array_map( function ( WP_Term $term ) : int {
 		return intval( $term->name );
 	}, $authors );
+
+	wp_cache_add( 'author_ids_' . $post->ID, $author_ids, 'authorship', 30 );
+
+	return $author_ids;
 }
 
 /**
@@ -46,22 +56,26 @@ function get_author_ids( WP_Post $post ) : array {
  * @return WP_User[] Array of user objects.
  */
 function get_authors( WP_Post $post ) : array {
+
+	/** @var WP_User[] */
+	$users = wp_cache_get( 'authors_' . $post->ID, 'authorship' );
+
+	if ( $users ) {
+		return $users;
+	}
+
 	$author_ids = get_author_ids( $post );
+
 	if ( empty( $author_ids ) ) {
 		return [];
 	}
 
-	/** @var WP_User[] */
-	$users = wp_cache_get( 'authors', 'authorship' );
+	$users = get_users( [
+		'include' => $author_ids,
+		'orderby' => 'include',
+	] );
 
-	if ( ! $users ) {
-		$users = get_users( [
-			'include' => $author_ids,
-			'orderby' => 'include',
-		] );
-
-		wp_cache_add( 'authors', $users, 'authorship', 30 );
-	}
+	wp_cache_add( 'authors_' . $post->ID, $users, 'authorship', 30 );
 
 	return $users;
 }
