@@ -20,3 +20,6 @@ parameters:
     - inc
     - lib
     - vendor/wp-phpunit/wp-phpunit/includes
+  ignoreErrors:
+    # Uses func_get_args()
+    - '#^Function apply_filters invoked with [34567] parameters, 2 required\.$#'
