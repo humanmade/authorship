@@ -21,12 +21,6 @@ use WP_User;
  * @return int[] Array of user IDs.
  */
 function get_author_ids( WP_Post $post ) : array {
-	$author_ids = wp_cache_get( 'author_ids_' . $post->ID, 'authorship' );
-
-	if ( $author_ids ) {
-		return $author_ids;
-	}
-
 	if ( ! is_post_type_supported( $post->post_type ) ) {
 		if ( post_type_supports( $post->post_type, 'author' ) ) {
 			return [ intval( $post->post_author ) ];
@@ -40,13 +34,9 @@ function get_author_ids( WP_Post $post ) : array {
 		return [];
 	}
 
-	$author_ids = array_map( function ( WP_Term $term ) : int {
+	return array_map( function ( WP_Term $term ) : int {
 		return intval( $term->name );
 	}, $authors );
-
-	wp_cache_add( 'author_ids_' . $post->ID, $author_ids, 'authorship', 30 );
-
-	return $author_ids;
 }
 
 /**
@@ -188,8 +178,6 @@ function set_authors( WP_Post $post, array $authors ) : array {
 	if ( is_wp_error( $terms ) ) {
 		throw new Exception( $terms->get_error_message() );
 	}
-
-	wp_cache_delete( 'author_ids_' . $post->ID, 'authorship' );
 
 	return $users;
 }
