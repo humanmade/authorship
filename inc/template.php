@@ -52,7 +52,7 @@ function get_authors( WP_Post $post ) : array {
 	}
 
 	static $cached_queries = [];
-	$key = hash( 'crc32', json_encode( $author_ids ) );
+	$key = hash( 'crc32', (string) wp_json_encode( $author_ids ) );
 
 	if ( isset( $cached_queries[ $key ] ) ) {
 		return $cached_queries[ $key ];
