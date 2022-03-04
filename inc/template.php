@@ -52,19 +52,20 @@ function get_authors( WP_Post $post ) : array {
 		return [];
 	}
 
-	$cache_key = 'author_ids_' . implode( '', $author_ids );
-	$users = wp_cache_get( $cache_key, 'authorship' );
+	static $cached_queries = [];
+	$key = hash( 'crc32', json_encode( $author_ids ) );
 
-	if ( $users ) {
-		return $users;
+	if ( isset( $cached_queries[ $key ] ) ) {
+		return $cached_queries[ $key ];
 	}
 
+	/** @var WP_User[] */
 	$users = get_users( [
 		'include' => $author_ids,
 		'orderby' => 'include',
 	] );
 
-	wp_cache_set( $cache_key, $users, 'authorship', 30 );
+	$cached_queries[ $key ] = $users;
 
 	return $users;
 }
