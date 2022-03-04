@@ -47,7 +47,6 @@ function get_author_ids( WP_Post $post ) : array {
  */
 function get_authors( WP_Post $post ) : array {
 	$author_ids = get_author_ids( $post );
-
 	if ( empty( $author_ids ) ) {
 		return [];
 	}
