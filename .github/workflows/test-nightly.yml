@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        php: ['7.2', '7.4']
+        php: ['7.4']
       fail-fast: false
     name: WP nightly / PHP ${{ matrix.php }}
     runs-on: ubuntu-18.04
@@ -23,7 +23,7 @@ jobs:
         php-version: ${{ matrix.php }}
         extensions: mysqli, xmlwriter
         coverage: none
-        tools: composer:v1
+        tools: composer:v2
 
     - name: Debugging
       run: |
