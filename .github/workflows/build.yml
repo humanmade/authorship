@@ -18,7 +18,7 @@ jobs:
         php-version: 7.4
         extensions: mysqli, xmlwriter
         coverage: none
-        tools: composer:v1
+        tools: composer:v2
 
     - name: Get Composer Cache Directory
       id: composer-cache-dir
