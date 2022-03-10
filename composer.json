@@ -28,6 +28,7 @@
     "preferred-install": "dist",
     "sort-packages": true,
     "allow-plugins": {
+      "composer/installers": true,
       "roots/wordpress-core-installer": true,
       "ergebnis/composer-normalize": true,
       "dealerdirect/phpcodesniffer-composer-installer": true
