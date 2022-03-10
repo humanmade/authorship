@@ -45,7 +45,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp5.9
 
     - name: Install PHP Dependencies
       run: |
