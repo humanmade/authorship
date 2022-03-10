@@ -78,8 +78,10 @@ These are the steps to take to release a new version of Authorship (for contribu
 ### For Release
 
 1. Bump and commit the plugin version number using `npm run bump:{INCEMENTOR}`, eg: `npm run bump:patch`, `npm run bump:minor`, or `npm run bump:major`
-1. `git push origin develop`
+1. Push to a new release branch, eg: `git checkout -b release-vxxx` and then `git push`
+1. Create a new pull-request from that branch, eg: `hub pull-request`
 1. Wait until (and ensure that) [the build passes](https://github.com/humanmade/authorship/actions)
+1. Get the PR reviewed and merged
 1. `git checkout main`
 1. `git merge develop`
 1. `git push origin main`
