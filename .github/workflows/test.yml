@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        php: ['7.4']
+        php: ['7.4', '8.0', '8.1']
       fail-fast: false
     name: WP 5.9 / PHP ${{ matrix.php }}
     runs-on: ubuntu-18.04
