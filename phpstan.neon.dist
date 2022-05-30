@@ -12,6 +12,8 @@ parameters:
     - inc/class-users-controller.php
     - inc/template.php
     - inc/admin.php
+    - inc/cli/namespace.php
+    - inc/cli/class-commands.php
     - tests/phpunit/includes/testcase.php
     - tests/phpunit/includes/email-testcase.php
     - tests/phpunit/includes/feed-testcase.php
