@@ -125,7 +125,7 @@ class Commands extends WP_CLI_Command {
 			foreach ( $posts as $post ) {
 				$authorship_authors = \Authorship\get_authors( $post );
 
-				if ( ! empty( $authorship_authors ) && ! $overwrite) {
+				if ( ! empty( $authorship_authors ) && ! $overwrite ) {
 					// skip posts that already have authorship data.
 					WP_CLI::line( 'Skipping post that already has Authorship data' );
 					continue;
