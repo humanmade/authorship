@@ -51,7 +51,7 @@ class Commands extends WP_CLI_Command {
 	 * @param array $args CLI arguments
 	 * @param array $assoc_args CLI arguments
 	 */
-	function migrateppa( $args, $assoc_args ) {
+	function migrate_ppa( $args, $assoc_args ) {
 
 		WP_CLI::log( 'To perform this migration you may need to activate the publishpress authors plugin' );
 
@@ -93,6 +93,7 @@ class Commands extends WP_CLI_Command {
 
 				if ( ! empty( $authorship_authors ) ) {
 					// skip posts that already have authorship data.
+					WP_CLI::line( 'Skipping post that already has Authorship data' );
 					continue;
 				}
 
@@ -102,7 +103,15 @@ class Commands extends WP_CLI_Command {
 				// if there are no Publish Press Authors data then there's
 				// nothing to migrate, skip!
 				if ( empty( $ppa_terms ) ) {
+					WP_CLI::line( 'Skipping post with no PPA data' );
 					continue;
+				}
+
+				// If PPA is deactivated the terms can be an error object.
+				// Usually invalid taxonomy, lets catch and report this.
+				if ( is_wp_error( $ppa_terms ) ) {
+					WP_CLI::error( 'There was an error fetching the Publishpress Author data, is the plugin activated?', false );
+					WP_CLI::error( wp_json_encode( $ppa_terms ), true );
 				}
 
 				/**
@@ -111,7 +120,6 @@ class Commands extends WP_CLI_Command {
 				 * If no user exists for the PPA guest author we create one.
 				 */
 				$new_authors = [];
-
 				foreach ( $ppa_terms as $ppa_author ) {
 					// add this user ID to the list of authors.
 					$user_id = $this->get_ppa_user_id( $ppa_author, $dry_run );
@@ -120,6 +128,11 @@ class Commands extends WP_CLI_Command {
 					if ( $user_id !== -1 ) {
 						$new_authors[] = $user_id;
 					}
+				}
+
+				if ( empty( $new_authors ) ) {
+					WP_CLI::line( 'Skipping post that has no multi-author data' );
+					continue;
 				}
 
 				if ( ! $dry_run ) {
@@ -139,7 +152,7 @@ class Commands extends WP_CLI_Command {
 			$paged++;
 		} while ( count( $posts ) );
 
-		if ( false === $dry_run ) {
+		if ( true === $dry_run ) {
 			WP_CLI::success( sprintf( '%d posts would have had Authorship data added if this was not a dry run.', $count ) );
 		} else {
 			WP_CLI::success( sprintf( '%d posts have had Authorship data added.', $count ) );
@@ -164,7 +177,7 @@ class Commands extends WP_CLI_Command {
 
 		// If there is no mapped PPA user then resolve that.
 		if ( ! empty( $ppa_user_id ) ) {
-			return $ppa_user_id;
+			return intval( $ppa_user_id );
 		}
 
 		/**
