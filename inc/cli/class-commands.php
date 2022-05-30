@@ -11,7 +11,10 @@ namespace Authorship\CLI;
 
 use WP_CLI;
 use WP_CLI_Command;
+use WP_Object_Cache;
+use WP_Post;
 use WP_Term;
+use WP_User;
 
 use const Authorship\GUEST_ROLE;
 
@@ -48,10 +51,10 @@ class Commands extends WP_CLI_Command {
 	 *
 	 * @when after_wp_load
 	 *
-	 * @param array $args CLI arguments
-	 * @param array $assoc_args CLI arguments
+	 * @param array<string> $args CLI arguments
+	 * @param array<string> $assoc_args CLI arguments
 	 */
-	function migrate_ppa( $args, $assoc_args ) {
+	function migrate_ppa( $args, $assoc_args ) : void {
 
 		WP_CLI::log( 'To perform this migration you may need to activate the publishpress authors plugin' );
 
@@ -75,6 +78,9 @@ class Commands extends WP_CLI_Command {
 		}
 
 		do {
+			/**
+			 * @var array<WP_Post>
+			 */
 			$posts = get_posts( [
 				'posts_per_page'   => $posts_per_page,
 				'paged'            => $paged,
@@ -85,7 +91,7 @@ class Commands extends WP_CLI_Command {
 
 			// Exit early if there are no more posts to avoid a final sleep call.
 			if ( empty( $posts ) ) {
-				continue;
+				break;
 			}
 
 			foreach ( $posts as $post ) {
@@ -111,7 +117,8 @@ class Commands extends WP_CLI_Command {
 				// Usually invalid taxonomy, lets catch and report this.
 				if ( is_wp_error( $ppa_terms ) ) {
 					WP_CLI::error( 'There was an error fetching the Publishpress Author data, is the plugin activated?', false );
-					WP_CLI::error( wp_json_encode( $ppa_terms ), true );
+					WP_CLI::error( $ppa_terms );
+					exit;
 				}
 
 				/**
@@ -213,7 +220,7 @@ class Commands extends WP_CLI_Command {
 		// arguments so we can reproduce later.
 		if ( is_wp_error( $ppa_user_id ) ) {
 			WP_CLI::error( 'Could not create Authorship user with these arguments:' );
-			WP_CLI::error( wp_json_encode( $args ) );
+			WP_CLI::error( $ppa_user_id );
 			return -1;
 		}
 
@@ -231,15 +238,26 @@ class Commands extends WP_CLI_Command {
 	 * @see https://github.com/Automattic/vip-go-mu-plugins/blob/master/vip-helpers/vip-caching.php#L733-L747
 	 */
 	private function reset_local_object_cache() : void {
+		/**
+		 * @var WP_Object_Cache
+		 */
 		global $wp_object_cache;
 
 		if ( ! is_object( $wp_object_cache ) ) {
 			return;
 		}
 
-		$wp_object_cache->group_ops      = [];
-		$wp_object_cache->memcache_debug = [];
-		$wp_object_cache->cache          = [];
+		if ( isset( $wp_object_cache->group_ops ) ) {
+			$wp_object_cache->group_ops = [];
+		}
+
+		if ( isset( $wp_object_cache->memcache_debug ) ) {
+			$wp_object_cache->memcache_debug = [];
+		}
+
+		if ( isset( $wp_object_cache->cache ) ) {
+			$wp_object_cache->cache = [];
+		}
 
 		if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
 			// important!

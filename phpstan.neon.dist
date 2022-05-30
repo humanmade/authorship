@@ -20,3 +20,4 @@ parameters:
     - inc
     - lib
     - vendor/wp-phpunit/wp-phpunit/includes
+    - vendor/wp-cli/wp-cli
