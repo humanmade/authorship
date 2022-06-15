@@ -139,7 +139,7 @@ In addition, user objects are embedded in the `_embedded['wp:authorship']` field
 
 ## WP-CLI
 
-Authorship implements a custom flag for use with posts, and a migration command for PublishPress Authors.
+Authorship implements a custom flag for use with posts, and migration commands.
 The following WP-CLI flags are available:
 
  - `--authorship`
@@ -163,7 +163,7 @@ Authorship provides a command for creating Authorship data using data from Publi
 With both plugins active, this command will copy PPA data into Authorship:
 
 ```sh
-wp authorship migrate_ppa --dry-run=true
+wp authorship migrate ppa --dry-run=true
 ```
 
 The command will perform a dry run by default, setting `--dry-run=false` will make changes to the database. Guest authors that do not exist as users will be created with blank emails and random passwords.
