@@ -71,20 +71,12 @@ class Migrate_Command extends WP_CLI_Command {
 		$paged = 1;
 		$count = 0;
 
-		$dry_run = true;
-
 		// If --dry-run is not set, then it will default to true.
 		// Must set --dry-run explicitly to false to run this command.
-		if ( isset( $assoc_args['dry-run'] ) ) {
-			$dry_run = filter_var( $assoc_args['dry-run'], FILTER_VALIDATE_BOOLEAN );
-		}
-
-		$overwrite = false;
+		$dry_run = filter_var( $assoc_args['dry-run'] ?? true, FILTER_VALIDATE_BOOLEAN );
 
 		// If --overwrite-authors is not set, then it will default to false.
-		if ( isset( $assoc_args['overwrite-authors'] ) ) {
-			$overwrite = filter_var( $assoc_args['overwrite-authors'], FILTER_VALIDATE_BOOLEAN );
-		}
+		$overwrite = filter_var( $assoc_args['overwrite-authors'] ?? false, FILTER_VALIDATE_BOOLEAN );
 
 		if ( $overwrite ) {
 			WP_CLI::warning( 'Overwriting of previous Authorship data is set to true.' );
