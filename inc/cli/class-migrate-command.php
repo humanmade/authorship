@@ -76,14 +76,14 @@ class Migrate_Command extends WP_CLI_Command {
 		// If --dry-run is not set, then it will default to true.
 		// Must set --dry-run explicitly to false to run this command.
 		if ( isset( $assoc_args['dry-run'] ) ) {
-			$dry_run = filter_var( $assoc_args['dry-run'], FILTER_VALIDATE_BOOLEAN ); // false|true
+			$dry_run = filter_var( $assoc_args['dry-run'], FILTER_VALIDATE_BOOLEAN );
 		}
 
 		$overwrite = false;
 
 		// If --overwrite-authors is not set, then it will default to false.
 		if ( isset( $assoc_args['overwrite-authors'] ) ) {
-			$overwrite = filter_var( $assoc_args['overwrite-authors'], FILTER_VALIDATE_BOOLEAN ); // false|true
+			$overwrite = filter_var( $assoc_args['overwrite-authors'], FILTER_VALIDATE_BOOLEAN );
 		}
 
 		if ( $overwrite ) {
@@ -142,7 +142,7 @@ class Migrate_Command extends WP_CLI_Command {
 				$new_authors = [];
 				foreach ( $ppa_terms as $ppa_author ) {
 					// add this user ID to the list of authors.
-					$user_id = $this->get_ppa_user_id( $ppa_author, $dry_run );
+					$user_id = $this->get_ppa_user_id( $ppa_author, ! $dry_run );
 
 					// on dry runs the ID might be -1 if a user needed to be created.
 					if ( $user_id !== -1 ) {
@@ -184,11 +184,11 @@ class Migrate_Command extends WP_CLI_Command {
 	 * for Authorship.
 	 *
 	 * @param WP_Term $ppa_author The term for the PPA author
-	 * @param boolean $dry_run If true no users will be created if they are missing
+	 * @param boolean $create_users If false no users will be created if they are missing
 	 *
 	 * @return integer a user ID for this term, or -1 if not resolvable
 	 */
-	private function get_ppa_user_id( WP_Term $ppa_author, bool $dry_run ) : int {
+	private function get_ppa_user_id( WP_Term $ppa_author, bool $create_users = false ) : int {
 		/**
 		 * We need to get the user for Authorship so check if a
 		 * user is already mapped in PPA.
@@ -212,8 +212,8 @@ class Migrate_Command extends WP_CLI_Command {
 			return $ppa_user_id->ID;
 		}
 
-		// Don't try to create a user if it's a dry run, return -1 instead.
-		if ( $dry_run ) {
+		// Return -1 unless we're allowed to create users.
+		if ( $create_users !== true ) {
 			return -1;
 		}
 
