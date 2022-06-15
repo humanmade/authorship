@@ -64,8 +64,10 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string> $assoc_args CLI arguments
 	 */
 	function ppa( $args, $assoc_args ) : void {
-
-		WP_CLI::log( 'To perform this migration you may need to activate the publishpress authors plugin' );
+		if ( ! is_plugin_active( 'publishpress-authors/publishpress-authors.php' ) ) {
+			// register the `author` taxonomy so that we can query for PPA author terms.
+			register_taxonomy( 'author', 'post' );
+		}
 
 		$posts_per_page = 100;
 		$paged = 1;
@@ -74,6 +76,10 @@ class Migrate_Command extends WP_CLI_Command {
 		// If --dry-run is not set, then it will default to true.
 		// Must set --dry-run explicitly to false to run this command.
 		$dry_run = filter_var( $assoc_args['dry-run'] ?? true, FILTER_VALIDATE_BOOLEAN );
+
+		if ( ! $dry_run ) {
+			WP_CLI::warning( 'Dry run is disabled, data will be modified.' );
+		}
 
 		// If --overwrite-authors is not set, then it will default to false.
 		$overwrite = filter_var( $assoc_args['overwrite-authors'] ?? false, FILTER_VALIDATE_BOOLEAN );
