@@ -52,7 +52,7 @@ if ( is_admin() ) {
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once __DIR__ . '/inc/cli/namespace.php';
-	require_once __DIR__ . '/inc/cli/class-commands.php';
+	require_once __DIR__ . '/inc/cli/class-migrate-command.php';
 	CLI\bootstrap();
 }
 

@@ -18,5 +18,5 @@ use WP_CLI;
  */
 function bootstrap() : void {
 	// @phpstan-ignore-next-line
-	WP_CLI::add_command( 'authorship', __NAMESPACE__ . '\\Commands' );
+	WP_CLI::add_command( 'authorship migrate', __NAMESPACE__ . '\\Migrate_Command' );
 }

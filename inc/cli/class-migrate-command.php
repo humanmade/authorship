@@ -19,9 +19,9 @@ use WP_User;
 use const Authorship\GUEST_ROLE;
 
 /**
- * Authorship utility and migration commands.
+ * Authorship migration commands.
  */
-class Commands extends WP_CLI_Command {
+class Migrate_Command extends WP_CLI_Command {
 
 	/**
 	 * Migrates PublishPress Authors data to Authorship.
@@ -54,17 +54,16 @@ class Commands extends WP_CLI_Command {
 	 *   - false
 	 * ---
 	 *
-	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp authorship migrateppa --dry-run=true
+	 *     wp authorship migrate ppa --dry-run=true
 	 *
 	 * @when after_wp_load
 	 *
 	 * @param array<string> $args CLI arguments
 	 * @param array<string> $assoc_args CLI arguments
 	 */
-	function migrate_ppa( $args, $assoc_args ) : void {
+	function ppa( $args, $assoc_args ) : void {
 
 		WP_CLI::log( 'To perform this migration you may need to activate the publishpress authors plugin' );
 
@@ -77,28 +76,14 @@ class Commands extends WP_CLI_Command {
 		// If --dry-run is not set, then it will default to true.
 		// Must set --dry-run explicitly to false to run this command.
 		if ( isset( $assoc_args['dry-run'] ) ) {
-			// Passing `--dry-run=false` to the command leads to the `false`
-			// value being set to string `'false'`, but casting `'false'`
-			// to bool produces `true`. Thus the special handling.
-			if ( 'false' === $assoc_args['dry-run'] ) {
-				$dry_run = false;
-			} else {
-				$dry_run = (bool) $assoc_args['dry-run'];
-			}
+			$dry_run = filter_var( $assoc_args['dry-run'], FILTER_VALIDATE_BOOLEAN ); // false|true
 		}
 
 		$overwrite = false;
 
 		// If --overwrite-authors is not set, then it will default to false.
 		if ( isset( $assoc_args['overwrite-authors'] ) ) {
-			// Passing `--dry-run=false` to the command leads to the `false`
-			// value being set to string `'false'`, but casting `'false'`
-			// to bool produces `true`. Thus the special handling.
-			if ( 'false' === $assoc_args['overwrite-authors'] ) {
-				$overwrite = false;
-			} else {
-				$overwrite = (bool) $assoc_args['overwrite-authors'];
-			}
+			$overwrite = filter_var( $assoc_args['overwrite-authors'], FILTER_VALIDATE_BOOLEAN ); // false|true
 		}
 
 		if ( $overwrite ) {
