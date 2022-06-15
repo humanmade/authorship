@@ -26,7 +26,7 @@ abstract class EmailTestCase extends TestCase {
 		$this->mailer = tests_retrieve_phpmailer_instance();
 	}
 
-	public function tearDown() {
+	public function tearDown() : void {
 		$this->mailer = null;
 		reset_phpmailer_instance();
 		parent::tearDown();
