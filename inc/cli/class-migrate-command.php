@@ -98,6 +98,12 @@ class Migrate_Command extends WP_CLI_Command {
 				'post_status'         => 'any',
 				'ignore_sticky_posts' => true,
 				'suppress_filters'    => false,
+				'tax_query' => [
+					[
+						'taxonomy' => 'author',
+						'operator' => 'EXISTS',
+					],
+				],
 			] );
 
 			// Exit early if there are no more posts to avoid a final sleep call.
@@ -207,7 +213,7 @@ class Migrate_Command extends WP_CLI_Command {
 		$ppa_user = get_user_by( 'slug', $ppa_author->slug );
 
 		if ( ! empty( $ppa_user ) ) {
-			return $ppa_user_id->ID;
+			return $ppa_user->ID;
 		}
 
 		// Return -1 unless we're allowed to create users.
