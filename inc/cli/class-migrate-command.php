@@ -64,7 +64,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string> $assoc_args CLI arguments
 	 */
 	function ppa( $args, $assoc_args ) : void {
-		if ( ! is_plugin_active( 'publishpress-authors/publishpress-authors.php' ) ) {
+		if ( ! taxonomy_exists( 'author' ) ) {
 			// register the `author` taxonomy so that we can query for PPA author terms.
 			register_taxonomy( 'author', 'post' );
 		}
@@ -133,13 +133,13 @@ class Migrate_Command extends WP_CLI_Command {
 				// If PPA is deactivated the terms can be an error object.
 				// Usually invalid taxonomy, lets catch and report this.
 				if ( is_wp_error( $ppa_terms ) ) {
-					WP_CLI::error( 'There was an error fetching the Publishpress Author data, is the plugin activated?', false );
+					WP_CLI::error( 'There was an error fetching the PublishPress Author data, is the plugin activated?', false );
 					WP_CLI::error( $ppa_terms );
 					exit;
 				}
 
 				/**
-				 * We're going to loop through all the Publishpress authors,
+				 * We're going to loop through all the PublishPress authors,
 				 * and get a list of user IDs to set in Authorship at the end.
 				 * If no user exists for the PPA guest author we create one.
 				 */
