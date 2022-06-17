@@ -16,13 +16,13 @@ use WP_REST_Response;
  * REST API test class for the plugin.
  */
 abstract class RESTAPITestCase extends TestCase {
-	public function setUp() {
+	public function setUp() : void {
 		parent::setUp();
 
 		rest_get_server();
 	}
 
-	public function tearDown() {
+	public function tearDown() : void {
 		parent::tearDown();
 
 		global $wp_rest_server;
