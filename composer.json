@@ -21,7 +21,7 @@
     "szepeviktor/phpstan-wordpress": "0.7.1",
     "vlucas/phpdotenv": "^3",
     "wp-cli/db-command": "^2",
-    "wp-phpunit/wp-phpunit": "5.9.3",
+    "wp-phpunit/wp-phpunit": "~5.9.3",
     "yoast/phpunit-polyfills": "^1.0"
   },
   "config": {
