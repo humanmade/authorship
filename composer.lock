@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "515f24b1bb7c8400fdc687def5844607",
+    "content-hash": "b806be43f0c2301b7712843a12fdc46f",
     "packages": [
         {
             "name": "composer/installers",
@@ -156,16 +156,16 @@
         },
         {
             "name": "humanmade/asset-loader",
-            "version": "v0.5.0",
+            "version": "v0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/humanmade/asset-loader.git",
-                "reference": "717ebc20e999affe7c601015221fe76037c011c4"
+                "reference": "9fdb74d39405b3e79bbb616a7b903409a631779a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/humanmade/asset-loader/zipball/717ebc20e999affe7c601015221fe76037c011c4",
-                "reference": "717ebc20e999affe7c601015221fe76037c011c4",
+                "url": "https://api.github.com/repos/humanmade/asset-loader/zipball/9fdb74d39405b3e79bbb616a7b903409a631779a",
+                "reference": "9fdb74d39405b3e79bbb616a7b903409a631779a",
                 "shasum": ""
             },
             "require": {
@@ -184,9 +184,9 @@
             "description": "Utilities to seamlessly consume Webpack-bundled assets in WordPress themes & plugins.",
             "support": {
                 "issues": "https://github.com/humanmade/asset-loader/issues",
-                "source": "https://github.com/humanmade/asset-loader/tree/v0.5.0"
+                "source": "https://github.com/humanmade/asset-loader/tree/v0.6.1"
             },
-            "time": "2021-01-27T15:20:46+00:00"
+            "time": "2022-06-30T14:45:03+00:00"
         }
     ],
     "packages-dev": [
@@ -4176,5 +4176,5 @@
         "php": ">=7.2"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
