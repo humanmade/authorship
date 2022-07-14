@@ -1,0 +1,6 @@
+{
+    "editor.js": "https://localhost:9090/build/editor.js",
+    "editor.js.map": "https://localhost:9090/build/editor.js.map",
+    "frontend-styles.js": "https://localhost:9090/build/frontend-styles.js",
+    "frontend-styles.js.map": "https://localhost:9090/build/frontend-styles.js.map"
+  }
