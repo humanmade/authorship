@@ -50,7 +50,7 @@ jobs:
         key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install JS Dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Build Assets
       run: npm run build
