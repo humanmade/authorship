@@ -21,18 +21,16 @@ use WP_User;
  * @return int[] Array of user IDs.
  */
 function get_author_ids( WP_Post $post ) : array {
-	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
-	// If $authors is an error or empty.
-	if ( is_wp_error( $authors ) || empty( $authors ) ) {
-		// Check if the post_type supports Authorship.
-		if ( is_post_type_supported( $post->post_type ) ) {
-			// Check the post_type support author.
-			if ( post_type_supports( $post->post_type, 'author' ) ) {
-				return [ intval( $post->post_author ) ];
-			}
-			return [];
+	if ( ! is_post_type_supported( $post->post_type ) ) {
+		if ( post_type_supports( $post->post_type, 'author' ) ) {
+			return [ intval( $post->post_author ) ];
 		}
 
+		return [];
+	}
+
+	$authors = wp_get_post_terms( $post->ID, TAXONOMY );
+	if ( is_wp_error( $authors ) ) {
 		return [];
 	}
 
@@ -55,7 +53,7 @@ function get_authors( WP_Post $post ) : array {
 
 	/** @var WP_User[] */
 	$users = get_users( [
-		'blog_id' => 0,
+		'blog_id' => 0, // Check all sites.
 		'include' => $author_ids,
 		'orderby' => 'include',
 	] );
@@ -158,6 +156,7 @@ function set_authors( WP_Post $post, array $authors ) : array {
 
 	/** @var WP_User[] */
 	$users = get_users( [
+		'blog_id' => 0, // Check all sites.
 		'include' => $authors,
 		'orderby' => 'include',
 	] );

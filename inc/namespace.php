@@ -428,6 +428,7 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 
 	/** @var WP_User[] */
 	$users = get_users( [
+		'blog_id' => 0, // Check all sites.
 		'include' => $authors,
 		'orderby' => 'include',
 	] );
