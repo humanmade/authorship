@@ -41,7 +41,7 @@ class TestMultisite extends TestCase {
 		self::$super_admin = $factory->user->create_and_get( [
 			'role' => 'administrator',
 			'display_name' => 'Super Admin',
-			'user_email' => "super-admin.role@example.org",
+			'user_email' => 'super-admin.role@example.org',
 		] );
 
 		grant_super_admin( self::$super_admin->ID );
