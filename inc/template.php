@@ -53,6 +53,8 @@ function get_authors( WP_Post $post ) : array {
 
 	/** @var WP_User[] */
 	$users = get_users( [
+		// Check all sites.
+		'blog_id' => 0,
 		'include' => $author_ids,
 		'orderby' => 'include',
 	] );
@@ -155,6 +157,8 @@ function set_authors( WP_Post $post, array $authors ) : array {
 
 	/** @var WP_User[] */
 	$users = get_users( [
+		// Check all sites.
+		'blog_id' => 0,
 		'include' => $authors,
 		'orderby' => 'include',
 	] );
