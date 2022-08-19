@@ -1,0 +1,11 @@
+<phpunit
+	colors="true"
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+>
+	<testsuites>
+		<testsuite name="asset-loader">
+			<directory prefix="class-test-" suffix=".php">tests</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
