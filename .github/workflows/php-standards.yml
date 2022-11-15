@@ -19,9 +19,8 @@ jobs:
     - name: Install PHP
       uses: shivammathur/setup-php@2.7.0
       with:
-        php-version: '7.2'
+        php-version: '7.4'
         coverage: none
-        tools: composer:v1
 
     - name: Debugging
       run: |

@@ -86,6 +86,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 
 		if (
 			$request->get_param( 'slug' ) ||
+			$request->get_param( 'capabilities' ) ||
 			$request->get_param( 'who' ) ||
 			$request->get_param( 'roles' )
 		) {
@@ -289,6 +290,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 		unset(
 			$query_params['context'],
 			$query_params['slug'],
+			$query_params['capabilities'],
 			$query_params['who'],
 			$query_params['roles']
 		);

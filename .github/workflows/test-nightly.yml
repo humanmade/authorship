@@ -9,7 +9,10 @@ jobs:
   build:
     strategy:
       matrix:
-        php: ['7.2', '7.4']
+        php: ['7.4']
+        include:
+          - php: '8.0'
+            experimental: true
       fail-fast: false
     name: WP nightly / PHP ${{ matrix.php }}
     runs-on: ubuntu-18.04
@@ -23,7 +26,7 @@ jobs:
         php-version: ${{ matrix.php }}
         extensions: mysqli, xmlwriter
         coverage: none
-        tools: composer:v1
+        tools: composer:v2
 
     - name: Debugging
       run: |
@@ -46,7 +49,7 @@ jobs:
 
     - name: Install PHP Dependencies
       run: |
-        composer install --prefer-dist --no-progress --no-suggest --no-interaction
+        composer install --prefer-dist --no-progress --no-suggest --no-interaction --ignore-platform-reqs
         composer require --dev --update-with-dependencies --prefer-dist roots/wordpress="dev-nightly" wp-phpunit/wp-phpunit="dev-master"
 
     - name: Run the tests

@@ -313,6 +313,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 				'slug',
 			],
 			[
+				'capabilities',
+			],
+			[
 				'who',
 			],
 		];

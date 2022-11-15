@@ -12,6 +12,8 @@ parameters:
     - inc/class-users-controller.php
     - inc/template.php
     - inc/admin.php
+    - inc/cli/namespace.php
+    - inc/cli/class-migrate-command.php
     - tests/phpunit/includes/testcase.php
     - tests/phpunit/includes/email-testcase.php
     - tests/phpunit/includes/feed-testcase.php
@@ -23,3 +25,4 @@ parameters:
   ignoreErrors:
     # Uses func_get_args()
     - '#^Function apply_filters invoked with [34567] parameters, 2 required\.$#'
+    - vendor/wp-cli/wp-cli
