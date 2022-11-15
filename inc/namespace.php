@@ -360,13 +360,21 @@ function filter_wp_insert_post_data( array $data, array $postarr, array $unsanit
 
 		if ( isset( $unsanitized_postarr[ POSTS_PARAM ] ) ) {
 			$authors = $unsanitized_postarr[ POSTS_PARAM ];
-		} elseif ( ! empty( $unsanitized_postarr['post_author'] ) ) {
-			$authors = [
-				$unsanitized_postarr['post_author'],
-			];
+		} else {
+			/**
+			 * Set the default authorship author. Defaults to the orignal post author.
+			 *
+			 * @param array $authors Authors to add to a post on insert if none have been passed. Default to post author.
+			 * @param WP_Post $post Post object.
+			 */
+			$authors = array_filter( apply_filters(
+				'authorship_default_author',
+				[ isset( $unsanitized_postarr['post_author'] ) ? $unsanitized_postarr['post_author'] : null ],
+				$post
+			) );
 		}
 
-		if ( ! isset( $authors ) ) {
+		if ( empty( $authors ) ) {
 			return;
 		}
 
