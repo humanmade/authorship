@@ -18,7 +18,7 @@ jobs:
             experimental: true
       fail-fast: false
     name: WP 5.9 / PHP ${{ matrix.php }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
       uses: actions/checkout@v1
