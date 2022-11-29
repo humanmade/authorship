@@ -1,8 +1,8 @@
 {
   "name": "humanmade/authorship",
-  "type": "wordpress-plugin",
   "description": "Authorship",
   "license": "GPL-3.0-or-later",
+  "type": "wordpress-plugin",
   "require": {
     "php": ">=7.2",
     "composer/installers": "^1.0 || ^2.0",
