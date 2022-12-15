@@ -264,13 +264,7 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
 			$post_type_caps = $post_type_object->cap;
 
 			// If we are not checking a specific post, then check if they can edit other posts of this type.
-			if ( empty( $args[2] ) ) {
-				$user_caps[ $cap ] = user_can( $user->ID, $post_type_caps->edit_others_posts );
-				break;
-			}
-
-			// Otherwise we _are_ checking a specific post, so perform the check but with the post ID.
-			$user_caps[ $cap ] = user_can( $user->ID, $post_type_caps->edit_others_posts, $args[2] );
+			$user_caps[ $cap ] = user_can( $user->ID, $post_type_caps->edit_others_posts );
 			break;
 
 	}//end switch
