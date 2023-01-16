@@ -24,6 +24,121 @@ use const Authorship\GUEST_ROLE;
 class Migrate_Command extends WP_CLI_Command {
 
 	/**
+	 * Set Authorship authors for existing WordPress posts.
+	 *
+	 * If you enable Authorship on an site that already has content, user archive pages will be broken because posts do not have any authorship authors set.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--dry-run=<dry-run>]
+	 * : Perform a test run if true, make changes to the database if false.
+	 * ---
+	 * default: true
+	 * options:
+	 *   - true
+	 *   - false
+	 * ---
+	 *
+	 * [--overwrite-authors=<overwrite-authors>]
+	 * : If true overwrite Authorship data with WP data, if false
+	 * skip posts that already have Authorship data.
+	 * ---
+	 * default: false
+	 * options:
+	 *   - true
+	 *   - false
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp authorship migrate wp-authors --dry-run=true
+	 *
+	 * @when after_wp_load
+	 * @subcommand wp-authors
+	 *
+	 * @param array<string> $args CLI arguments
+	 * @param array<string> $assoc_args CLI arguments
+	 */
+	public function wp_authors( $args, $assoc_args ) : void {
+		$posts_per_page = 100;
+		$paged = 1;
+		$count = 0;
+
+		// If --dry-run is not set, then it will default to true.
+		// Must set --dry-run explicitly to false to run this command.
+		$dry_run = filter_var( $assoc_args['dry-run'] ?? true, FILTER_VALIDATE_BOOLEAN );
+
+		if ( ! $dry_run ) {
+			WP_CLI::warning( 'Dry run is disabled, data will be modified.' );
+		}
+
+
+		// If --overwrite-authors is not set, then it will default to false.
+		$overwrite = filter_var( $assoc_args['overwrite-authors'] ?? false, FILTER_VALIDATE_BOOLEAN );
+
+		if ( $overwrite ) {
+			WP_CLI::warning( 'Overwriting of previous Authorship data is set to true.' );
+		}
+
+		$tax_query = $overwrite ? [] : [
+			[
+				'taxonomy' => 'authorship',
+				'operator' => 'NOT EXISTS',
+			],
+		];
+
+		do {
+			/**
+			 * @var array<WP_Post>
+			 */
+			$posts = get_posts( [
+				'posts_per_page'      => $posts_per_page,
+				'paged'               => $paged,
+				'post_status'         => 'any',
+				'ignore_sticky_posts' => true,
+				'suppress_filters'    => false,
+				'tax_query'           => $tax_query,
+			] );
+
+			// Exit early if there are no more posts to avoid a final sleep call.
+			if ( empty( $posts ) ) {
+				break;
+			}
+
+			foreach ( $posts as $post ) {
+				$authorship_authors = \Authorship\get_authors( $post );
+
+				if ( ! empty( $authorship_authors ) && ! $overwrite ) {
+					// skip posts that already have authorship data.
+					WP_CLI::line( 'Skipping post that already has Authorship data' );
+					continue;
+				}
+
+				// Set post author as Authorship author.
+				\Authorship\set_authors( $post, [ $post->post_author ] );
+
+			$count++;
+			} //end foreach
+
+			// Avoid memory exhaustion issues.
+			$this->reset_local_object_cache();
+
+			// Pause for a moment to let the database catch up.
+			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
+			sleep( 2 );
+
+			$paged++;
+		} //end foreach
+		while ( count( $posts ) );
+
+		if ( true === $dry_run ) {
+			WP_CLI::success( sprintf( '%d posts would have had Authorship data added if this was not a dry run.', $count ) );
+		} else {
+			WP_CLI::success( sprintf( '%d posts have had Authorship data added.', $count ) );
+		}
+	}
+
+	/**
 	 * Migrates PublishPress Authors data to Authorship.
 	 *
 	 * Running this creates new Authorship data, but does not remove PPA data
