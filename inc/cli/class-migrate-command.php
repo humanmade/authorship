@@ -127,8 +127,7 @@ class Migrate_Command extends WP_CLI_Command {
 			sleep( 2 );
 
 			$paged++;
-		}//end foreach
-		while ( count( $posts ) );
+		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
 			WP_CLI::success( sprintf( '%d posts would have had Authorship data added if this was not a dry run.', $count ) );
