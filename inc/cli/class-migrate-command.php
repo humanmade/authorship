@@ -127,7 +127,7 @@ class Migrate_Command extends WP_CLI_Command {
 			sleep( 2 );
 
 			$paged++;
-		} //end foreach
+		}//end foreach
 		while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
