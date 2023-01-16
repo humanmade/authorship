@@ -72,7 +72,6 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::warning( 'Dry run is disabled, data will be modified.' );
 		}
 
-
 		// If --overwrite-authors is not set, then it will default to false.
 		$overwrite = filter_var( $assoc_args['overwrite-authors'] ?? false, FILTER_VALIDATE_BOOLEAN );
 
@@ -117,8 +116,8 @@ class Migrate_Command extends WP_CLI_Command {
 				// Set post author as Authorship author.
 				\Authorship\set_authors( $post, [ $post->post_author ] );
 
-			$count++;
-			} //end foreach
+				$count++;
+			}//end foreach
 
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
