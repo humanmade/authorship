@@ -156,6 +156,20 @@ If this flag is *not* set:
 * When creating a new post, if the `--post_author` flag is set then it will be used for attributed authors
 * When updating an existing post, no change will be made to attributed authors
 
+### Migration of WordPress authors on existing posts.
+
+If you activate Authorship on an existing site, all content already created will not have authorship data set for old content. This breaks things such as author archive pages.
+
+This command will set the WordPress author as the authorship user for any posts with no authorship user. (Optionally you can override any existing authorship data, updating it with the WordPress post author).
+
+```sh
+wp authorship migrate wp-authors --dry-run=true
+```
+
+The command will perform a dry run by default, setting `--dry-run=false` will make changes to the database.
+
+This command will not overwrite or update Authorship data unless the `--overwrite-authors=true` flag is set.
+
 ### PublishPress Authors Migration
 
 Authorship provides a command for creating Authorship data using data from PublishPress Authors. This allows a non-destructive migration path from PublishPress Authors.
