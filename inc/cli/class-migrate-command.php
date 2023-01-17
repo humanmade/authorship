@@ -115,7 +115,7 @@ class Migrate_Command extends WP_CLI_Command {
 
 				// Set post author as Authorship author.
 				if ( ! $dry_run ) {
-					\Authorship\set_authors( $post, [ intval( $post->post_author ] );
+					\Authorship\set_authors( $post, [ intval( $post->post_author ) ] );
 				}
 
 				$count++;
