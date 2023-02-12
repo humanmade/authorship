@@ -11,6 +11,8 @@ namespace Authorship\Admin;
 
 use WP_Post;
 
+use const Authorship\TAXONOMY;
+
 use function Authorship\get_authors;
 use function Authorship\get_supported_post_types;
 
@@ -22,6 +24,22 @@ const COLUMN_NAME = 'authorship';
 function bootstrap() : void {
 	// Actions.
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
+	add_filter( 'quick_edit_show_taxonomy', __NAMESPACE__ . '\\remove_authorship_quick_edit', 10, 3 );
+}
+
+/**
+ * Removes the Authorship taxonomy from the quick/bulk edit while it's not properly supported.
+ *
+ * @param bool   $show_in_quick_edit Whether to show the taxonomy in the quick/bulk edit.
+ * @param string $taxonomy_name      Taxonomy name.
+ * @param string $post_type          Post type.
+ * @return bool Whether to show the taxonomy in the quick/bulk edit.
+ */
+function remove_authorship_quick_edit( $show_in_quick_edit, $taxonomy_name, $post_type ) : bool {
+	if ( TAXONOMY !== $taxonomy_name ) {
+		return $show_in_quick_edit;
+	}
+	return false;
 }
 
 /**
