@@ -309,6 +309,10 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
 
 	$data = $result->get_data();
 
+	if ( ! is_array( $data ) ) {
+		return $result;
+	}
+
 	if ( ! isset( $data[ REST_PARAM ] ) ) {
 		return $result;
 	}
