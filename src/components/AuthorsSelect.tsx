@@ -107,7 +107,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	 * Declares styles for elements that can't easily be targeted with a CSS selector.
 	 */
 	const styles: Styles<Option, true> = {
-		input: ( provided, state ) => ( {
+		input: () => ( {
 			margin: 0,
 			width: '100%',
 		} ),
