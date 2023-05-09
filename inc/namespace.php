@@ -339,7 +339,7 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
  *                                     originally passed to wp_insert_post().
  * @return mixed[] An array of slashed, sanitized, and processed post data.
  */
-function filter_wp_insert_post_data( array $data, array $postarr, array $unsanitized_postarr ) : array {
+function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_postarr ) : array {
 
 	// Make sure the unsanitized post array is actually an array. Core sometimes passes it as a WP_Post object.
 	if ( ! is_array( $unsanitized_postarr ) ) {
