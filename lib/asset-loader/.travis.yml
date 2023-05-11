@@ -1,0 +1,19 @@
+# Travis CI Configuration File
+
+branches:
+  only:
+    - main
+
+# Tell Travis CI we're using PHP
+language: php
+
+php:
+  - 7.2
+  - 7.3
+  - 7.4
+
+install: composer install
+
+script:
+  - composer lint
+  - composer test
