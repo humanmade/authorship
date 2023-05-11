@@ -335,11 +335,18 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
  *
  * @param mixed[] $data                An array of slashed, sanitized, and processed post data.
  * @param mixed[] $postarr             An array of sanitized (and slashed) but otherwise unmodified post data.
- * @param mixed[] $unsanitized_postarr An array of slashed yet _unsanitized_ and unprocessed post data as
- *                                     originally passed to wp_insert_post().
+ * @param mixed   $unsanitized_postarr An array (or object that implements array access, like a WP_Post) of
+ *                                     slashed yet _unsanitized_ and unprocessed post data as originally passed
+ *                                     to wp_insert_post().
  * @return mixed[] An array of slashed, sanitized, and processed post data.
  */
-function filter_wp_insert_post_data( array $data, array $postarr, array $unsanitized_postarr ) : array {
+function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_postarr ) : array {
+
+	// Make sure the unsanitized post array is actually an array. Core sometimes passes it as a WP_Post object.
+	if ( ! is_array( $unsanitized_postarr ) ) {
+		$unsanitized_postarr = (array) $unsanitized_postarr;
+	}
+
 	/**
 	 * Fires once a post has been saved.
 	 *
