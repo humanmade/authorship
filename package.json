@@ -1,5 +1,5 @@
 {
-  "name": "@humanmade/authorship",
+  "name": "nuk-wp-authorship",
   "version": "0.2.16",
   "description": "Authorship",
   "private": true,
