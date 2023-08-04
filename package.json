@@ -9,11 +9,11 @@
     "lint": "concurrently -n CSS,JS -c cyan.bold,yellow.bold \"npm run lint:css\" \"npm run lint:js\"",
     "lint:css": "stylelint src/",
     "lint:js": "eslint --ext .js,.jsx,.ts,.tsx src/",
-    "start": "webpack-dev-server --config=.config/webpack.config.dev.js",
-    "build": "webpack --config=.config/webpack.config.prod.js",
-    "bump:patch": "bump patch --commit 'The v%s release' package.json package-lock.json README.md plugin.php",
-    "bump:minor": "bump minor --commit 'The v%s release' package.json package-lock.json README.md plugin.php",
-    "bump:major": "bump major --commit 'The v%s release' package.json package-lock.json README.md plugin.php"
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "version:patch": "node ./scripts/version patch",
+    "version:minor": "node ./scripts/version minor",
+    "version:major": "node ./scripts/version major"
   },
   "dependencies": {
     "@types/react-select": "^3.0.26",
@@ -38,6 +38,7 @@
     "@wordpress/edit-post": "^3.25.4",
     "@wordpress/plugins": "^2.23.0",
     "@wordpress/url": "^2.19.0",
+    "@wordpress/scripts": "^19.2.2",
     "babel-eslint": "^10.0.0",
     "bell-on-bundler-error-plugin": "^2.0.0",
     "classnames": "^2.2",
