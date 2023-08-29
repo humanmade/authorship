@@ -37,6 +37,8 @@ const STYLE_HANDLE = 'authorship-css';
  * Bootstraps the main actions and filters.
  */
 function bootstrap() : void {
+	$insert_post_handler = new InsertPostHandler();
+
 	// Actions.
 	add_action( 'init', __NAMESPACE__ . '\\init_taxonomy', 99 );
 	add_action( 'init', __NAMESPACE__ . '\\register_roles_and_caps', 1 );
@@ -44,9 +46,10 @@ function bootstrap() : void {
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
+	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
 
 	// Filters.
-	add_filter( 'wp_insert_post_data', __NAMESPACE__ . '\\filter_wp_insert_post_data', 10, 3 );
+	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
 	add_filter( 'rest_request_after_callbacks', __NAMESPACE__ . '\\filter_rest_request_after_callbacks', 10, 3 );
 	add_filter( 'map_meta_cap', __NAMESPACE__ . '\\filter_map_meta_cap_for_editing', 10, 4 );
 	add_filter( 'user_has_cap', __NAMESPACE__ . '\\filter_user_has_cap', 10, 4 );
@@ -330,21 +333,27 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
 	return $result;
 }
 
-/**
- * Filters slashed post data just before it is inserted into the database.
- *
- * @param mixed[] $data                An array of slashed, sanitized, and processed post data.
- * @param mixed[] $postarr             An array of sanitized (and slashed) but otherwise unmodified post data.
- * @param mixed   $unsanitized_postarr An array (or object that implements array access, like a WP_Post) of
- *                                     slashed yet _unsanitized_ and unprocessed post data as originally passed
- *                                     to wp_insert_post().
- * @return mixed[] An array of slashed, sanitized, and processed post data.
- */
-function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_postarr ) : array {
+class InsertPostHandler {
+	/**
+	 * @var array<mixed>
+	 */
+	private $postarr = [];
 
-	// Make sure the unsanitized post array is actually an array. Core sometimes passes it as a WP_Post object.
-	if ( ! is_array( $unsanitized_postarr ) ) {
-		$unsanitized_postarr = (array) $unsanitized_postarr;
+	/**
+	 * Filters slashed post data just before it is inserted into the database.
+	 *
+	 * @param mixed[] $data                An array of slashed, sanitized, and processed post data.
+	 * @param mixed[] $postarr             An array of sanitized (and slashed) but otherwise unmodified post data.
+	 * @param mixed   $unsanitized_postarr An array (or object that implements array access, like a WP_Post) of
+	 *                                     slashed yet _unsanitized_ and unprocessed post data as originally passed
+	 *                                     to wp_insert_post().
+	 * @return mixed[] An array of slashed, sanitized, and processed post data.
+	 */
+	function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_postarr ) : array {
+		// Make sure the unsanitized post array is actually an array. Core sometimes passes it as a WP_Post object.
+		$this->postarr = (array) $unsanitized_postarr;
+
+		return $data;
 	}
 
 	/**
@@ -354,7 +363,11 @@ function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_p
 	 * @param WP_Post $post    Post object.
 	 * @param bool    $update  Whether this is an existing post being updated.
 	 */
-	add_action( 'wp_insert_post', function( int $post_ID, WP_Post $post, bool $update ) use ( $unsanitized_postarr ) : void {
+	function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
+		$unsanitized_postarr = $this->postarr;
+
+		$this->postarr = [];
+
 		if ( isset( $unsanitized_postarr['tax_input'] ) && ! empty( $unsanitized_postarr['tax_input'][ TAXONOMY ] ) ) {
 			return;
 		}
@@ -390,9 +403,7 @@ function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_p
 		} catch ( Exception $e ) {
 			// Nothing at the moment.
 		}
-	}, 10, 3 );
-
-	return $data;
+	}
 }
 
 /**
