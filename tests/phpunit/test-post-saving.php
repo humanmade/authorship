@@ -137,4 +137,20 @@ class TestPostSaving extends TestCase {
 
 		remove_filter( 'authorship_default_author', '__return_empty_array' );
 	}
+
+	public function testMultiplePostInsertionDoesNotCompoundActions() : void {
+		global $wp_filter;
+
+		$before = count( $wp_filter['wp_insert_post']->callbacks );
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			wp_insert_post( [
+				'post_title' => "Testing $i",
+			] );
+		}
+
+		$after = count( $wp_filter['wp_insert_post']->callbacks );
+
+		$this->assertSame( $before, $after );
+	}
 }
