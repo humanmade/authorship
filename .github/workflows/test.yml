@@ -12,10 +12,11 @@ jobs:
   build:
     strategy:
       matrix:
-        php: ['7.4']
-        include:
-          - php: '8.0'
-            experimental: true
+        php:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+          - '8.2'
       fail-fast: false
     name: WP 6.3 / PHP ${{ matrix.php }}
     runs-on: ubuntu-20.04
