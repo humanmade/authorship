@@ -44,7 +44,7 @@ class TestCLI extends TestCase {
 		// Check migration command has correctly set the author.
 		$authorship_authors = \Authorship\get_authors( $post1 );
 		$this->assertCount( 1, $authorship_authors );
-		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0] );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
 
 	public function testMigratePostTypePage() : void {
@@ -72,6 +72,6 @@ class TestCLI extends TestCase {
 		// Check migration command has correctly set the author.
 		$authorship_authors = \Authorship\get_authors( $page1 );
 		$this->assertCount( 1, $authorship_authors );
-		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0] );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
 }
