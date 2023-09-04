@@ -46,6 +46,7 @@ class TestCLI extends TestCase {
 		$command->wp_authors( [], [
 			'dry-run' => false,
 			'overwrite' => true,
+			'post-type' => 'post', // Must set default value manually.
 		] );
 
 		// Verify author data migrated correctly.
