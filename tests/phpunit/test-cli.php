@@ -23,21 +23,19 @@ class TestCLI extends TestCase {
 
 	public function testMigrateWpAuthorsPagination() : void {
 		$factory = self::factory()->post;
-		$post_ids = [];
+		$posts = [];
 
 		for ( $i = 0; $i < 200; $i++ ) {
-			$post = $factory->create_and_get( [
+			$posts[] = $factory->create_and_get( [
 				'post_author' => self::$users['admin']->ID,
 				POSTS_PARAM   => [
 					self::$users['editor']->ID,
 				],
 			] );
-
-			$post_ids[] = $post->ID;
 		}
 
-		$paged_post_id = $post_ids[100];
-		$authorship_authors = \Authorship\get_authors( $paged_post_id );
+		$paged_post = $posts[100]; // Any post from second page of results.
+		$authorship_authors = \Authorship\get_authors( $paged_post );
 
 		// Asset initial authorship authors set correctly.
 		$this->assertCount( 1, $authorship_authors );
@@ -51,7 +49,7 @@ class TestCLI extends TestCase {
 		] );
 
 		// Verify author data migrated correctly.
-		$authorship_authors = \Authorship\get_authors( $paged_post_id );
+		$authorship_authors = \Authorship\get_authors( $paged_post->ID );
 		$this->assertCount( 1, $authorship_authors );
 		$this->assertSame( self::$users['admin']->ID, $authorship_authors[0]->ID );
 	}
