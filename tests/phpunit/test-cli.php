@@ -1,6 +1,6 @@
 <?php
 /**
- * Author archive tests for the plugin.
+ * Plugin CLI command tests.
  *
  * @package authorship
  */
