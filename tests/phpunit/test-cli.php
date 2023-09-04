@@ -11,6 +11,7 @@ namespace Authorship\Tests;
 
 use Authorship\CLI;
 use const Authorship\POSTS_PARAM;
+use const Authorship\TAXONOMY;
 
 class TestCLI extends TestCase {
 	public function testMigratePostTypePost() : void {
@@ -20,6 +21,9 @@ class TestCLI extends TestCase {
 		$post1 = $factory->create_and_get( [
 			'post_author' => self::$users['editor']->ID,
 		] );
+
+		// Unset author data.
+		wp_set_post_terms( $post1->ID, [], TAXONOMY );
 
 		// Check initial authorship data unset.
 		$authorship_authors = \Authorship\get_authors( $post1 );
@@ -44,6 +48,9 @@ class TestCLI extends TestCase {
 			'post_author' => self::$users['editor']->ID,
 			'post_type' => 'page',
 		] );
+
+		// Unset author data.
+		wp_set_post_terms( $page1->ID, [], TAXONOMY );
 
 		// Check initial authorship data unset.
 		$authorship_authors = \Authorship\get_authors( $page1 );
