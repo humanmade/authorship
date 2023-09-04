@@ -14,6 +14,13 @@ use const Authorship\POSTS_PARAM;
 use const Authorship\TAXONOMY;
 
 class TestCLI extends TestCase {
+	public function set_up() {
+		parent::set_up();
+		require_once __DIR__ . '/inc/cli/namespace.php';
+		require_once __DIR__ . '/inc/cli/class-migrate-command.php';
+		CLI\bootstrap();
+	}
+
 	public function testMigratePostTypePost() : void {
 		$factory = self::factory()->post;
 
@@ -29,7 +36,7 @@ class TestCLI extends TestCase {
 		$authorship_authors = \Authorship\get_authors( $post1 );
 		$this->assertCount( 0, $authorship_authors );
 
-		$command = new CLI\Migrate_Command();
+		$command = new CLI\Migrate_Command;
 		$command->wp_authors( [], [
 			'dry-run' => false,
 		] );
