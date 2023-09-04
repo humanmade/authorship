@@ -128,7 +128,11 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
 			sleep( 2 );
 
-			$paged++;
+			// A normal run, don't need to paginate due to NOT EXISTS tax query.
+			// But for dry run or when overwriting, need to increment paged.
+			if ( $dry_run || $overwrite ) {
+				$paged++;
+			}
 		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
