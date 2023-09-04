@@ -10,6 +10,11 @@ declare( strict_types=1 );
 namespace Authorship\Admin;
 
 use WP_Post;
+use WP_Error;
+use WP_User;
+use stdClass;
+
+use const Authorship\GUEST_ROLE;
 
 use function Authorship\get_authors;
 use function Authorship\get_supported_post_types;
@@ -22,6 +27,29 @@ const COLUMN_NAME = 'authorship';
 function bootstrap() : void {
 	// Actions.
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
+	add_action( 'user_profile_update_errors', __NAMESPACE__ . '\\remove_required_fields_errors', 10, 3 );
+}
+
+/**
+ * Removes required fields errors from the user profile update.
+ *
+ * @param WP_Error $errors WP_Error object (passed by reference).
+ * @param bool     $update Whether this is a user update.
+ * @param stdClass $user   User object (passed by reference).
+ * @return void
+ */
+function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass $user ) : void {
+	if ( $user->role !== GUEST_ROLE ) {
+		return;
+	}
+
+	$error_codes = $errors->get_error_codes();
+	$error_codes_to_remove = [ 'empty_email', 'nickname' ];
+	$current_codes = array_intersect( $error_codes, $error_codes_to_remove );
+
+	foreach ( $current_codes as $code ) {
+		$errors->remove( $code );
+	}
 }
 
 /**
