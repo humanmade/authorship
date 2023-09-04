@@ -39,7 +39,7 @@ class TestCLI extends TestCase {
 		$command = new CLI\Migrate_Command;
 		$command->wp_authors( [], [
 			'dry-run' => false,
-			'post_type' => 'post', // Note, have to set default values manually.
+			'post-type' => 'post', // Note, have to set default values manually.
 		] );
 
 		// Check migration command has correctly set the author.
