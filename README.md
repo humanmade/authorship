@@ -1,8 +1,8 @@
 # Authorship
 
-Stable tag: 0.2.14  
+Stable tag: 0.2.16  
 Requires at least: 5.4  
-Tested up to: 6.1  
+Tested up to: 6.2  
 Requires PHP: 7.2  
 License: GPL v3 or later  
 Contributors: johnbillion, humanmade  
