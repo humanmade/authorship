@@ -49,6 +49,12 @@ class Migrate_Command extends WP_CLI_Command {
 	 *   - false
 	 * ---
 	 *
+	 * [--post-type=<post-type>]
+	 * : Post type, or comma separated list of post types.
+	 * ---
+	 * default: post
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp authorship migrate wp-authors --dry-run=true
@@ -79,6 +85,9 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::warning( 'Overwriting of previous Authorship data is set to true.' );
 		}
 
+		$post_types = explode( ',', $assoc_args['post-type'] );
+		WP_CLI::line( sprintf( 'Updating post types: %s', implode( ', ', $post_types ) ) );
+
 		$tax_query = $overwrite ? [] : [
 			[
 				'taxonomy' => 'authorship',
@@ -93,6 +102,7 @@ class Migrate_Command extends WP_CLI_Command {
 			$posts = get_posts( [
 				'posts_per_page'      => $posts_per_page,
 				'paged'               => $paged,
+				'post_type'           => $post_types,
 				'post_status'         => 'any',
 				'ignore_sticky_posts' => true,
 				'suppress_filters'    => false,
