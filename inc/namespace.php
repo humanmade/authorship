@@ -57,6 +57,7 @@ function bootstrap() : void {
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
+	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
 }
 
 /**
@@ -751,4 +752,19 @@ function filter_comment_notification_recipients( array $emails, int $comment_id 
 	}, $authors ) );
 
 	return array_unique( array_merge( $emails, $additional_emails ) );
+}
+
+/**
+ * Hide author select from quick edit.
+ *
+ * Bit of a hack, but filter filter_quickedit_authors and include only author with ID 0.
+ * Also hide if only one author just in case someone someone has created author with 0.
+ *
+ * @param array $options Options.
+ * @return array Options.
+ */
+function hide_quickedit_authors( array $options ) : array {
+	$users_opt['hide_if_only_one_author'] = true;
+	$users_opt['include'] = [ 0 ];
+	return $users_opt;
 }
