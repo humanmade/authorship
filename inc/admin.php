@@ -46,20 +46,20 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 	$current_error_codes = $errors->get_error_codes();
 	$removed_error_codes = [ 'empty_email' ];
 	if ( $update ) {
-		// Remove those errors on update
+		// Remove those errors on update.
 		array_push( $removed_error_codes, 'nickname' );
 	} else {
-		// Remove those errors on add
+		// Remove those errors on add.
 		array_push( $removed_error_codes, 'pass' );
 	}
 
-	// Remove matched errors
+	// Remove matched errors.
 	$codes = array_intersect( $current_error_codes, $removed_error_codes );
 	foreach ( $codes as $code ) {
 		$errors->remove( $code );
 	}
 
-	// Provide a random password for the user (JS disabled)
+	// Provide a random password for the user (JS disabled).
 	if ( empty( $user->user_pass ) && in_array( 'pass', $codes, true ) ) {
 		$user->user_pass = wp_generate_password();
 	}
