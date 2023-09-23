@@ -35,7 +35,7 @@ function get_author_ids( WP_Post $post ) : array {
 	}
 
 	return array_map( function ( WP_Term $term ) : int {
-		return intval( $term->name );
+		return intval( $term->slug );
 	}, $authors );
 }
 
