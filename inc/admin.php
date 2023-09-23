@@ -43,12 +43,25 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 		return;
 	}
 
-	$error_codes = $errors->get_error_codes();
-	$error_codes_to_remove = [ 'empty_email', 'nickname' ];
-	$current_codes = array_intersect( $error_codes, $error_codes_to_remove );
+	$current_error_codes = $errors->get_error_codes();
+	$removed_error_codes = [ 'empty_email' ];
+	if ( $update ) {
+		// Remove those errors on update
+		array_push( $removed_error_codes, 'nickname' );
+	} else {
+		// Remove those errors on add
+		array_push( $removed_error_codes, 'pass' );
+	}
 
-	foreach ( $current_codes as $code ) {
+	// Remove matched errors
+	$codes = array_intersect( $current_error_codes, $removed_error_codes );
+	foreach ( $codes as $code ) {
 		$errors->remove( $code );
+	}
+
+	// Provide a random password for the user (JS disabled)
+	if ( empty( $user->user_pass ) && in_array( 'pass', $codes, true ) ) {
+		$user->user_pass = wp_generate_password();
 	}
 }
 
