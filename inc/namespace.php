@@ -20,6 +20,7 @@ use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Term;
 use WP_User;
 
 use function Asset_Loader\enqueue_asset;
@@ -47,6 +48,7 @@ function bootstrap() : void {
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
+	add_action( 'profile_update', __NAMESPACE__ . '\\update_author_term_name', 10, 3 );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -57,6 +59,61 @@ function bootstrap() : void {
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
+	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\add_term_name', 10, 3 );
+}
+
+/**
+ * Set term name to user display name on term creation.
+ *
+ * @param array{'name': string, 'slug': string, 'term_group': int}                        $data Term data.
+ * @param string                                                                          $taxonomy Taxonomy.
+ * @param array{'alias_of': string, 'description': string, 'parent': int, 'slug': string} $args Term args
+ *
+ * @return array{'name': string, 'slug': string, 'term_group': int}
+ */
+function add_term_name( array $data, string $taxonomy, array $args ) : array {
+	if ( $taxonomy !== TAXONOMY ) {
+		return $data;
+	}
+	$user_id = (int) ( $data['slug'] ?? 0 );
+	if ( $user_id <= 0 ) {
+		return $data;
+	}
+
+	$user = get_userdata( $user_id );
+	if ( ! $user instanceof WP_User ) {
+		return $data;
+	}
+
+	$data['name'] = $user->display_name;
+	return $data;
+}
+
+/**
+ * Sync author term name with user display name.
+ *
+ * @param int           $user_id User ID.
+ * @param WP_User       $old_user_data Old user data.
+ * @param array<string> $userdata User data.
+ * @return void
+ */
+function update_author_term_name( int $user_id, WP_User $old_user_data, array $userdata ) : void {
+	// User doesn't exist in authorship taxonomy.
+	$term = get_term_by( 'slug', (string) $user_id, TAXONOMY );
+	if ( ! $term instanceof WP_Term ) {
+		return;
+	}
+
+	$display_name = $userdata['display_name'] ?? null;
+
+	// User display name hasn't changed.
+	if ( $term->name === $display_name ) {
+		return;
+	}
+
+	wp_update_term($term->term_id, TAXONOMY, [
+		'name' => $userdata['display_name'],
+	]);
 }
 
 /**
