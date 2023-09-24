@@ -248,25 +248,25 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
 			break;
 
 		case 'attribute_post_type':
-			if ( empty( $args[2] ) ) {
-				$user_caps[ $cap ] = false;
+			// If the user already has the cap then, defer to the existing value.
+			if ( array_key_exists( $cap, $user_caps ) ) {
 				break;
 			}
 
+			// Fetch the post type.
 			$post_type_object = get_post_type_object( $args[2] );
 
+			// If it's for an undefined post type, then they do not have `attribute_post_type`.
 			if ( ! $post_type_object ) {
 				$user_caps[ $cap ] = false;
 				break;
 			}
 
-			if ( array_key_exists( $cap, $user_caps ) ) {
-				break;
-			}
-
+			// Fallback to post type edit others post.
 			/** @var stdClass */
 			$post_type_caps = $post_type_object->cap;
 
+			// If we are not checking a specific post, then check if they can edit other posts of this type.
 			$user_caps[ $cap ] = user_can( $user->ID, $post_type_caps->edit_others_posts );
 			break;
 
