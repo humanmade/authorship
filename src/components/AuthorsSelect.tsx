@@ -146,8 +146,10 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 			setSelected( options );
 			onUpdate( options.map( option => option.value ) );
-		} ).catch( ( error: WP_REST_API_Error ) => {
-			onError( error.message );
+		} ).catch( ( errorResponse: Response ) => {
+			errorResponse.json().then( response => {
+				onError( response.message );
+			} );
 		} );
 	};
 
