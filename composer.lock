@@ -1977,7 +1977,7 @@
         },
         {
             "name": "roots/wordpress",
-            "version": "6.3.1",
+            "version": "6.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/roots/wordpress.git",
@@ -2008,7 +2008,7 @@
             ],
             "support": {
                 "issues": "https://github.com/roots/wordpress/issues",
-                "source": "https://github.com/roots/wordpress/tree/6.3.1"
+                "source": "https://github.com/roots/wordpress/tree/6.4.3"
             },
             "funding": [
                 {
@@ -2091,22 +2091,22 @@
         },
         {
             "name": "roots/wordpress-no-content",
-            "version": "6.3.1",
+            "version": "6.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress.git",
-                "reference": "6.3.1"
+                "reference": "6.4.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/release/wordpress-6.3.1-no-content.zip",
-                "shasum": "102bc5e48d9372f1a71fbb133270e113af2363e3"
+                "url": "https://downloads.wordpress.org/release/wordpress-6.4.3-no-content.zip",
+                "shasum": "4138c6337bf524159b406d5b27916deebb0f78df"
             },
             "require": {
                 "php": ">= 7.0.0"
             },
             "provide": {
-                "wordpress/core-implementation": "6.3.1"
+                "wordpress/core-implementation": "6.4.3"
             },
             "suggest": {
                 "ext-curl": "Performs remote request operations.",
@@ -2157,7 +2157,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-08-29T14:23:47+00:00"
+            "time": "2024-01-30T19:32:01+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -4060,16 +4060,16 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "6.3.0",
+            "version": "6.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "4797791a311c41d213027333e4fcc48073f77df0"
+                "reference": "aa3c8f5d1b7efc295fd2b37c7264d2356a8c1099"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/4797791a311c41d213027333e4fcc48073f77df0",
-                "reference": "4797791a311c41d213027333e4fcc48073f77df0",
+                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/aa3c8f5d1b7efc295fd2b37c7264d2356a8c1099",
+                "reference": "aa3c8f5d1b7efc295fd2b37c7264d2356a8c1099",
                 "shasum": ""
             },
             "type": "library",
@@ -4104,7 +4104,7 @@
                 "issues": "https://github.com/wp-phpunit/issues",
                 "source": "https://github.com/wp-phpunit/wp-phpunit"
             },
-            "time": "2023-08-09T01:26:57+00:00"
+            "time": "2023-12-07T00:50:08+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",
