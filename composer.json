@@ -16,12 +16,12 @@
     "phpcompatibility/phpcompatibility-wp": "2.1.0",
     "phpstan/phpstan": "0.12.57",
     "phpunit/phpunit": "^9.5.20",
-    "roots/wordpress": "~5.9.0",
+    "roots/wordpress": "~6.4.0",
     "squizlabs/php_codesniffer": "3.5.8",
     "szepeviktor/phpstan-wordpress": "0.7.1",
     "vlucas/phpdotenv": "^3",
     "wp-cli/db-command": "^2",
-    "wp-phpunit/wp-phpunit": "~5.9.3",
+    "wp-phpunit/wp-phpunit": "~6.4.0",
     "yoast/phpunit-polyfills": "^1.0"
   },
   "config": {
