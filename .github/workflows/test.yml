@@ -18,7 +18,7 @@ jobs:
           - '8.1'
           - '8.2'
       fail-fast: false
-    name: WP 6.3 / PHP ${{ matrix.php }}
+    name: WP 6.4 / PHP ${{ matrix.php }}
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
@@ -49,7 +49,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp6.3
+        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp6.4
 
     - name: Install PHP Dependencies
       run: |
