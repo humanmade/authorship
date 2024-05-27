@@ -703,7 +703,22 @@ function action_reference_pre_user_query( WP_User_Query $query ) : void {
 
 	$blog_id = $query->get( 'blog_id' ) ?: 0;
 	$post_types = $query->get( 'has_published_posts' );
+	$supported_post_types = array_intersect(
+		get_supported_post_types(),
+		$post_types
+	);
+	$unsupported_post_types = array_diff(
+		$supported_post_types,
+		$post_types
+	);
+
 	foreach ( $post_types as &$post_type ) {
+		$post_type = $wpdb->prepare( '%s', $post_type );
+	}
+	foreach ( $supported_post_types as &$post_type ) {
+		$post_type = $wpdb->prepare( '%s', $post_type );
+	}
+	foreach ( $unsupported_post_types as &$post_type ) {
 		$post_type = $wpdb->prepare( '%s', $post_type );
 	}
 
@@ -716,18 +731,25 @@ function action_reference_pre_user_query( WP_User_Query $query ) : void {
 	// Rebuild the has_published_posts part of the query.
 	$sql = " $wpdb->users.ID IN ( SELECT DISTINCT $posts_table.post_author FROM $posts_table WHERE $posts_table.post_status = 'publish' AND $posts_table.post_type IN ( " . implode( ', ', $post_types ) . ' ) )';
 
-	// Guest author query.
-	$guest_sql = " $wpdb->users.ID IN (
-		SELECT DISTINCT CAST( t.slug AS SIGNED )
-		FROM {$posts_table} p
-			LEFT JOIN {$term_relationships_table} tr ON p.ID = tr.object_id
-			LEFT JOIN {$term_taxonomy_table} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-			LEFT JOIN {$terms_table} t ON tt.term_id = t.term_id
-		WHERE p.post_type IN ( " . implode( ', ', $post_types ) . " )
-			AND p.post_status = 'publish'
-	)";
+	// Non-authorship author query.
+	$unsupported_sql = empty( $unsupported_post_types )
+		? '1=0'
+		: str_replace( implode( ', ', $post_types ), implode( ', ', $unsupported_post_types ), $sql );
 
-	$query_with_guests = " ( ( $sql ) OR ( $guest_sql ) )";
+	// Attributed author query.
+	$supported_sql = empty( $supported_post_types )
+		? '1=0'
+		: " $wpdb->users.ID IN (
+			SELECT DISTINCT CAST( t.slug AS SIGNED )
+			FROM {$posts_table} p
+				LEFT JOIN {$term_relationships_table} tr ON p.ID = tr.object_id
+				LEFT JOIN {$term_taxonomy_table} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+				LEFT JOIN {$terms_table} t ON tt.term_id = t.term_id
+			WHERE p.post_type IN ( " . implode( ', ', $supported_post_types ) . " )
+				AND p.post_status = 'publish'
+		)";
+
+	$query_with_guests = " ( ( $unsupported_sql ) OR ( $supported_sql ) )";
 
 	$query->query_where = str_replace( $sql, $query_with_guests, $query->query_where );
 }
