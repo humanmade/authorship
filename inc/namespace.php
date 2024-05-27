@@ -21,6 +21,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use WP_User;
+use WP_User_Query;
 
 use function Asset_Loader\enqueue_asset;
 
@@ -45,6 +46,7 @@ function bootstrap() : void {
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
+	add_action( 'pre_user_query', __NAMESPACE__ . '\\action_reference_pre_user_query', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
 
@@ -684,6 +686,50 @@ function action_pre_get_posts( WP_Query $query ) : void {
 
 		return $posts;
 	}, 999, 2 );
+}
+
+/**
+ * Handle has_published_posts where clause to include guest authors.
+ *
+ * @param WP_User_Query $query Current instance of WP_User_Query (passed by reference).
+ */
+function action_reference_pre_user_query( WP_User_Query $query ) : void {
+	global $wpdb;
+
+	// Author sitemap queries check for this meta key.
+	if ( ! is_array( $query->get( 'has_published_posts' ) ) ) {
+		return;
+	}
+
+	$blog_id = $query->get( 'blog_id' ) ?: 0;
+	$post_types = $query->get( 'has_published_posts' );
+	foreach ( $post_types as &$post_type ) {
+		$post_type = $wpdb->prepare( '%s', $post_type );
+	}
+
+	$prefix = $wpdb->get_blog_prefix( $blog_id );
+	$posts_table = $prefix . 'posts';
+	$term_relationships_table = $prefix . 'term_relationships';
+	$term_taxonomy_table = $prefix . 'term_taxonomy';
+	$terms_table = $prefix . 'terms';
+
+	// Rebuild the has_published_posts part of the query.
+	$sql = " $wpdb->users.ID IN ( SELECT DISTINCT $posts_table.post_author FROM $posts_table WHERE $posts_table.post_status = 'publish' AND $posts_table.post_type IN ( " . implode( ', ', $post_types ) . ' ) )';
+
+	// Guest author query.
+	$guest_sql = " $wpdb->users.ID IN (
+		SELECT DISTINCT CAST( t.slug AS SIGNED )
+		FROM {$posts_table} p
+			LEFT JOIN {$term_relationships_table} tr ON p.ID = tr.object_id
+			LEFT JOIN {$term_taxonomy_table} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+			LEFT JOIN {$terms_table} t ON tt.term_id = t.term_id
+		WHERE p.post_type IN ( " . implode( ', ', $post_types ) . " )
+			AND p.post_status = 'publish'
+	)";
+
+	$query_with_guests = " ( ( $sql ) OR ( $guest_sql ) )";
+
+	$query->query_where = str_replace( $sql, $query_with_guests, $query->query_where );
 }
 
 /**
