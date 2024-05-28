@@ -708,8 +708,8 @@ function action_reference_pre_user_query( WP_User_Query $query ) : void {
 		$post_types
 	);
 	$unsupported_post_types = array_diff(
-		$supported_post_types,
-		$post_types
+		$post_types,
+		$supported_post_types
 	);
 
 	foreach ( $post_types as &$post_type ) {
