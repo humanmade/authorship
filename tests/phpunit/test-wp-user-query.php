@@ -68,7 +68,7 @@ class TestWPUserQuery extends TestCase {
 		] );
 
 		$common_args = [
-			'fields'  => 'ids',
+			'fields'  => 'ID',
 			'orderby' => 'ID',
 			'order'   => 'ASC',
 		];
@@ -83,8 +83,7 @@ class TestWPUserQuery extends TestCase {
 				$test_key => $test_value,
 			] );
 
-			$query = new WP_User_Query();
-			$users = $query->query( $args );
+			$users = new WP_User_Query( $args );
 
 			$this->assertSame(
 				[ self::$users['editor']->ID, self::$users[ GUEST_ROLE ]->ID ],
@@ -103,8 +102,7 @@ class TestWPUserQuery extends TestCase {
 				$test_key => $test_value,
 			] );
 
-			$query = new WP_User_Query();
-			$users = $query->query( $args );
+			$users = new WP_User_Query( $args );
 
 			$this->assertSame(
 				[ self::$users['admin']->ID, self::$users['author']->ID ],
@@ -123,8 +121,7 @@ class TestWPUserQuery extends TestCase {
 				$test_key => $test_value,
 			] );
 
-			$query = new WP_User_Query();
-			$users = $query->query( $args );
+			$users = new WP_User_Query( $args );
 
 			$this->assertSame(
 				[
