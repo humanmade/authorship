@@ -83,7 +83,9 @@ class TestWPUserQuery extends TestCase {
 				$test_key => $test_value,
 			] );
 
-			$users = new WP_User_Query( $args );
+			$query = new WP_User_Query( $args );
+			$users = (array) $query->get_results();
+			$users = array_map( 'absint', $users );
 
 			$this->assertSame(
 				[ self::$users['editor']->ID, self::$users[ GUEST_ROLE ]->ID ],
@@ -102,7 +104,9 @@ class TestWPUserQuery extends TestCase {
 				$test_key => $test_value,
 			] );
 
-			$users = new WP_User_Query( $args );
+			$query = new WP_User_Query( $args );
+			$users = (array) $query->get_results();
+			$users = array_map( 'absint', $users );
 
 			$this->assertSame(
 				[ self::$users['admin']->ID, self::$users['author']->ID ],
@@ -121,14 +125,16 @@ class TestWPUserQuery extends TestCase {
 				$test_key => $test_value,
 			] );
 
-			$users = new WP_User_Query( $args );
+			$query = new WP_User_Query( $args );
+			$users = (array) $query->get_results();
+			$users = array_map( 'absint', $users );
 
 			$this->assertSame(
 				[
 					self::$users['admin']->ID,
 					self::$users['editor']->ID,
 					self::$users['author']->ID,
-					self::$users[ GUEST_ROLE ]->ID
+					self::$users[ GUEST_ROLE ]->ID,
 				],
 				$users,
 				"User IDs for combined attributed and non-attributed {$test_key} query are incorrect."
