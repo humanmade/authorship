@@ -57,14 +57,14 @@ class TestWPUserQuery extends TestCase {
 		$factory->create_and_get( [
 			'post_author' => self::$users['author']->ID,
 			'post_status' => 'publish',
-			'post_type'   => 'non_existent_type',
+			'post_type'   => 'test_cpt_no_author',
 		] );
 
 		// Owned by Admin.
 		$factory->create_and_get( [
 			'post_author' => self::$users['admin']->ID,
 			'post_status' => 'publish',
-			'post_type'   => 'non_existent_type',
+			'post_type'   => 'test_cpt_no_author',
 		] );
 
 		$common_args = [
@@ -96,7 +96,7 @@ class TestWPUserQuery extends TestCase {
 
 		// Queries for non attributed published post types.
 		$test_args = [
-			'has_published_posts' => [ 'non_existent_type' ],
+			'has_published_posts' => [ 'test_cpt_no_author' ],
 		];
 
 		foreach ( $test_args as $test_key => $test_value ) {
@@ -117,7 +117,7 @@ class TestWPUserQuery extends TestCase {
 
 		// Queries for non attributed published post types.
 		$test_args = [
-			'has_published_posts' => [ 'post', 'non_existent_type' ],
+			'has_published_posts' => [ 'post', 'test_cpt_no_author' ],
 		];
 
 		foreach ( $test_args as $test_key => $test_value ) {
