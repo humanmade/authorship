@@ -58,7 +58,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	if ( ! selected.length && isEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
 		setSelected( preloadedAuthorOptions.authors );
-	} else if ( currentAuthorIDs.length && ! selected.length ) {
+	} else if ( currentAuthorIDs !== undefined && currentAuthorIDs.length && ! selected.length ) {
 
 		const path = addQueryArgs(
 			'/authorship/v1/users/',
