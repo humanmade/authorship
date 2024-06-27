@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
 
     - name: Install PHP
-      uses: shivammathur/setup-php@2.7.0
+      uses: shivammathur/setup-php@v2
       with:
         php-version: 7.4
         extensions: mysqli, xmlwriter
@@ -28,13 +28,13 @@ jobs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
-        path: ${{ steps.composer-cache-dir.outputs.dir }}
+        path: ${{ steps.composer-cache-dir.outputs.DIR }}
         key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
@@ -43,16 +43,16 @@ jobs:
     - name: Get npm cache directory
       id: npm-cache-dir
       run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-        echo "::set-output name=npm-version::$(npm -v)"
-        echo "::set-output name=node-version::$(node -v)"
+        echo "DIR=$(npm config get cache)" >> $GITHUB_OUTPUT
+        echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
+        echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
 
     - name: Cache JS Dependencies
       id: npm-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('package-lock.json') }}
+        path: ${{ steps.npm-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.NODE_VERSION }}-${{ steps.npm-cache-dir.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install JS Dependencies
       run: npm install --legacy-peer-deps
