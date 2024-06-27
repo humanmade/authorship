@@ -1,11 +1,11 @@
 # Authorship
 
-Stable tag: 0.2.17  
-Requires at least: 5.4  
-Tested up to: 6.2  
-Requires PHP: 7.2  
-License: GPL v3 or later  
-Contributors: johnbillion, humanmade  
+Stable tag: 0.2.17
+Requires at least: 5.4
+Tested up to: 6.2
+Requires PHP: 7.2
+License: GPL v3 or later
+Contributors: johnbillion, humanmade
 
 A modern approach to author attribution in WordPress.
 
@@ -61,9 +61,10 @@ _Features without a checkmark are still work in progress._
 ### For development use
 
 * Clone this repo into your plugins directory
-* Install the dependencies:  
+* Ensure you have Composer v2 and Node v16 installed
+* Install the dependencies:
   `composer install && npm install`
-* Start the dev server:  
+* Start the dev server:
   `npm run start`
 
 ## Design Decisions
