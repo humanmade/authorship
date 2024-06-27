@@ -1,11 +1,11 @@
 # Authorship
 
-Stable tag: 0.2.17
-Requires at least: 5.4
-Tested up to: 6.2
-Requires PHP: 7.2
-License: GPL v3 or later
-Contributors: johnbillion, humanmade
+Stable tag: 0.2.17  
+Requires at least: 5.4  
+Tested up to: 6.2  
+Requires PHP: 7.2  
+License: GPL v3 or later  
+Contributors: johnbillion, humanmade  
 
 A modern approach to author attribution in WordPress.
 
