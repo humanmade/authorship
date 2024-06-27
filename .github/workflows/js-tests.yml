@@ -29,16 +29,16 @@ jobs:
     - name: Get npm cache directory
       id: npm-cache-dir
       run: |
-        echo "{dir}=$(npm config get cache)" >> $GITHUB_OUTPUT
-        echo "{npm_version}=$(npm -v)" >> $GITHUB_OUTPUT
-        echo "{node_version}=$(node -v)" >> $GITHUB_OUTPUT
+        echo "DIR=$(npm config get cache)" >> $GITHUB_OUTPUT
+        echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
+        echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
 
     - name: Cache Dependencies
       id: npm-cache
       uses: actions/cache@v4
       with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node_version }}-${{ steps.npm-cache-dir.outputs.npm_version }}-${{ hashFiles('package-lock.json') }}
+        path: ${{ steps.npm-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.NODE_VERSION }}-${{ steps.npm-cache-dir.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install Dependencies
       run: npm install --legacy-peer-deps

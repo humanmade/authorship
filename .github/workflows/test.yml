@@ -41,13 +41,13 @@ jobs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
-        echo "{dir}=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
     - name: Cache PHP Dependencies
       id: composer-cache
       uses: actions/cache@v4
       with:
-        path: ${{ steps.composer-cache-dir.outputs.dir }}
+        path: ${{ steps.composer-cache-dir.outputs.DIR }}
         key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp5.9
 
     - name: Install PHP Dependencies
