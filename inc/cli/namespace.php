@@ -17,6 +17,5 @@ use WP_CLI;
  * @return void
  */
 function bootstrap() : void {
-	// @phpstan-ignore-next-line
 	WP_CLI::add_command( 'authorship migrate', __NAMESPACE__ . '\\Migrate_Command' );
 }

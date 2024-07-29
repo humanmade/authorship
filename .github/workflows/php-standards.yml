@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Install PHP
-      uses: shivammathur/setup-php@2.7.0
+      uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
         coverage: none
@@ -31,24 +31,24 @@ jobs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
-        path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-7.2-${{ hashFiles('composer.lock') }}
+        path: ${{ steps.composer-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
       run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
     - name: PHPCS cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: tests/cache
-        key: ${{ runner.os }}-phpcs-7.2-${{ hashFiles('plugin.php') }}
+        key: ${{ runner.os }}-phpcs-7.4-${{ hashFiles('plugin.php') }}
 
     - name: Run the tests
       run: |

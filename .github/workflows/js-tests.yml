@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version-file: '.nvmrc'
 
@@ -29,16 +29,16 @@ jobs:
     - name: Get npm cache directory
       id: npm-cache-dir
       run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-        echo "::set-output name=npm-version::$(npm -v)"
-        echo "::set-output name=node-version::$(node-v)"
+        echo "DIR=$(npm config get cache)" >> $GITHUB_OUTPUT
+        echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
+        echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
 
     - name: Cache Dependencies
       id: npm-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('package-lock.json') }}
+        path: ${{ steps.npm-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.NODE_VERSION }}-${{ steps.npm-cache-dir.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install Dependencies
       run: npm install --legacy-peer-deps

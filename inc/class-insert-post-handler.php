@@ -66,7 +66,7 @@ class InsertPostHandler {
 			$authors = $unsanitized_postarr[ POSTS_PARAM ];
 		} else {
 			/**
-			 * Set the default authorship author. Defaults to the orignal post author.
+			 * Set the default authorship author. Defaults to the original post author.
 			 *
 			 * @param array $authors Authors to add to a post on insert if none have been passed. Default to post author.
 			 * @param WP_Post $post Post object.

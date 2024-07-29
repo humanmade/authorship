@@ -26,3 +26,6 @@ parameters:
   ignoreErrors:
     # Uses func_get_args()
     - '#^Function apply_filters invoked with [34567] parameters, 2 required\.$#'
+  # Cant declare types always because extended
+  # core parent class methods don't
+  checkGenericClassInNonGenericObjectType: false

@@ -12,19 +12,21 @@ jobs:
   build:
     strategy:
       matrix:
-        php: ['7.4']
-        include:
-          - php: '8.0'
-            experimental: true
+        php:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+          - '8.2'
+          - '8.3'
       fail-fast: false
-    name: WP 5.9 / PHP ${{ matrix.php }}
+    name: WP 6.6 / PHP ${{ matrix.php }}
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     - name: Install PHP
-      uses: shivammathur/setup-php@2.7.0
+      uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php }}
         extensions: mysqli, xmlwriter
@@ -41,14 +43,14 @@ jobs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp5.9
+        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp6.6
 
     - name: Install PHP Dependencies
       run: |
