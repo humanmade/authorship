@@ -311,6 +311,11 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
 		return $result;
 	}
 
+	// skip requests to wpml api
+	if(preg_match('/^\/wpml\//', $request->get_route())){
+		return $result;
+	}
+
 	$data = $result->get_data();
 
 	if ( ! is_array( $data ) || ! isset( $data[ REST_PARAM ] ) ) {
