@@ -1,6 +1,7 @@
+import { arrayMove } from '@dnd-kit/sortable';
 import { get, isEqual } from 'lodash';
 import React, { ReactElement, useState } from 'react';
-import { Styles } from 'react-select';
+import { Styles, OptionTypeBase } from 'react-select';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
@@ -12,9 +13,8 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
-import arrayMove from '../utils/arrayMove';
 
-import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
+import SortableSelectContainer from './SortableSelectContainer';
 
 declare const authorshipData: authorshipDataFromWP;
 
@@ -38,8 +38,6 @@ const createOption = ( user: WP_REST_API_User ): Option => ( {
 	label: user.name,
 	avatar: user?.avatar_urls?.[48] || null,
 } );
-
-const getHelperContainer = (): HTMLElement => document.querySelector( `.${ containerClassName}` );
 
 /**
  * Returns the author selector control.
@@ -106,7 +104,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	/**
 	 * Declares styles for elements that can't easily be targeted with a CSS selector.
 	 */
-	const styles: Styles<Option, true> = {
+	const styles: Partial<Styles<OptionTypeBase, boolean>> = {
 		input: () => ( {
 			margin: 0,
 			width: '100%',
@@ -164,13 +162,8 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	return (
 		<SortableSelectContainer
-			axis="y"
-			distance={ 4 }
-			helperContainer={ getHelperContainer }
 			isDisabled={ isDisabled }
 			loadOptions={ loadOptions }
-			lockAxis="y"
-			lockToContainerEdges
 			styles={ styles }
 			value={ selected }
 			onChange={ changeValue }

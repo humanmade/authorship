@@ -1,6 +1,19 @@
-import React, { ReactElement } from 'react';
-import AsyncCreatableSelect, { Props as AsyncCreatableSelectProps } from 'react-select/async-creatable';
-import { SortableContainer } from 'react-sortable-hoc';
+import {
+	DndContext,
+	closestCenter,
+	KeyboardSensor,
+	PointerSensor,
+	useSensor,
+	useSensors,
+	DragEndEvent,
+} from '@dnd-kit/core';
+import {
+	SortableContext,
+	sortableKeyboardCoordinates,
+	verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import React, { ReactElement, ComponentProps } from 'react';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 
 import { __ } from '@wordpress/i18n';
 
@@ -39,10 +52,10 @@ const formatOptionLabel = ( option: Option ): ReactElement => (
 /**
  * Returns the base author selector control.
  *
- * @param {AsyncCreatableSelectProps} props Component props.
+ * @param {ComponentProps<typeof AsyncCreatableSelect>} props Component props.
  * @returns {ReactElement} An element.
  */
-const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement => (
+const Select = ( props: ComponentProps<typeof AsyncCreatableSelect> ): ReactElement => (
 	<AsyncCreatableSelect
 		cacheOptions
 		className={ className }
@@ -57,6 +70,68 @@ const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement 
 	/>
 );
 
+interface SortableSelectContainerProps extends ComponentProps<typeof AsyncCreatableSelect> {
+	onSortEnd?: ( sort: { oldIndex: number; newIndex: number } ) => void;
+}
+
+/**
+ * Returns the sortable author selector control.
+ *
+ * @param {SortableSelectContainerProps} props Component props.
+ * @returns {ReactElement} An element.
+ */
+const SortableSelectContainer = ( props: SortableSelectContainerProps ): ReactElement => {
+	const { value = [], onSortEnd, onChange, ...restProps } = props;
+
+	const sensors = useSensors(
+		useSensor( PointerSensor, {
+			activationConstraint: {
+				distance: 4,
+			},
+		} ),
+		useSensor( KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		} )
+	);
+
+	const handleDragEnd = ( event: DragEndEvent ) => {
+		const { active, over } = event;
+
+		if ( active && over && active.id !== over.id ) {
+			const oldIndex = value.findIndex( item => item.value === Number( active.id ) );
+			const newIndex = value.findIndex( item => item.value === Number( over.id ) );
+
+			if ( onSortEnd ) {
+				onSortEnd( {
+					oldIndex,
+					newIndex,
+				} );
+			}
+		}
+	};
+
+	const items = value.map( item => item.value );
+
+	return (
+		<DndContext
+			collisionDetection={ closestCenter }
+			sensors={ sensors }
+			onDragEnd={ handleDragEnd }
+		>
+			<SortableContext
+				items={ items }
+				strategy={ verticalListSortingStrategy }
+			>
+				<Select
+					value={ value }
+					onChange={ onChange }
+					{ ...restProps }
+				/>
+			</SortableContext>
+		</DndContext>
+	);
+};
+
 export { Select };
 
-export default SortableContainer( Select );
+export default SortableSelectContainer;
