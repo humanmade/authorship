@@ -22,13 +22,11 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@emotion/stylis": "0.8.5",
-    "@wordpress/editor": "^9.24.3",
-    "@wordpress/i18n": "^3.12.0",
+    "@wordpress/editor": "^12.21.0",
+    "@wordpress/i18n": "^4.58.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "react-select": "3.2.0",
-    "stylis": "3.5.4"
+    "react-select": "5.10.2"
   },
   "devDependencies": {
     "@humanmade/eslint-config": "^1.1.3",
@@ -40,10 +38,10 @@
     "@types/wordpress__plugins": "^2.3.7",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
     "@typescript-eslint/parser": "^4.12.0",
-    "@wordpress/api-fetch": "^3.20.0",
-    "@wordpress/edit-post": "^3.25.4",
-    "@wordpress/plugins": "^2.23.0",
-    "@wordpress/url": "^2.19.0",
+    "@wordpress/api-fetch": "^6.55.0",
+    "@wordpress/edit-post": "^6.19.0",
+    "@wordpress/plugins": "^4.20.0",
+    "@wordpress/url": "^3.59.0",
     "babel-eslint": "^10.0.0",
     "bell-on-bundler-error-plugin": "^2.0.0",
     "classnames": "^2.2",
@@ -63,9 +61,9 @@
     "ts-loader": "^8.0.14",
     "typescript": "^4.1.3",
     "version-bump-prompt": "^6.1.0",
-    "webpack": "^4",
-    "webpack-cli": "^4.2.0",
-    "webpack-dev-server": "^3.11.0",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.2",
     "wp-types": "^1.2.0"
   }
 }
