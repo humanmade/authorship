@@ -1,14 +1,11 @@
 const { externals, helpers } = require( '@humanmade/webpack-helpers' );
 const { filePath } = helpers;
-const BellOnBundlerErrorPlugin = require( 'bell-on-bundler-error-plugin' );
 const webpack = require( 'webpack' );
 
 /** @type {webpack.Configuration} */
 const shared = {
 	externals,
-	plugins: [
-		new BellOnBundlerErrorPlugin(),
-	],
+	plugins: [],
 	entry: {
 		main: filePath( 'src/index.tsx' ),
 		style: filePath( 'src/style.scss' ),
