@@ -1,3 +1,5 @@
+import React from 'react';
+import type { ReactElement, ComponentProps } from 'react';
 import {
 	DndContext,
 	closestCenter,
@@ -5,14 +7,14 @@ import {
 	PointerSensor,
 	useSensor,
 	useSensors,
-	DragEndEvent,
 } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
 	SortableContext,
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import React, { ReactElement, ComponentProps } from 'react';
+import type { AsyncProps } from 'react-select/async';
 import AsyncCreatableSelect from 'react-select/async-creatable';
 
 import { __ } from '@wordpress/i18n';
@@ -70,8 +72,10 @@ const Select = ( props: ComponentProps<typeof AsyncCreatableSelect> ): ReactElem
 	/>
 );
 
-interface SortableSelectContainerProps extends ComponentProps<typeof AsyncCreatableSelect> {
+interface SortableSelectContainerProps extends AsyncProps<Option, true, never> {
 	onSortEnd?: ( sort: { oldIndex: number; newIndex: number } ) => void;
+	onCreateOption?: ( inputValue: string ) => void;
+	isValidNewOption?: ( inputValue: string ) => boolean;
 }
 
 /**
@@ -81,7 +85,8 @@ interface SortableSelectContainerProps extends ComponentProps<typeof AsyncCreata
  * @returns {ReactElement} An element.
  */
 const SortableSelectContainer = ( props: SortableSelectContainerProps ): ReactElement => {
-	const { value = [], onSortEnd, onChange, ...restProps } = props;
+	const { value: propValue = [], onSortEnd, onChange, isLoading, ...restProps } = props;
+	const value = Array.isArray(propValue) ? propValue : [];
 
 	const sensors = useSensors(
 		useSensor( PointerSensor, {
@@ -98,8 +103,8 @@ const SortableSelectContainer = ( props: SortableSelectContainerProps ): ReactEl
 		const { active, over } = event;
 
 		if ( active && over && active.id !== over.id ) {
-			const oldIndex = value.findIndex( item => item.value === Number( active.id ) );
-			const newIndex = value.findIndex( item => item.value === Number( over.id ) );
+			const oldIndex = value.findIndex( ( item: Option ) => item.value === Number( active.id ) );
+			const newIndex = value.findIndex( ( item: Option ) => item.value === Number( over.id ) );
 
 			if ( onSortEnd ) {
 				onSortEnd( {
@@ -110,7 +115,7 @@ const SortableSelectContainer = ( props: SortableSelectContainerProps ): ReactEl
 		}
 	};
 
-	const items = value.map( item => item.value );
+	const items = value.map( ( item: Option ) => item.value );
 
 	return (
 		<DndContext
@@ -123,7 +128,7 @@ const SortableSelectContainer = ( props: SortableSelectContainerProps ): ReactEl
 				strategy={ verticalListSortingStrategy }
 			>
 				<Select
-					value={ value }
+					value={ propValue }
 					onChange={ onChange }
 					{ ...restProps }
 				/>

@@ -1,7 +1,7 @@
+import React, { ReactElement, useState } from 'react';
+import { StylesConfig } from 'react-select';
 import { arrayMove } from '@dnd-kit/sortable';
 import { get, isEqual } from 'lodash';
-import React, { ReactElement, useState } from 'react';
-import { Styles, OptionTypeBase } from 'react-select';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
@@ -104,7 +104,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	/**
 	 * Declares styles for elements that can't easily be targeted with a CSS selector.
 	 */
-	const styles: Partial<Styles<OptionTypeBase, boolean>> = {
+	const styles: Partial<StylesConfig<Option, boolean>> = {
 		input: () => ( {
 			margin: 0,
 			width: '100%',
@@ -155,7 +155,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	 * @param {SortedOption} option Sorting information for the option.
 	 */
 	const onSortEnd = ( option: SortedOption ) => {
-		const value = arrayMove( selected, option.oldIndex, option.newIndex );
+		const value: Option[] = arrayMove( selected, option.oldIndex, option.newIndex );
 		setSelected( value );
 		onUpdate( value.map( option => option.value ) );
 	};
@@ -195,7 +195,7 @@ const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> =
 	) ),
 } );
 
-export default compose( [
+export default compose(
 	withDispatch( mapDispatchToProps ),
-	withSelect( mapSelectToProps ),
-] )( AuthorsSelect );
+	withSelect( mapSelectToProps )
+)( AuthorsSelect ) as any;

@@ -1,11 +1,10 @@
+import React, { ReactElement } from 'react';
+import type { MultiValueProps } from 'react-select';
+import { components } from 'react-select';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import React, { ReactElement } from 'react';
-import { components, MultiValueProps } from 'react-select';
 
 import { Option } from '../types';
-
-const { MultiValue } = components;
 
 const MultiValueElement = ( props: MultiValueProps<Option> ): ReactElement => {
 	const {
@@ -23,25 +22,22 @@ const MultiValueElement = ( props: MultiValueProps<Option> ): ReactElement => {
 		opacity: isDragging ? 0.5 : 1,
 	};
 
-	// This prevents the menu from being opened/closed when the user clicks
-	// on a value to begin dragging it.
-	const innerProps = {
-		/**
-		 * Stops event propagation when sorting options.
-		 *
-		 * @param {Event} e The event.
-		 */
-		onMouseDown( e: Event ) {
-			e.preventDefault();
-			e.stopPropagation();
-		},
-		...attributes,
-		...listeners,
-		ref: setNodeRef,
-		style,
-	};
-
-	return <MultiValue { ...props } innerProps={ innerProps } />;
+	return (
+		<div
+			{...attributes}
+			{...listeners}
+			ref={setNodeRef}
+			style={style}
+			className="authorship-select__multi-value"
+			onMouseDown={e => {
+				e.preventDefault();
+				e.stopPropagation();
+			}}
+			{...props.innerProps}
+		>
+			<components.MultiValue {...props} />
+		</div>
+	);
 };
 
 export { MultiValueElement };
