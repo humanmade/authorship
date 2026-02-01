@@ -58,6 +58,12 @@ function bootstrap() : void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
+
+	// Author function filters for blocks and templates.
+	add_filter( 'get_the_author_display_name', __NAMESPACE__ . '\\filter_get_the_author_display_name', 10, 2 );
+	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author', 10, 2 );
+	add_filter( 'get_the_author_user_url', __NAMESPACE__ . '\\filter_get_the_author_user_url', 10, 2 );
+	add_filter( 'get_the_author_user_description', __NAMESPACE__ . '\\filter_get_the_author_user_description', 10, 2 );
 }
 
 /**
@@ -767,4 +773,160 @@ function hide_quickedit_authors( array $options ) : array {
 	$options['hide_if_only_one_author'] = true;
 	$options['include'] = [ 0 ];
 	return $options;
+}
+
+
+/**
+ * Filters the display name of the post's author(s).
+ *
+ * @param string $display_name The author's display name.
+ * @param int    $user_id      The author's ID.
+ * @return string The author's display name (or names).
+ */
+function filter_get_the_author_display_name( string $display_name, int $user_id ) : string {
+	$post = get_post();
+
+	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
+		return $display_name;
+	}
+
+	// Don't filter if we're specifically requesting a particular author.
+	if ( $user_id && intval( $post->post_author ) !== $user_id ) {
+		return $display_name;
+	}
+
+	return get_author_names( $post );
+}
+
+/**
+ * Filters the post's author display name for template tags.
+ *
+ * This filter already exists in the plugin for RSS feeds, but we extend it
+ * to work for all contexts where it makes sense.
+ *
+ * @param string $display_name The author's display name.
+ * @param int    $user_id      The author's ID (optional, may be 0).
+ * @return string The author's display name.
+ */
+function filter_the_author( string $display_name, int $user_id = 0 ) : string {
+	// Existing RSS feed handling.
+	if ( is_feed( 'rss2' ) ) {
+		$post = get_post();
+		if ( ! $post ) {
+			return $display_name;
+		}
+		return get_author_names( $post );
+	}
+
+	// Handle block rendering context.
+	if ( doing_filter( 'render_block' ) || doing_action( 'wp_body_open' ) || in_the_loop() ) {
+		$post = get_post();
+
+		if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
+			return $display_name;
+		}
+
+		// Don't filter if we're specifically requesting a particular author.
+		if ( $user_id && intval( $post->post_author ) !== $user_id ) {
+			return $display_name;
+		}
+
+		/**
+		 * Filters whether to return multiple author names in template tags.
+		 *
+		 * @param bool    $return_multiple Whether to return all author names. Default true.
+		 * @param WP_Post $post            The current post object.
+		 * @param string  $display_name    The original display name.
+		 */
+		$return_multiple = apply_filters( 'authorship_return_multiple_author_names', true, $post, $display_name );
+
+		if ( $return_multiple ) {
+			return get_author_names( $post );
+		}
+	}
+
+	return $display_name;
+}
+
+/**
+ * Filters the author's URL.
+ *
+ * For multiple authors, returns the first author's URL.
+ *
+ * @param string $url     The author's URL.
+ * @param int    $user_id The author's ID.
+ * @return string The author's URL.
+ */
+function filter_get_the_author_user_url( string $url, int $user_id ) : string {
+	$post = get_post();
+
+	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
+		return $url;
+	}
+
+	// Don't filter if we're specifically requesting a particular author.
+	if ( $user_id && intval( $post->post_author ) !== $user_id ) {
+		return $url;
+	}
+
+	$authors = get_authors( $post );
+
+	if ( empty( $authors ) ) {
+		return $url;
+	}
+
+	// Return the first author's URL.
+	$first_author = reset( $authors );
+	$author_url = get_the_author_meta( 'user_url', $first_author->ID );
+
+	return $author_url ? $author_url : $url;
+}
+
+/**
+ * Filters the author's description/bio.
+ *
+ * For multiple authors, returns the first author's bio or a combined list.
+ *
+ * @param string $description The author's description.
+ * @param int    $user_id     The author's ID.
+ * @return string The author's description.
+ */
+function filter_get_the_author_user_description( string $description, int $user_id ) : string {
+	$post = get_post();
+
+	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
+		return $description;
+	}
+
+	// Don't filter if we're specifically requesting a particular author.
+	if ( $user_id && intval( $post->post_author ) !== $user_id ) {
+		return $description;
+	}
+
+	$authors = get_authors( $post );
+
+	if ( empty( $authors ) ) {
+		return $description;
+	}
+
+	/**
+	 * Filters whether to combine author bios or return just the first.
+	 *
+	 * @param bool      $combine_bios Whether to combine bios. Default false (return first only).
+	 * @param WP_Post   $post         The current post object.
+	 * @param WP_User[] $authors      Array of author objects.
+	 */
+	$combine_bios = apply_filters( 'authorship_combine_author_bios', false, $post, $authors );
+
+	if ( $combine_bios && count( $authors ) > 1 ) {
+		$bios = array_filter( array_map( function( WP_User $author ) {
+			return get_the_author_meta( 'description', $author->ID );
+		}, $authors ) );
+
+		return implode( "\n\n", $bios );
+	}
+
+	// Return first author's bio.
+	$first_author = reset( $authors );
+	return get_the_author_meta( 'description', $first_author->ID );
 }
