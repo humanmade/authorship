@@ -5,19 +5,19 @@ type: build
 wave: 1
 depends_on: ["01-02"]
 files_modified:
-  - "src/components/AuthorsSelect.tsx"
-  - "inc/cli/class-migrate-command.php"
+  - "inc/class-insert-post-handler.php"
+  - "tests/phpunit/test-post-saving.php"
 autonomous: true
 user_setup: []
 must_haves:
   truths:
-    - "Editor behavior stays correct while avoiding render-time side effects."
+    - "Author assignment failures are observable and test-visible instead of being silently swallowed."
   artifacts:
-    - path: "docs/audit/patch_scaffolds/01-02-performance_build.patch"
-      provides: "Editor and CLI performance outline"
+    - path: "docs/audit/patch_scaffolds/01-02-observability_build.md"
+      provides: "Post-insert observability hardening outline"
   key_links: []
 ---
 
 <objective>
-Move editor fetch/state initialization out of render and make CLI migration pacing configurable.
+Harden post insert author-assignment flow by surfacing failures through a controlled, testable path.
 </objective>

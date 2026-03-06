@@ -13,7 +13,7 @@ must_haves:
   truths:
     - "Guest author creation remains API-compatible while handling edge-case names safely."
   artifacts:
-    - path: "docs/audit/patch_scaffolds/01-02-security_build.patch"
+    - path: "docs/audit/patch_scaffolds/01-02-security_build.md"
       provides: "Guest-author hardening outline"
   key_links: []
 ---

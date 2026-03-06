@@ -15,7 +15,7 @@ must_haves:
   truths:
     - "Standards tooling remains reproducible in CI and locally."
   artifacts:
-    - path: "docs/audit/patch_scaffolds/01-02-hm-wpcs_build.patch"
+    - path: "docs/audit/patch_scaffolds/01-02-hm-wpcs_build.md"
       provides: "Standards-tooling compatibility outline"
   key_links: []
 ---

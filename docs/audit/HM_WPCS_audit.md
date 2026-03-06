@@ -10,6 +10,7 @@ This document replaces the earlier placeholder audit with repo-grounded notes ta
 
 ## Verification performed
 - Confirmed that a root PHPCS ruleset exists at `phpcs.xml.dist`.
+- Ran `composer test:phpcs` on local PHP 8.5.1; the legacy PHPCS stack produced internal errors before a standards result.
 - Ran `php -d error_reporting='E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED' vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary plugin.php inc tests/phpunit`.
 - Attempted `composer test:phpstan` on local PHP 8.5.1. The toolchain failed with PHPStan/parser internal errors before reporting code issues.
 
@@ -30,7 +31,7 @@ Evidence:
 - Output escaping is present in the admin column renderer.
 - REST permission checks are present on the custom users controller and post attribution field.
 - PHPUnit coverage exists for archives, capabilities, CLI, feeds, REST API, multisite, post saving, and template helpers.
-- PHPCS completed cleanly under the current repo ruleset when PHP 8.5 deprecations from legacy tooling were suppressed.
+- PHPCS completed cleanly under the current repo ruleset when run via the targeted command with legacy-tooling deprecations suppressed.
 
 Evidence:
 - `plugin.php`
@@ -126,8 +127,9 @@ Recommendation:
 ## Build-mode patch candidates
 - Standards/tooling compatibility refresh for PHPCS/PHPStan and contributor guidance.
 - Guest author creation hardening for username normalization and temporary filter scope.
+- Post insert observability hardening for swallowed exception paths.
 - Editor/CLI performance cleanup for render-time fetches and migration throttling.
 
 ## Status
-- HM/WPCS baseline: healthy under the current repo ruleset.
-- Highest-value next work: tooling compatibility and targeted hardening, not broad standards cleanup.
+- HM/WPCS baseline: code appears clean under targeted PHPCS verification, but default standards gates are not reproducible on modern local PHP.
+- Highest-value next work: tooling compatibility and targeted hardening (guest author and post insert observability) before performance cleanup.
