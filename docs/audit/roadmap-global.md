@@ -140,6 +140,9 @@ Submit all four PRs at the same time, after `02-Build-13` is complete. Reference
 - If any PR is merged, rebase fork against upstream `develop`.
 - If PRs are ignored for 30+ days, proceed without further follow-up.
 
+### Residual risk note
+- PR C (CLI migration improvements) is still the largest Build-13 package. If upstream review stalls or CI failures cluster in PR C, split it into C1 (pause hook contract + pacing) and C2 (post-type validation + multisite stabilization) without blocking fork-local phase closure.
+
 ---
 
 ## Phase 03: Frontend modernization (next)

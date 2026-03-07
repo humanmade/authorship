@@ -47,5 +47,7 @@ Phase 02 is done when these fork-local outcomes are all true:
 
 Phase closes on PR *submission*, not on upstream response. Existing #160/#161 may be closed as housekeeping if no active review signal, but this is not a gate.
 
+Residual risk note: PR C (CLI migration improvements) remains the broadest Build-13 PR. Split into C1/C2 if upstream review or CI signal indicates excessive scope.
+
 ## Next step
 - Execute `02-Build-11`.
