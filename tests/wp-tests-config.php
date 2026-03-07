@@ -22,6 +22,7 @@ define( 'ABSPATH', $root . '/' . $composer['extra']['wordpress-install-dir'] . '
 
 // Test with WordPress debug mode (default).
 define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_DISPLAY', false );
 
 // WARNING WARNING WARNING!
 // These tests will DROP ALL TABLES in the database with the prefix named below.

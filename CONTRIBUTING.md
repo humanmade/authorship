@@ -41,6 +41,13 @@ To start the file watcher which will watch for changes and automatically build t
 
 ## Running the Tests
 
+### PHP standards environment
+
+- Standards tooling is maintained to run on both PHP `7.4` and modern PHP (`8.4+`), matching the CI standards matrix.
+- `composer test:phpcs` suppresses runtime deprecation notices from third-party sniffs on modern PHP so standards checks stay runnable.
+- `composer test:phpstan` runs with an explicit memory limit (`1G`) for consistent local and CI execution.
+- Existing PHPStan technical debt is tracked in `phpstan-baseline.neon`. Do not add new baseline entries for newly introduced issues.
+
 To run the whole test suite which includes unit tests and linting:
 
 	composer test
@@ -48,6 +55,10 @@ To run the whole test suite which includes unit tests and linting:
 To run just the PHPUnit tests:
 
 	composer test:ut
+
+To run PHPUnit with coverage and enforce the baseline threshold:
+
+	composer test:coverage
 
 To run just the code sniffer:
 
@@ -60,6 +71,16 @@ To run just the PHP Static Analysis tool:
 To lint the JS and CSS:
 
 	npm run lint
+
+### Coverage notes
+
+- `composer test:coverage` uses `phpdbg` as the coverage driver, so no Xdebug/PCOV extension is required.
+- The current gate enforces statement coverage from `tests/cache/coverage/clover.xml` against the baseline threshold defined in `composer.json`.
+- Coverage threshold ratcheting policy:
+  - Raise only after at least 3 consecutive green coverage-gate runs in CI and at least 1 green local confirmation run.
+  - Raise in small increments (normally 1-2 percentage points) and keep the floor at least 1 point below the most recent measured statement coverage.
+  - Do not lower the threshold for feature work. A rollback is allowed only for measurement drift, test-environment changes, or confirmed flaky external factors, and must be a 1-point maximum with follow-up issue tracking.
+- Current threshold is `63%` (ratcheted from `60%` after stable `64.03%` coverage signal).
 
 ## Releasing a New Version
 
