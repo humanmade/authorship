@@ -80,6 +80,23 @@ Expected:
 - User cannot change attributed authors.
 - Selector is effectively read-only/disabled.
 
+### [ ] UI-05 Accessibility runtime checks (label, announcements, keyboard reorder)
+
+Steps:
+1. Open an existing post in the block editor with at least two selected authors.
+2. In the Post sidebar, locate the Authorship control and verify an explicit field name is announced as `Authors`.
+3. Remove one selected author and observe assistive text output.
+4. Type a unique guest author name and choose the `Create "<name>"` option.
+5. Focus a selected author token (not the remove button), then use keyboard reorder:
+   - `Space` to pick up
+   - arrow key (`ArrowUp`/`ArrowDown`) to move
+   - `Space` to drop
+
+Expected:
+- Instructions for reorder behavior are present near the field.
+- Add/remove/reorder actions emit status updates (for example `Removed author ...`, `Added guest author ...`, `Moved ... to position ...`).
+- Keyboard reorder changes author order without requiring pointer drag.
+
 ## REST API tests
 
 Use Basic auth with Application Password credentials.

@@ -110,6 +110,24 @@ const Select = ( props: SortableSelectProps ): ReactElement => {
 							__( 'Picked up %s for reordering.', 'authorship' ),
 							getOptionLabel( active.id )
 						),
+						onDragOver: ( { over }: { over: { id: number | string } | null } ) => {
+							if ( ! over ) {
+								return __( 'Author reordering in progress.', 'authorship' );
+							}
+
+							const overIndex = selectedIDs.indexOf( Number( over.id ) );
+
+							if ( overIndex < 0 ) {
+								return __( 'Author reordering in progress.', 'authorship' );
+							}
+
+							return sprintf(
+								/* translators: 1: position number, 2: total selected authors. */
+								__( 'Moving to position %1$d of %2$d.', 'authorship' ),
+								overIndex + 1,
+								selectedIDs.length
+							);
+						},
 						onDragEnd: ( { active, over }: { active: { id: number | string }, over: { id: number | string } | null } ) => {
 							if ( ! over ) {
 								return __( 'Author reordering cancelled.', 'authorship' );

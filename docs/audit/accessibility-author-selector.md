@@ -99,6 +99,36 @@ Implemented in `03-Build-08`:
 | R3 explicit labeling/instructions | Implemented | `src/components/SortableSelectContainer.tsx:19-23`, `src/components/SortableSelectContainer.tsx:101-143` |
 | R4 component replacement decision | Pending | Follow-up Build-09+ decision record |
 
+## Build-09 runtime validation update
+
+Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post.php?post=19&action=edit` using browser automation in a live editor session.
+
+| Check | Result | Runtime evidence |
+|---|---|---|
+| Selector has explicit programmatic name | Pass | Snapshot exposes `combobox "Authors"` and nearby instruction copy (`Use the authors field...`). |
+| Instruction text is present for reorder behavior | Pass | Sidebar includes keyboard reorder instructions adjacent to selector. |
+| Live status text for remove action | Pass | Status text shows `Removed author guest guest.` after token removal. |
+| Live status text for guest-author creation | Pass | Status text shows `Added guest author Build09 Runtime Guest.` after create flow. |
+| Keyboard reorder updates order and status | Pass | Focus sortable token wrapper (`tabindex=0`), `Space` + arrow + `Space` reorders tokens and emits `Moved ...` status. |
+
+Runtime regression discovered during validation:
+- Missing `onDragOver` accessibility callback produced `TypeError: t.onDragOver is not a function` during drag flow.
+- Fixed in Build-09 by adding `onDragOver` announcements and extending JS test coverage.
+- Evidence: `src/components/SortableSelectContainer.tsx` announcements now include `onDragOver`; test coverage in `tests/js/components/sortable-select-container.test.tsx`.
+
+Known runtime caveats observed:
+- `403` for `wp-json/wp/v2/users/1?context=edit` when validating as non-admin role (did not block selector interactions).
+- Intermittent `net::ERR_NETWORK_CHANGED` noise from `wp-sync` endpoint in local environment.
+
+Post-validation remediation status:
+
+| Remediation item | Status | Evidence |
+|---|---|---|
+| R1 keyboard-operable reorder path | Implemented and runtime-validated | Runtime reorder result + `src/components/SortableSelectContainer.tsx:58-84` |
+| R2 screen reader status announcements | Implemented and runtime-validated at DOM/status level; full SR matrix still pending | Runtime status strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150` |
+| R3 explicit labeling/instructions | Implemented and runtime-validated | Runtime `combobox "Authors"` + instruction text + `src/components/SortableSelectContainer.tsx:19-23,141-143` |
+| R4 component replacement decision | Pending | Route to Build-10+ design decision |
+
 ## Verification plan for remediation
 
 When implementation starts, verify with:
@@ -109,5 +139,6 @@ When implementation starts, verify with:
 
 ## Residual risk
 
-- Runtime assistive-tech verification still pending: implementation-level fixes are in place but NVDA/VoiceOver manual validation is still required.
+- Full assistive-tech matrix is still pending: NVDA/VoiceOver manual verification and transcripted results are not yet captured.
+- Non-admin role path still produces a `wp/v2/users/<id>?context=edit` `403` request in editor console; behavior impact appears low but should be hardened/quieted.
 - Upstream adoption risk: if upstream PR cadence is slow, fork should treat accessibility remediation as fork-local delivery scope and proceed.

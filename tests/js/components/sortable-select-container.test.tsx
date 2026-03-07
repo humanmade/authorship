@@ -231,5 +231,8 @@ describe( 'SortableSelectContainer', () => {
 			active: { id: 11 },
 			over: { id: 33 },
 		} ) ).toContain( 'Moved Author A to position 3 of 3.' );
+		expect( announcements.onDragOver( {
+			over: { id: 22 },
+		} ) ).toContain( 'Moving to position 2 of 3.' );
 	} );
 } );

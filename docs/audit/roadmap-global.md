@@ -199,6 +199,10 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - enabled keyboard DnD sensor configuration for author reordering
   - added explicit selector labeling and screen-reader instruction metadata
   - added drag/create/reorder announcements and JS tests for accessibility behavior
+- `03-Build-09` executed on `codex/phase-03-build-09-runtime-a11y-validation`:
+  - validated selector behavior in a live editor session (labeling, instruction text, live announcements, keyboard reorder)
+  - fixed runtime regression (`onDragOver` announcement callback) discovered during validation
+  - aligned README accessibility statement with validated runtime behavior and remaining gaps
 
 ### Scope
 
@@ -264,7 +268,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 8 | Remove `lodash` dependency | WP core direction |
 | 9 | Add JS unit tests | Zero JS test coverage today |
 | 10 | Move `PluginPostStatusInfo` to `@wordpress/editor` | Site editor forward-compat |
-| 11 | Runtime AT validation + README alignment | Confirm NVDA/VoiceOver outcomes and update accessibility statement to match current behavior |
+| 11 | AT matrix validation + role-path hardening | Capture NVDA/VoiceOver outcomes and resolve non-admin selector request-noise paths |
 
 ### P2 — Important, next after P1 (Phase 04)
 
@@ -294,7 +298,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-08-accessibility-remediation`
+- Active execution branch: `codex/phase-03-build-09-runtime-a11y-validation`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -309,9 +313,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-08 executed.
+- Phase 03 status: active; Build-01 through Build-09 executed.
 
 ## What happens next
 
-1. Plan and execute `03-Build-09` for runtime assistive-technology validation and README accessibility statement alignment.
+1. Plan and execute `03-Build-10` for assistive-technology matrix capture (NVDA/VoiceOver) and non-admin request-path hardening.
 2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

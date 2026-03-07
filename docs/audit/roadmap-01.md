@@ -23,6 +23,7 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - `03-Build-06` executed on `codex/phase-03-build-06-manual-testing-checklist` (manual UI/REST/WP-CLI/XML-RPC verification checklist in `docs/manual-testing-checklist.md`)
   - `03-Build-07` executed on `codex/phase-03-build-07-accessibility-audit` (WCAG 2.1 AA author-selector audit and remediation backlog in `docs/audit/accessibility-author-selector.md`)
   - `03-Build-08` executed on `codex/phase-03-build-08-accessibility-remediation` (keyboard sensor support, selector ARIA metadata, and live announcements with JS test coverage)
+  - `03-Build-09` executed on `codex/phase-03-build-09-runtime-a11y-validation` (runtime validation + `onDragOver` regression fix + README accessibility statement alignment)
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -67,4 +68,4 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Plan and execute `03-Build-09` (runtime assistive-technology validation and README accessibility statement alignment).
+- Plan and execute `03-Build-10` (NVDA/VoiceOver matrix validation and role-based hardening for non-admin editor request noise).
