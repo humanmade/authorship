@@ -42,7 +42,7 @@ At this stage, the work is focused on making the plugin safer to operate and eas
   - `1d02511` `Execute 01-Build-04 performance hardening and stabilize tests`
 
 ### Phase 02: Fork-first delivery stabilization (active — closing)
-- Executed `02-Build-01` through `02-Build-10` on `codex/restack-audit-queue`.
+- Executed `02-Build-01` through `02-Build-12` on `codex/restack-audit-queue`.
 - Main theme: deterministic and test-covered CLI migration behavior.
 - Highlights:
   - pause filter/clamping coverage
@@ -51,6 +51,8 @@ At this stage, the work is focused on making the plugin safer to operate and eas
   - post-type input normalization, validation, and `post-type=any` compatibility
   - baseline statement-coverage gate via `composer test:coverage` (`64.03%` vs `60%` threshold)
   - CI parity for coverage gate in the WP unit-test workflow
+  - ratcheting policy adoption with threshold increase from `60%` to `63%`
+  - PHPStan baseline reduced to zero ignored errors via annotation/type-guard fixes
 - Recent commits:
   - `eededb0` `Build-06: harden wp-authors post-type input handling`
   - `2a9d813` `Build-07: validate migration post types against registered types`
@@ -78,8 +80,8 @@ After these five items, Phase 02 is closed and Phase 03 begins.
 
 | Item | Description | Status |
 |------|-------------|--------|
-| `02-Build-11` | Coverage threshold ratcheting policy + raise to 63% | queued |
-| `02-Build-12` | PHPStan baseline reduction (fix what's fixable without behavior changes) | queued |
+| `02-Build-11` | Coverage threshold ratcheting policy + raise to 63% | completed |
+| `02-Build-12` | PHPStan baseline reduction (fix what's fixable without behavior changes) | completed |
 | `02-Build-13` | Upstream PR preparation and submission | queued |
 
 ---
@@ -201,9 +203,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 | # | Item | Phase | Notes |
 |---|------|-------|-------|
-| 1 | Coverage ratchet to 63% + policy | 02-Build-11 | Queued |
-| 2 | PHPStan baseline reduction | 02-Build-12 | Fix annotation-level issues only |
-| 3 | Upstream PR preparation + submission | 02-Build-13 | 4 PRs, see strategy above |
+| 1 | Upstream PR preparation + submission | 02-Build-13 | 4 PRs, see strategy above |
 
 ### P1 — High impact, planned (Phase 03)
 
@@ -249,12 +249,11 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
   - `#160` current branch integration PR
   - `#161` focused Build-04 PR
 - Quality state: `composer test`, `composer test:phpstan`, `composer test:phpcs`, and `composer test:coverage` all green.
-- 82 PHPUnit test methods, ~64% statement coverage.
-- Phase 02 closing: 3 build items remain before upstream PR submission and phase close.
+- 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
+- PHPStan state: baseline contains zero ignored errors.
+- Phase 02 closing: 1 build item remains before phase close.
 
 ## What happens next
 
-1. Execute `02-Build-11` (ratchet coverage threshold to 63%).
-2. Execute `02-Build-12` (reduce PHPStan baseline).
-3. Execute `02-Build-13` (prepare and submit 4 upstream PRs).
-4. Tag branch, close Phase 02, begin Phase 03 on a new branch.
+1. Execute `02-Build-13` (prepare and submit 4 upstream PRs, using C1/C2 split fallback if PR C scope proves too large).
+2. Tag branch, close Phase 02, begin Phase 03 on a new branch.

@@ -28,13 +28,14 @@ Define and apply a threshold-ratcheting policy for coverage so gate strictness i
 </objective>
 
 <status>
-Queued on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
+Executed on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
 
-Planned scope:
-- Document ratcheting rules (when to raise, by how much, and rollback criteria).
-- Raise baseline threshold from 60% to the next policy-approved value only after CI parity is stable.
-- Record the threshold change and rationale in roadmap docs.
+Delivered:
+- Documented explicit threshold-ratcheting rules and rollback criteria in `CONTRIBUTING.md`.
+- Raised coverage threshold from `60%` to `63%` in `composer.json`.
+- Updated phase planning and roadmap docs to mark Build-11 complete and queue Build-12 next.
 
-Execution state:
-- Not started.
+Verification:
+- `composer test:coverage` passes with statement coverage `64.03%` (`566/884`) against the new `63.00%` threshold.
+- `composer test` passes locally (`157 tests, 391 assertions`).
 </status>

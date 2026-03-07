@@ -76,6 +76,11 @@ To lint the JS and CSS:
 
 - `composer test:coverage` uses `phpdbg` as the coverage driver, so no Xdebug/PCOV extension is required.
 - The current gate enforces statement coverage from `tests/cache/coverage/clover.xml` against the baseline threshold defined in `composer.json`.
+- Coverage threshold ratcheting policy:
+  - Raise only after at least 3 consecutive green coverage-gate runs in CI and at least 1 green local confirmation run.
+  - Raise in small increments (normally 1-2 percentage points) and keep the floor at least 1 point below the most recent measured statement coverage.
+  - Do not lower the threshold for feature work. A rollback is allowed only for measurement drift, test-environment changes, or confirmed flaky external factors, and must be a 1-point maximum with follow-up issue tracking.
+- Current threshold is `63%` (ratcheted from `60%` after stable `64.03%` coverage signal).
 
 ## Releasing a New Version
 

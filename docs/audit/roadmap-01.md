@@ -7,7 +7,7 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
 - `01-01` exists as the initial planning stub at `.planning/phases/01-audit-roadmap-authorship/01-01-PLAN.md`.
 - `01-02` has a repo-grounded audit deliverable in `docs/audit/HM_WPCS_audit.md`.
 - `01-Build-01` through `01-Build-04` executed on `codex/restack-audit-queue`.
-- `02-Build-01` through `02-Build-10` executed with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, registration-aware post-type input hardening, a baseline coverage gate, and CI parity.
+- `02-Build-01` through `02-Build-12` executed with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, registration-aware post-type input hardening, a baseline coverage gate, CI parity, threshold-ratcheting policy, and PHPStan baseline elimination.
 - Focused upstream PR for Build-04 is open: `https://github.com/humanmade/authorship/pull/161`.
 
 ## What Phase 01 established
@@ -32,8 +32,8 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
 - `02-Build-08`: completed
 - `02-Build-09`: completed
 - `02-Build-10`: completed
-- `02-Build-11`: queued — coverage threshold ratcheting policy, raise to 63%
-- `02-Build-12`: queued — PHPStan baseline reduction (annotation-level fixes only)
+- `02-Build-11`: completed — coverage threshold ratcheting policy documented, threshold raised to 63%
+- `02-Build-12`: completed — baseline reduced to zero ignored errors with annotation/type-guard-only fixes
 - `02-Build-13`: queued — upstream PR preparation and submission (4 PRs)
 
 ## Phase 02 completion criteria
@@ -50,4 +50,4 @@ Phase closes on PR *submission*, not on upstream response. Existing #160/#161 ma
 Residual risk note: PR C (CLI migration improvements) remains the broadest Build-13 PR. Split into C1/C2 if upstream review or CI signal indicates excessive scope.
 
 ## Next step
-- Execute `02-Build-11`.
+- Execute `02-Build-13`.

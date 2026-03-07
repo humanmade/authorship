@@ -49,10 +49,11 @@ class InsertPostHandler {
 	 */
 	function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
 		$unsanitized_postarr = $this->postarr;
+		$tax_input           = $unsanitized_postarr['tax_input'] ?? null;
 
 		$this->postarr = [];
 
-		if ( isset( $unsanitized_postarr['tax_input'] ) && ! empty( $unsanitized_postarr['tax_input'][ TAXONOMY ] ) ) {
+		if ( is_array( $tax_input ) && ! empty( $tax_input[ TAXONOMY ] ) ) {
 			return;
 		}
 

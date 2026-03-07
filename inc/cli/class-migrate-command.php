@@ -281,9 +281,12 @@ class Migrate_Command extends WP_CLI_Command {
 				// If PPA is deactivated the terms can be an error object.
 				// Usually invalid taxonomy, lets catch and report this.
 				if ( is_wp_error( $ppa_terms ) ) {
-					WP_CLI::error( 'There was an error fetching the PublishPress Author data, is the plugin activated?', false );
-					WP_CLI::error( $ppa_terms, false );
-					exit( 1 );
+					WP_CLI::error(
+						sprintf(
+							'There was an error fetching the PublishPress Author data, is the plugin activated? (%s)',
+							$ppa_terms->get_error_message()
+						)
+					);
 				}
 
 				/**
@@ -348,7 +351,9 @@ class Migrate_Command extends WP_CLI_Command {
 
 		// If there is no mapped PPA user then resolve that.
 		if ( ! empty( $ppa_user_id ) ) {
-			return intval( $ppa_user_id );
+			if ( is_scalar( $ppa_user_id ) ) {
+				return (int) $ppa_user_id;
+			}
 		}
 
 		/**
@@ -383,9 +388,12 @@ class Migrate_Command extends WP_CLI_Command {
 		// If this fails we want the debug data, so print out the
 		// arguments so we can reproduce later.
 		if ( is_wp_error( $ppa_user_id ) ) {
-			WP_CLI::error( 'Could not create Authorship user with these arguments:', false );
-			WP_CLI::error( $ppa_user_id, false );
-			exit( 1 );
+			WP_CLI::error(
+				sprintf(
+					'Could not create Authorship user with these arguments: %s',
+					$ppa_user_id->get_error_message()
+				)
+			);
 		}
 
 		return $ppa_user_id;
@@ -548,9 +556,7 @@ class Migrate_Command extends WP_CLI_Command {
 			$wp_object_cache->memcache_debug = [];
 		}
 
-		if ( isset( $wp_object_cache->cache ) ) {
 			$wp_object_cache->cache = [];
-		}
 
 		if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
 			// important!

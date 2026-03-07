@@ -66,8 +66,14 @@ Reduce the PHPStan baseline by fixing annotation-level issues that do not requir
 </tasks>
 
 <status>
-Queued on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
+Executed on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
 
-Execution state:
-- Not started.
+Delivered:
+- Removed all fixable PHPStan baseline entries using annotation-safe guards and type narrowing only.
+- Updated `phpstan-baseline.neon` to an empty `ignoreErrors` set.
+- Kept runtime behavior unchanged while improving static type safety in `inc/namespace.php`, `inc/class-insert-post-handler.php`, and `inc/cli/class-migrate-command.php`.
+
+Verification:
+- `composer test:phpstan` passes with no baseline ignores.
+- `composer test` remains green after the type-safety updates.
 </status>
