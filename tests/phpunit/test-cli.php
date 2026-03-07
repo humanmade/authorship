@@ -40,6 +40,7 @@ class TestCLI extends TestCase {
 		$command->wp_authors( [], [
 			'dry-run' => false,
 			'post-type' => 'post', // Note, have to set default values manually.
+			'batch-pause' => '0',
 		] );
 
 		// Check migration command has correctly set the author.
@@ -68,11 +69,38 @@ class TestCLI extends TestCase {
 		$command->wp_authors( [], [
 			'dry-run' => false,
 			'post-type' => 'post,page',
+			'batch-pause' => '0',
 		] );
 
 		// Check migration command has correctly set the author.
 		$authorship_authors = \Authorship\get_authors( $page1 );
 		$this->assertCount( 1, $authorship_authors );
 		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+	}
+
+	public function testMigrateRespectsZeroBatchPause() : void {
+		$factory = self::factory()->post;
+
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		wp_set_post_terms( $post->ID, [], TAXONOMY );
+
+		$command = new CLI\Migrate_Command();
+
+		$start_time = microtime( true );
+		$command->wp_authors( [], [
+			'dry-run' => true,
+			'post-type' => 'post',
+			'batch-pause' => '0',
+		] );
+		$elapsed = microtime( true ) - $start_time;
+
+		$this->assertLessThan(
+			1.5,
+			$elapsed,
+			'Expected wp authors migration to skip fixed delay when batch-pause is zero.'
+		);
 	}
 }

@@ -55,6 +55,12 @@ class Migrate_Command extends WP_CLI_Command {
 	 * default: post
 	 * ---
 	 *
+	 * [--batch-pause=<batch-pause>]
+	 * : Seconds to pause between processed batches.
+	 * ---
+	 * default: 2
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp authorship migrate wp-authors --dry-run=true
@@ -134,9 +140,7 @@ class Migrate_Command extends WP_CLI_Command {
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
 
-			// Pause for a moment to let the database catch up.
-			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
-			sleep( 2 );
+			$this->pause_between_batches( $assoc_args, 'wp-authors', $count );
 
 			$paged++;
 		} while ( count( $posts ) );
@@ -177,6 +181,12 @@ class Migrate_Command extends WP_CLI_Command {
 	 * options:
 	 *   - true
 	 *   - false
+	 * ---
+	 *
+	 * [--batch-pause=<batch-pause>]
+	 * : Seconds to pause between processed batches.
+	 * ---
+	 * default: 2
 	 * ---
 	 *
 	 * ## EXAMPLES
@@ -294,9 +304,7 @@ class Migrate_Command extends WP_CLI_Command {
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
 
-			// Pause for a moment to let the database catch up.
-			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
-			sleep( 2 );
+			$this->pause_between_batches( $assoc_args, 'ppa', $count );
 
 			$paged++;
 		} while ( count( $posts ) );
@@ -367,6 +375,68 @@ class Migrate_Command extends WP_CLI_Command {
 		}
 
 		return $ppa_user_id;
+	}
+
+	/**
+	 * Pause between migration batches.
+	 *
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 * @param string              $migration Migration subcommand identifier.
+	 * @param int                 $count Number of processed posts so far.
+	 */
+	private function pause_between_batches( array $assoc_args, string $migration, int $count ) : void {
+		$pause_seconds = $this->get_batch_pause_seconds( $assoc_args, $migration );
+
+		if ( $pause_seconds <= 0 ) {
+			WP_CLI::line( sprintf( 'Processed %d posts, continuing without pause.', $count ) );
+			return;
+		}
+
+		WP_CLI::line(
+			sprintf(
+				'Processed %1$d posts, pausing for %2$s second(s)...',
+				$count,
+				$pause_seconds
+			)
+		);
+
+		usleep( (int) round( $pause_seconds * 1000000 ) );
+	}
+
+	/**
+	 * Resolve pause seconds between migration batches.
+	 *
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 * @param string              $migration Migration subcommand identifier.
+	 *
+	 * @return float
+	 */
+	private function get_batch_pause_seconds( array $assoc_args, string $migration ) : float {
+		$pause_seconds = 2.0;
+		if ( isset( $assoc_args['batch-pause'] ) && is_numeric( $assoc_args['batch-pause'] ) ) {
+			$pause_seconds = floatval( $assoc_args['batch-pause'] );
+		}
+		$pause_seconds = max( 0.0, $pause_seconds );
+
+		/**
+		 * Filter the pause duration between migration batches.
+		 *
+		 * @param float               $pause_seconds Pause length in seconds.
+		 * @param string              $migration Migration subcommand identifier.
+		 * @param array<string,mixed> $assoc_args Original CLI assoc args.
+		 */
+		$pause_seconds = apply_filters(
+			'authorship_migrate_batch_pause_seconds',
+			$pause_seconds,
+			$migration,
+			$assoc_args
+		);
+
+		if ( ! is_numeric( $pause_seconds ) ) {
+			return 0.0;
+		}
+
+		return max( 0.0, floatval( $pause_seconds ) );
 	}
 
 	/**

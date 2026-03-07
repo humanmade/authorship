@@ -1,5 +1,5 @@
 import { get, isEqual } from 'lodash';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { Styles } from 'react-select';
 import type {
 	WP_REST_API_Error,
@@ -53,30 +53,63 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	const isDisabled = ! hasAssignAuthorAction;
 
 	const [ selected, setSelected ] = useState<Option[]>( [] );
+	const hasInitializedSelection = useRef<boolean>( false );
 
-	const preloadedAuthorIDs = preloadedAuthorOptions.authors.map( author => author.value );
+	useEffect( () => {
+		if ( hasInitializedSelection.current || selected.length ) {
+			return;
+		}
 
-	if ( ! selected.length && isEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
-		setSelected( preloadedAuthorOptions.authors );
-	} else if ( currentAuthorIDs !== undefined && currentAuthorIDs.length && ! selected.length ) {
+		const preloadedAuthorIDs = preloadedAuthorOptions.authors.map( author => author.value );
 
-		const path = addQueryArgs(
-			'/authorship/v1/users/',
-			{
-				include: currentAuthorIDs,
-				orderby: 'include',
-				post_type: postType,
-			}
-		);
+		if ( isEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
+			setSelected( preloadedAuthorOptions.authors );
+			hasInitializedSelection.current = true;
+			return;
+		}
 
-		const api: Promise<WP_REST_API_User[]> = apiFetch( { path } );
+		if ( currentAuthorIDs !== undefined && currentAuthorIDs.length ) {
+			hasInitializedSelection.current = true;
 
-		api.then( users => {
-			setSelected( users.map( createOption ) );
-		} ).catch( ( error: WP_REST_API_Error ) => {
-			onError( error.message );
-		} );
-	}
+			const path = addQueryArgs(
+				'/authorship/v1/users/',
+				{
+					include: currentAuthorIDs,
+					orderby: 'include',
+					post_type: postType,
+				}
+			);
+
+			let isCancelled = false;
+			const api: Promise<WP_REST_API_User[]> = apiFetch( { path } );
+
+			api.then( users => {
+				if ( isCancelled ) {
+					return;
+				}
+
+				setSelected( users.map( createOption ) );
+			} ).catch( ( error: WP_REST_API_Error ) => {
+				if ( isCancelled ) {
+					return;
+				}
+
+				onError( error.message );
+			} );
+
+			return () => {
+				isCancelled = true;
+			};
+		}
+
+		hasInitializedSelection.current = true;
+	}, [
+		currentAuthorIDs,
+		onError,
+		postType,
+		preloadedAuthorOptions.authors,
+		selected.length,
+	] );
 
 	/**
 	 * Asynchronously loads the options for the control based on the search parameter.
