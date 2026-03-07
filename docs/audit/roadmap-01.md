@@ -14,6 +14,9 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - PR B: `https://github.com/humanmade/authorship/pull/163`
   - PR C: `https://github.com/humanmade/authorship/pull/164`
   - PR D: `https://github.com/humanmade/authorship/pull/165`
+- Phase 03 started on 2026-03-07:
+  - `03-Build-01` executed on `codex/phase-03-build-01-toolchain` (tooling migration + initial JS tests)
+  - `03-Build-02` is next (DND migration from `react-sortable-hoc` to `@dnd-kit`)
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -58,4 +61,4 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Tag Phase 02 submission point and start detailed Phase 03 planning.
+- Execute `03-Build-02` with TDD-first reorder-behavior coverage.

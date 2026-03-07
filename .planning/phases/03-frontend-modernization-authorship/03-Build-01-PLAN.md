@@ -14,8 +14,9 @@ files_modified:
   - "docs/audit/roadmap-global.md"
 files_deleted:
   - ".babelrc.js"
-  - ".config/webpack.config.js"
+  - ".config/webpack.config.dev.js"
   - ".config/webpack.config.prod.js"
+  - ".config/webpack.shared.js"
 autonomous: true
 user_setup: []
 must_haves:
@@ -79,5 +80,11 @@ Migrate the frontend toolchain baseline to Node 20 + @wordpress/scripts and esta
 Started on 2026-03-07 on branch `codex/phase-03-build-01-toolchain`.
 
 Execution state:
-- In progress.
+- Executed.
+
+Verification notes:
+- `npm run lint:js` passed.
+- `npm run test:js -- --ci` passed (2 tests in `tests/js/components/authors-select-init.test.tsx`).
+- `npm run build` passed with `@wordpress/scripts` output (`build/main.asset.php`, `build/style.asset.php`, `build/style-style.css`).
+- `composer test` passed (legacy upstream deprecation noise remains).
 </status>

@@ -157,10 +157,17 @@ Submit all four PRs at the same time, after `02-Build-13` is complete. Reference
 
 ---
 
-## Phase 03: Frontend modernization (next)
+## Phase 03: Frontend modernization (active)
 
 ### Goal
 Replace the deprecated and accessibility-impaired frontend stack with current WordPress-ecosystem tooling. This is the highest-impact remaining work.
+
+### Execution status (2026-03-07)
+- `03-Build-01` executed on `codex/phase-03-build-01-toolchain`:
+  - migrated to `@wordpress/scripts` with Node 20 baseline
+  - added editor enqueue compatibility for `*.asset.php` metadata and CSS filename variants
+  - introduced first JS unit tests for `AuthorsSelect` initialization behavior
+- `03-Build-02` is next: replace `react-sortable-hoc` with `@dnd-kit` via TDD-first reorder tests.
 
 ### Scope
 
@@ -256,7 +263,8 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Branch: `codex/restack-audit-queue`
+- Active execution branch: `codex/phase-03-build-01-toolchain`
+- Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
   - `#163` guest author + post-insert hardening
@@ -270,8 +278,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
+- Phase 03 status: started; Build-01 executed, Build-02 planning/TDD starting.
 
 ## What happens next
 
-1. Tag the Phase 02 submission point on `codex/restack-audit-queue`.
-2. Start Phase 03 planning on a new branch with Node 20 + `@wordpress/scripts` migration as first build item.
+1. Open and monitor the Build-01 Phase-03 PR from `codex/phase-03-build-01-toolchain`.
+2. Execute `03-Build-02`: replace `react-sortable-hoc` with `@dnd-kit` using a TDD reorder-behavior test-first flow.
