@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import React from 'react';
 
 const mockApiFetch = jest.fn();
@@ -89,5 +89,50 @@ describe( 'AuthorsSelect initialization', () => {
 		} );
 
 		expect( mockApiFetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'emits reordered author IDs on sort end', async () => {
+		const onUpdate = jest.fn();
+		const preloaded = [
+			{
+				value: 11,
+				label: 'Author A',
+				avatar: null,
+			},
+			{
+				value: 22,
+				label: 'Author B',
+				avatar: null,
+			},
+			{
+				value: 33,
+				label: 'Author C',
+				avatar: null,
+			},
+		];
+
+		render(
+			<AuthorsSelectBase
+				{ ...baseProps }
+				currentAuthorIDs={ [ 11, 22, 33 ] }
+				preloadedAuthorOptions={ {
+					authors: preloaded,
+				} }
+				onUpdate={ onUpdate }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( mockSortableProps.value ).toEqual( preloaded );
+		} );
+
+		act( () => {
+			( mockSortableProps.onSortEnd as CallableFunction )( {
+				oldIndex: 0,
+				newIndex: 2,
+			} );
+		} );
+
+		expect( onUpdate ).toHaveBeenCalledWith( [ 22, 33, 11 ] );
 	} );
 } );
