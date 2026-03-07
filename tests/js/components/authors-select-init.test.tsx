@@ -169,4 +169,79 @@ describe( 'AuthorsSelect initialization', () => {
 		expect( mockSortableProps.lockAxis ).toBeUndefined();
 		expect( mockSortableProps.lockToContainerEdges ).toBeUndefined();
 	} );
+
+	it( 'emits author IDs when selected values change', async () => {
+		const onUpdate = jest.fn();
+		const preloaded = [
+			{
+				value: 11,
+				label: 'Author A',
+				avatar: null,
+			},
+		];
+
+		render(
+			<AuthorsSelectBase
+				{ ...baseProps }
+				currentAuthorIDs={ [ 11 ] }
+				preloadedAuthorOptions={ {
+					authors: preloaded,
+				} }
+				onUpdate={ onUpdate }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( mockSortableProps.value ).toEqual( preloaded );
+		} );
+
+		act( () => {
+			( mockSortableProps.onChange as CallableFunction )( [
+				{
+					value: 22,
+					label: 'Author B',
+					avatar: null,
+				},
+				{
+					value: 33,
+					label: 'Author C',
+					avatar: null,
+				},
+			] );
+		} );
+
+		expect( onUpdate ).toHaveBeenCalledWith( [ 22, 33 ] );
+	} );
+
+	it( 'clears author IDs when selected values are cleared', async () => {
+		const onUpdate = jest.fn();
+		const preloaded = [
+			{
+				value: 11,
+				label: 'Author A',
+				avatar: null,
+			},
+		];
+
+		render(
+			<AuthorsSelectBase
+				{ ...baseProps }
+				currentAuthorIDs={ [ 11 ] }
+				preloadedAuthorOptions={ {
+					authors: preloaded,
+				} }
+				onUpdate={ onUpdate }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( mockSortableProps.value ).toEqual( preloaded );
+		} );
+
+		act( () => {
+			( mockSortableProps.onChange as CallableFunction )( null );
+		} );
+
+		expect( onUpdate ).toHaveBeenCalledWith( [] );
+	} );
 } );

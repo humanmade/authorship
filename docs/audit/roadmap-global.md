@@ -172,6 +172,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - migrated multi-value sorting components while preserving legacy `onSortEnd({ oldIndex, newIndex })` callback shape
   - added JS tests for DND drag-end index mapping and removed legacy sortable-hoc prop assumptions
   - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
+- `03-Build-03` executed on `codex/phase-03-build-03-react-select`:
+  - upgraded `react-select` from v3 to v5 and removed `@types/react-select`
+  - aligned selector adapter typing to v5-native interfaces (`AsyncCreatableProps`, `StylesConfig`, `MultiValue`)
+  - added JS tests for selection-change and clearing callback behavior
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
 
 ### Scope
 
@@ -267,7 +272,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-02-dnd-migration`
+- Active execution branch: `codex/phase-03-build-03-react-select`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -282,9 +287,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 and Build-02 executed.
+- Phase 03 status: active; Build-01, Build-02, and Build-03 executed.
 
 ## What happens next
 
-1. Open and monitor the Build-02 Phase-03 PR from `codex/phase-03-build-02-dnd-migration` after commit/push.
-2. Plan and execute `03-Build-03`: evaluate `react-select` v5 upgrade versus replacement with `@wordpress/components` `FormTokenField`, with accessibility acceptance criteria and tests.
+1. Open and monitor the Build-03 Phase-03 PR from `codex/phase-03-build-03-react-select` after commit/push.
+2. Plan and execute `03-Build-04`: convert `withSelect`/`withDispatch` HOCs to hooks and remove `lodash` usage in `AuthorsSelect`.

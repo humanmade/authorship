@@ -1,6 +1,6 @@
 import { get, isEqual } from 'lodash';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import { Styles } from 'react-select';
+import type { MultiValue, StylesConfig } from 'react-select';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
@@ -137,7 +137,7 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 	/**
 	 * Declares styles for elements that can't easily be targeted with a CSS selector.
 	 */
-	const styles: Styles<Option, true> = {
+	const styles: StylesConfig<Option, true> = {
 		input: () => ( {
 			margin: 0,
 			width: '100%',
@@ -147,11 +147,13 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 	/**
 	 * Handles changes to the selected authors.
 	 *
-	 * @param {Option[]} [options] The selected options.
+	 * @param {MultiValue<Option> | null} options The selected options.
 	 */
-	const changeValue = ( options?: Option[] ) => {
-		setSelected( options || [] );
-		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
+	const changeValue = ( options: MultiValue<Option> | null ) => {
+		const normalized = options ? [ ...options ] : [];
+
+		setSelected( normalized );
+		onUpdate( normalized.map( option => option.value ) );
 	};
 
 	/**

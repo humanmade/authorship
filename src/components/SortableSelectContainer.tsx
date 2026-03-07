@@ -1,7 +1,8 @@
 import { DndContext, DragEndEvent, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import React, { ReactElement } from 'react';
-import AsyncCreatableSelect, { Props as AsyncCreatableSelectProps } from 'react-select/async-creatable';
+import type { GroupBase } from 'react-select';
+import AsyncCreatableSelect, { AsyncCreatableProps } from 'react-select/async-creatable';
 
 import { __ } from '@wordpress/i18n';
 
@@ -20,7 +21,7 @@ const placeholder = __( 'Select authors…', 'authorship' );
 export const className = 'authorship-select-container';
 export const classNamePrefix = 'authorship-select';
 
-interface SortableSelectProps extends AsyncCreatableSelectProps<Option, true> {
+interface SortableSelectProps extends AsyncCreatableProps<Option, true, GroupBase<Option>> {
 	onSortEnd: ( option: SortedOption ) => void;
 }
 
@@ -44,7 +45,7 @@ const formatOptionLabel = ( option: Option ): ReactElement => (
 /**
  * Returns the base author selector control.
  *
- * @param {AsyncCreatableSelectProps} props Component props.
+ * @param {SortableSelectProps} props Component props.
  * @returns {ReactElement} An element.
  */
 const Select = ( props: SortableSelectProps ): ReactElement => {
