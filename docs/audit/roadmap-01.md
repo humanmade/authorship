@@ -8,7 +8,12 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
 - `01-02` has a repo-grounded audit deliverable in `docs/audit/HM_WPCS_audit.md`.
 - `01-Build-01` through `01-Build-04` executed on `codex/restack-audit-queue`.
 - `02-Build-01` through `02-Build-12` executed with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, registration-aware post-type input hardening, a baseline coverage gate, CI parity, threshold-ratcheting policy, and PHPStan baseline elimination.
-- Focused upstream PR for Build-04 is open: `https://github.com/humanmade/authorship/pull/161`.
+- `02-Build-13` executed on 2026-03-07 with upstream submissions:
+  - Umbrella issue: `https://github.com/humanmade/authorship/issues/166`
+  - PR A: `https://github.com/humanmade/authorship/pull/162`
+  - PR B: `https://github.com/humanmade/authorship/pull/163`
+  - PR C: `https://github.com/humanmade/authorship/pull/164`
+  - PR D: `https://github.com/humanmade/authorship/pull/165`
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -34,7 +39,7 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
 - `02-Build-10`: completed
 - `02-Build-11`: completed — coverage threshold ratcheting policy documented, threshold raised to 63%
 - `02-Build-12`: completed — baseline reduced to zero ignored errors with annotation/type-guard-only fixes
-- `02-Build-13`: queued — upstream PR preparation and submission (4 PRs)
+- `02-Build-13`: completed — upstream PR preparation and submission (4 PRs + umbrella issue)
 
 ## Phase 02 completion criteria
 
@@ -47,7 +52,10 @@ Phase 02 is done when these fork-local outcomes are all true:
 
 Phase closes on PR *submission*, not on upstream response. Existing #160/#161 may be closed as housekeeping if no active review signal, but this is not a gate.
 
-Residual risk note: PR C (CLI migration improvements) remains the broadest Build-13 PR. Split into C1/C2 if upstream review or CI signal indicates excessive scope.
+Residual risk notes:
+- PR C (CLI migration improvements) remains the broadest Build-13 PR. Split into C1/C2 if upstream review or CI signal indicates excessive scope.
+- Build-12 no-behavior-change type hardening remains fork-local and verified on `codex/restack-audit-queue`.
+- Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Execute `02-Build-13`.
+- Tag Phase 02 submission point and start detailed Phase 03 planning.

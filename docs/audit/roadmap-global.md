@@ -41,7 +41,7 @@ At this stage, the work is focused on making the plugin safer to operate and eas
   - `5a3e0c7` `Execute 01-Build-03 post insert observability hardening`
   - `1d02511` `Execute 01-Build-04 performance hardening and stabilize tests`
 
-### Phase 02: Fork-first delivery stabilization (active — closing)
+### Phase 02: Fork-first delivery stabilization (completed — fork-local)
 - Executed `02-Build-01` through `02-Build-12` on `codex/restack-audit-queue`.
 - Main theme: deterministic and test-covered CLI migration behavior.
 - Highlights:
@@ -82,7 +82,7 @@ After these five items, Phase 02 is closed and Phase 03 begins.
 |------|-------------|--------|
 | `02-Build-11` | Coverage threshold ratcheting policy + raise to 63% | completed |
 | `02-Build-12` | PHPStan baseline reduction (fix what's fixable without behavior changes) | completed |
-| `02-Build-13` | Upstream PR preparation and submission | queued |
+| `02-Build-13` | Upstream PR preparation and submission | completed |
 
 ---
 
@@ -136,6 +136,13 @@ Why separate: JS change requiring a different reviewer skillset and a build step
 ### Timing
 Submit all four PRs at the same time, after `02-Build-13` is complete. Reference them from a single umbrella issue that explains the overall hardening effort. This gives HM one place to understand the full scope while letting them merge PRs independently.
 
+### Submission record (2026-03-07)
+- Umbrella issue: https://github.com/humanmade/authorship/issues/166
+- PR A (tooling/CI): https://github.com/humanmade/authorship/pull/162
+- PR B (guest author + observability): https://github.com/humanmade/authorship/pull/163
+- PR C (CLI migration improvements): https://github.com/humanmade/authorship/pull/164
+- PR D (editor asset fix): https://github.com/humanmade/authorship/pull/165
+
 ### After submission
 - Tag `codex/restack-audit-queue` at the submission point.
 - Continue fork-local work on a new branch for Phase 03.
@@ -144,6 +151,8 @@ Submit all four PRs at the same time, after `02-Build-13` is complete. Reference
 
 ### Residual risk note
 - PR C (CLI migration improvements) is still the largest Build-13 package. If upstream review stalls or CI failures cluster in PR C, split it into C1 (pause hook contract + pacing) and C2 (post-type validation + multisite stabilization) without blocking fork-local phase closure.
+- Build-12's zero-baseline runtime type hardening remains validated on the fork integration branch (`codex/restack-audit-queue`) with no intentional behavior changes; upstream packaging keeps this decoupled from phase completion.
+- Coverage ratchet remains conservative at `63%`; continue incremental raises in Phase 04 only after stable CI windows.
 
 ---
 
@@ -246,14 +255,20 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 - Branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
-  - `#160` current branch integration PR
-  - `#161` focused Build-04 PR
+  - `#162` tooling/CI modernization
+  - `#163` guest author + post-insert hardening
+  - `#164` CLI migration improvements
+  - `#165` editor asset fix
+  - Umbrella issue: `#166`
+- Legacy upstream-facing PRs:
+  - `#160` previous integration PR (superseded in packaging, pending housekeeping decision)
+  - `#161` previous focused Build-04 PR (superseded in packaging, pending housekeeping decision)
 - Quality state: `composer test`, `composer test:phpstan`, `composer test:phpcs`, and `composer test:coverage` all green.
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
-- Phase 02 closing: 1 build item remains before phase close.
+- Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
 
 ## What happens next
 
-1. Execute `02-Build-13` (prepare and submit 4 upstream PRs, using C1/C2 split fallback if PR C scope proves too large).
-2. Tag branch, close Phase 02, begin Phase 03 on a new branch.
+1. Tag the Phase 02 submission point on `codex/restack-audit-queue`.
+2. Start Phase 03 planning on a new branch with Node 20 + `@wordpress/scripts` migration as first build item.

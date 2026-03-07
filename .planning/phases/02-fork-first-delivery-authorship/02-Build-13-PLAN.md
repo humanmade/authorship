@@ -95,8 +95,19 @@ Prepare and submit upstream PRs that package the Phase 01–02 hardening work in
 </tasks>
 
 <status>
-Queued on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
+Executed on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
 
 Execution state:
-- Not started.
+- 02-13-01 completed: PR A opened as https://github.com/humanmade/authorship/pull/162
+- 02-13-02 completed: PR B opened as https://github.com/humanmade/authorship/pull/163
+- 02-13-03 completed: PR C opened as https://github.com/humanmade/authorship/pull/164
+- 02-13-04 completed: PR D opened as https://github.com/humanmade/authorship/pull/165
+- 02-13-05 completed: umbrella issue opened as https://github.com/humanmade/authorship/issues/166
+
+Verification notes:
+- PR B scope was restacked to remove unrelated `inc/namespace.php` deltas before submission.
+- PR C remains the broadest package; C1/C2 split fallback is retained if CI/review signal warrants it.
+- Local environment caveats observed during branch verification:
+  - legacy PHPCS/WPCS deprecation exceptions on modern PHP in some branch-local runs
+  - webpack 4 build on Node 24 requiring `NODE_OPTIONS=--openssl-legacy-provider`
 </status>
