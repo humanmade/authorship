@@ -2,13 +2,16 @@
 
 This document supplements the Phase 01 audit (`docs/audit/HM_WPCS_audit.md`) with additional findings from the source-level architecture review.
 
+> **Baseline note:** Findings below were originally documented against upstream v0.2.17. Items resolved by the fork are annotated with their build reference and current status. Unresolved items remain as-is.
+
 ## Security
 
 ### Guest author login is not actively blocked
 
 **Severity:** Low (mitigated by design, but defense-in-depth gap)
+**Status:** Resolved — Phase 01 Build-02 (`a83e128`). Upstream PR B (`#163`).
 
-Guest authors are `WP_User` rows with the `guest-author` role (zero capabilities). Authorship does not register an `authenticate` filter or `wp_login` action to prevent login. The defense relies on:
+Guest authors are `WP_User` rows with the `guest-author` role (zero capabilities). Upstream Authorship (v0.2.17) does not register an `authenticate` filter or `wp_login` action to prevent login. The defense relies on:
 
 - Passwords are random 24-character strings generated at creation time, never returned to any caller.
 - Email is set to empty string by default, preventing password reset.
@@ -16,7 +19,7 @@ Guest authors are `WP_User` rows with the `guest-author` role (zero capabilities
 
 **Risk scenario:** An Administrator creates a guest author with an email address. The guest author uses WordPress's password reset flow to obtain credentials. They log in with an empty-capability session. The session itself may have side effects with plugins that check `is_user_logged_in()` rather than specific capabilities.
 
-**Recommendation:** Add an `authenticate` filter that returns `WP_Error` for users whose only role is `guest-author`. This is a one-line defense-in-depth addition:
+**Fork resolution:** An `authenticate` filter now returns `WP_Error` for users whose only role is `guest-author`:
 
 ```php
 add_filter( 'authenticate', function( $user ) {
@@ -30,33 +33,47 @@ add_filter( 'authenticate', function( $user ) {
 ### Guest author username normalization
 
 **Severity:** Low (edge case)
+**Status:** Resolved — Phase 01 Build-02 (`a83e128`). Upstream PR B (`#163`).
 
-`create_item()` in `class-users-controller.php:194-195` derives usernames from the display name:
+Upstream `create_item()` in `class-users-controller.php:194-195` derives usernames from the display name:
 
 ```php
 $username = sanitize_title( sanitize_user( $request->get_param( 'name' ), true ) );
 $username = preg_replace( '/[^a-z0-9]/', '', $username );
 ```
 
-This can produce empty strings for non-ASCII names (e.g., Japanese, Arabic, Chinese names) or collide for near-duplicate display names. See `docs/audit/patch_scaffolds/01-02-security_build.md` for the planned hardening.
+This can produce empty strings for non-ASCII names (e.g., Japanese, Arabic, Chinese names) or collide for near-duplicate display names.
+
+**Fork resolution:** Dedicated `normalize_guest_username()` method falls back to `guest-` prefix with unique suffix for non-ASCII names. `get_unique_guest_username()` handles collision resolution with numeric suffixes. Test coverage added in `test-rest-api-user-endpoint.php`.
 
 ### Signup validation filter scope
 
 **Severity:** Low (code hygiene)
+**Status:** Resolved — Phase 01 Build-02 (`a83e128`). Upstream PR B (`#163`).
 
-`create_item()` adds an anonymous `wpmu_validate_user_signup` filter and never removes it. This is a request-scoped side effect that is inconsistent with the pattern used in `get_items()` where the filter is explicitly removed after use. See `docs/audit/patch_scaffolds/01-02-security_build.md`.
+Upstream `create_item()` adds an anonymous `wpmu_validate_user_signup` filter and never removes it. This is a request-scoped side effect that is inconsistent with the pattern used in `get_items()` where the filter is explicitly removed after use.
+
+**Fork resolution:** Filter is now properly removed after use, matching the `get_items()` pattern.
 
 ## Data integrity
 
 ### Post-insert author assignment failures are silent
 
-`InsertPostHandler::action_wp_insert_post()` catches exceptions from `set_authors()` and discards them. This means author attribution can silently fail during post save, migration, or programmatic post creation. The REST API path handles the same exceptions by returning `WP_Error`. See `docs/audit/patch_scaffolds/01-02-observability_build.md`.
+**Status:** Resolved — Phase 01 Build-03 (`5a3e0c7`). Upstream PR B (`#163`).
+
+Upstream `InsertPostHandler::action_wp_insert_post()` catches exceptions from `set_authors()` and discards them. This means author attribution can silently fail during post save, migration, or programmatic post creation. The REST API path handles the same exceptions by returning `WP_Error`.
+
+**Fork resolution:** `action_wp_insert_post()` now fires an `authorship_author_assignment_failure` action hook with the post ID and exception when `set_authors()` fails. This allows monitoring/logging integrations to detect silent failures. Test coverage added in `test-post-saving.php`.
 
 ### `post_author` field divergence
+
+**Status:** Open — P2 backlog item. See `docs/audit/roadmap-global.md` backlog #18.
 
 WordPress core's `post_author` field on `wp_posts` is not the source of truth for Authorship — the hidden taxonomy is. However, `post_author` continues to exist and may be set/read by other plugins and themes. Authorship does not currently synchronize `post_author` with the first attributed author.
 
 This can cause divergence where `$post->post_author` says user A but Authorship says users B and C. Theme code that reads `post_author` directly (rather than using `the_author()` or Authorship's template functions) will show stale data.
+
+**Impact:** This is a real-world compatibility issue. Many themes, SEO plugins, and caching layers read `$post->post_author` directly. A synchronization hook (updating `post_author` to match the first attributed author on `set_authors()`) would close the gap without changing the architectural principle that the taxonomy is the source of truth.
 
 ### Object cache considerations
 
@@ -72,17 +89,24 @@ On sites with Elasticsearch (e.g., WordPress VIP), this is likely irrelevant as 
 
 ### Editor component render behavior
 
-`AuthorsSelect.tsx` performs state initialization and can trigger `apiFetch()` from render-time conditionals. See `docs/audit/patch_scaffolds/01-02-performance_build.md`.
+**Status:** Resolved — Phase 01 Build-04 (`1d02511`). Upstream PR D (`#165`).
+
+Upstream `AuthorsSelect.tsx` performs state initialization and can trigger `apiFetch()` from render-time conditionals.
+
+**Fork resolution:** Side-effect moved into `useEffect` hook. `lodash.get` replaced with optional chaining.
 
 ## Feed output limitations
+
+**Status:** Open — feed gaps remain. Byline spec implementation planned (see below). Schema.org HTML output added as P2 backlog item.
 
 - RSS2: outputs comma-separated name list only via `the_author` filter. No structured metadata.
 - Atom: no Authorship-specific handling at all.
 - JSON Feed: not addressed.
 - No `dc:creator` output for individual co-authors.
 - No Schema.org / JSON-LD author metadata in feeds.
+- No Schema.org / JSON-LD author markup in HTML output (for SEO). This is a separate concern from feed metadata — PublishPress Authors (Pro) and Molongui both provide this. See `docs/audit/roadmap-global.md` backlog #19.
 
-See `docs/byline-spec-plan.md` for the proposed Byline spec implementation that would address structured feed output.
+See `.planning/byline-spec-plan.md` for the proposed Byline spec implementation that would address structured feed output.
 
 ## Compatibility
 

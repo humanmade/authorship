@@ -78,7 +78,7 @@ When a guest author is created via the REST API (`authorship/v1/users`), the `pr
 - **Role:** always forced to `['guest-author']` regardless of request input.
 - **Username:** derived from the display name, sanitized to lowercase ASCII alphanumerics.
 
-**Security note:** Authorship does **not** actively block login for the Guest Author role. There is no `authenticate` filter. The defense relies on the password being unknowable and the role having zero capabilities. If an Administrator creates a guest author with an email address, the password-reset flow could theoretically be used to obtain credentials. The resulting session would have no capabilities, but the session would exist. This is documented as a known gap in the audit.
+**Security note (upstream baseline):** Upstream Authorship (v0.2.17) does **not** actively block login for the Guest Author role. There is no `authenticate` filter. The defense relies on the password being unknowable and the role having zero capabilities. If an Administrator creates a guest author with an email address, the password-reset flow could theoretically be used to obtain credentials. The resulting session would have no capabilities, but the session would exist. **Fork status:** Resolved in Phase 01 Build-02. See [Fork divergence](#fork-divergence-from-upstream-v0217) below.
 
 ### Query rewriting
 
@@ -157,3 +157,33 @@ The plugin removes the default `wp:action-assign-author` link relation and repla
 The block editor integration is built in TypeScript with React, using the `PluginDocumentSettingPanel` SlotFill. It replaces the default Author panel with a search-as-you-type multi-select component that queries `authorship/v1/users`. Author data is preloaded via `wp_localize_script` to avoid an initial API call.
 
 The classic editor uses a standard metabox registered in `inc/admin.php`.
+
+## Fork divergence from upstream v0.2.17
+
+The sections above describe the upstream architecture as audited from the `develop` branch (v0.2.17). The fork (`codex/restack-audit-queue` and subsequent phase branches) has introduced the following changes. The architectural design is unchanged; these are hardening and observability additions within the existing structure.
+
+### Security hardening (Phase 01, Build-02)
+
+- **Guest author login blocking.** An `authenticate` filter now returns `WP_Error` for users whose only role is `guest-author`. This closes the defense-in-depth gap described in the guest author section above. Source: `inc/namespace.php`.
+- **Username normalization.** `create_item()` in `class-users-controller.php` now uses a dedicated `normalize_guest_username()` method that handles non-ASCII names by falling back to a `guest-` prefix with a unique suffix. A companion `get_unique_guest_username()` handles collision resolution.
+- **Signup validation filter cleanup.** The anonymous `wpmu_validate_user_signup` filter added during `create_item()` is now properly removed after use, matching the pattern in `get_items()`.
+
+### Observability (Phase 01, Build-03)
+
+- **Post-insert failure signaling.** `InsertPostHandler::action_wp_insert_post()` now fires an `authorship_author_assignment_failure` action hook when `set_authors()` throws an exception, instead of silently discarding the error. The REST API path continues to return `WP_Error` as before.
+
+### CLI migration (Phase 01 Build-04, Phase 02 Builds 01-08)
+
+- **Batch pause hooks.** `class-migrate-command.php` now supports a `authorship_migrate_batch_pause_seconds` filter (clamped to 0-60) and fires `authorship_migrate_batch_pause_resolved` after each pause. This allows external orchestration of large migrations.
+- **Post-type validation.** Migration commands validate `--post-type` input against registered post types and handle `any` as a special value.
+- **Cache reset.** `reset_local_object_cache()` clears WordPress object cache between batches to prevent memory growth.
+
+### Editor (Phase 01, Build-04)
+
+- **Render side-effect removal.** `AuthorsSelect.tsx` moved an `apiFetch()` call from render-time conditional into a `useEffect` hook. `lodash.get` replaced with optional chaining.
+
+### Quality tooling (Phase 02, Builds 09-12)
+
+- **Coverage gate.** `composer test:coverage` command with threshold checking (currently 63%, actual ~64.03%).
+- **PHPStan baseline to zero.** Baseline reduced from 15 ignored errors to zero via annotation and type-guard fixes at WordPress API boundaries. No runtime behavior changes.
+- **CI parity.** Coverage gate runs in the GitHub Actions unit test workflow.

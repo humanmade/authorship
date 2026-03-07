@@ -1,6 +1,11 @@
 ---
-title: "Human Made Authorship Plugin — Architecture"
+title: "Human Made Authorship Plugin — Architecture (fork current state)"
 ---
+
+%% This diagram is maintained with fork progress.
+%% Last updated: 2026-03-07.
+%% Items marked ✅ reflect fork hardening applied during Phases 01-02.
+%% See architecture.md § Fork divergence for full details.
 
 graph TB
     subgraph WordPress Core Tables
@@ -20,7 +25,7 @@ graph TB
         end
 
         subgraph "Roles & Caps (namespace.php)"
-            Role["register_roles_and_caps()<br/>add_role( 'guest-author', [], <b>no caps</b> )<br/>⚠️ No authenticate filter exists"]
+            Role["register_roles_and_caps()<br/>add_role( 'guest-author', [], <b>no caps</b> )<br/>✅ authenticate filter blocks guest login<br/>(Fork: Phase 01 Build-02)"]
             MapCap["filter_map_meta_cap_for_editing()<br/>Grants attributed authors<br/>edit/delete/read on their posts"]
             UserCap["filter_user_has_cap()<br/>Maps custom caps:<br/>• create_guest_authors → edit_others_posts<br/>• attribute_post_type → edit_others_posts"]
         end
@@ -49,7 +54,7 @@ graph TB
         end
 
         subgraph "Guest Author Creation (class-users-controller.php)"
-            Create["prepare_item_for_database()<br/>• password = wp_generate_password(24)<br/>• email = '' (unless Admin provides)<br/>• roles = ['guest-author']<br/>• username = sanitized display name"]
+            Create["prepare_item_for_database()<br/>• password = wp_generate_password(24)<br/>• email = '' (unless Admin provides)<br/>• roles = ['guest-author']<br/>• ✅ username = normalize_guest_username()<br/>(Fork: non-ASCII fallback + collision handling)"]
             Perms["Permission checks:<br/>• GET: attribute_post_type cap<br/>• POST: create_guest_authors cap<br/>• Email: create_users cap only<br/>• Roles/Password params: FORBIDDEN"]
         end
 
@@ -58,8 +63,12 @@ graph TB
             Email["Comment moderation &<br/>notification emails sent to<br/>all attributed authors"]
         end
 
+        subgraph "Observability (Fork: Phase 01 Build-03)"
+            FailHook["✅ authorship_author_assignment_failure<br/>action hook on set_authors() exception<br/>in InsertPostHandler"]
+        end
+
         subgraph "WP-CLI (inc/cli/)"
-            CLI["--authorship=4,11 flag<br/>wp authorship migrate wp-authors<br/>wp authorship migrate ppa"]
+            CLI["--authorship=4,11 flag<br/>wp authorship migrate wp-authors<br/>wp authorship migrate ppa<br/>✅ batch pause hooks + post-type validation<br/>(Fork: Phases 01-02)"]
         end
     end
 
@@ -109,7 +118,10 @@ graph TB
     classDef warn fill:#fff3cd,stroke:#d4a017,stroke-width:2px
     classDef ui fill:#f4e8e8,stroke:#b44646,stroke-width:2px
 
+    classDef fork fill:#d4edda,stroke:#28a745,stroke-width:2px
+
     class WPUsers,WPPosts,WPTerms,WPTermTax,WPTermRel db
     class Role,MapCap,UserCap,Tax,MineView core
     class RestField,RestEmbed,UsersCtrl,Create,Perms api
     class TSX,Preload ui
+    class FailHook fork

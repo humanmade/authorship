@@ -63,13 +63,18 @@ Disadvantages: yet another entity type, complex querying, more custom admin UI.
 | REST API read | Partial | Yes | Yes (first-class) | Partial |
 | REST API write | No | Yes | Yes (first-class) | No |
 | WP-CLI support | Yes | Yes | Yes (--authorship flag) | No |
-| Author boxes / display | Blocks only | Yes (extensive) | No (developer-only) | Yes (extensive) |
-| Schema.org output | No | Yes (Pro) | No | Yes |
+| Author boxes / display | Blocks only | Yes (extensive) | No (intentionally out of scope) | Yes (extensive) |
+| Schema.org output | No | Yes (Pro) | No (P2 backlog) | Yes |
 | Migration tools | N/A (origin) | CAP, Byline import | CAP, PPA, wp-authors import | CAP, PPA, One User Avatar import |
 | RSS/Atom feed support | Template tags | Automatic | RSS2 only (name list) | Yes |
 | Multisite support | Yes | Yes | Yes | Yes |
 | Author categories | No | Yes (Pro) | No | No |
 | Custom author fields | No | Yes (Pro) | No (uses user meta) | Yes |
+
+**Design scope notes for HM Authorship (this fork):**
+
+- **Author boxes / display** are intentionally out of scope. Authorship is an attribution data layer, not a presentation plugin. Author display is the responsibility of themes and blocks. This is a deliberate architectural boundary, not a gap — the plugin provides clean template functions and REST API data for themes to build their own display.
+- **Schema.org / JSON-LD output** is not currently implemented but is tracked as a P2 backlog item (`docs/audit/roadmap-global.md` #19). Competitors (PPA Pro, Molongui) provide this, and it has clear SEO value. This is independent of the Byline spec feed work.
 
 ### PublishPress Authors data model in detail
 

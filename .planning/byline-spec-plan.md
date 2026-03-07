@@ -116,7 +116,11 @@ Filterable via `apply_filters( 'authorship_byline_role', $role, $user, $post )`.
 
 ### Phase 2: perspective (requires new data)
 
+> **Adoption gate:** Phase 2 should not begin until at least one of these signals is present: (a) a feed reader ships Byline namespace support, (b) the spec reaches v0.5.0 or higher, or (c) a second CMS/plugin implements Phase 1-level support. Without external adoption signal, the investment in new editorial UI is premature.
+
 The `byline:perspective` element is the spec's most important feature for addressing content collapse. It requires editorial metadata that WordPress doesn't natively provide.
+
+**Adoption caution:** Adding a `perspective` field is technically simple (post meta + sidebar control), but getting editors to actually populate it is a UX and workflow adoption problem. Unlike structural elements in Phase 1 (which use data that already exists), `perspective` requires conscious editorial input on every post. Without clear value to the author — such as feed reader UIs that visibly differentiate perspectives — adoption will be low and the field will be empty on most posts. The filter hook (`authorship_byline_perspective`) mitigates this by allowing automated population from existing data (categories, post formats, etc.), but this trades accuracy for coverage.
 
 Options for storage:
 
@@ -128,6 +132,8 @@ Recommendation: start with post meta and a block editor sidebar control. Add a f
 
 ### Phase 3: extended identity (progressive enhancement)
 
+> **Adoption gate:** Same gate as Phase 2. Do not proceed without external adoption signal.
+
 Add support for `byline:profile`, `byline:now`, `byline:uses` using user meta fields with a defined key convention:
 
 - `authorship_profile_mastodon`, `authorship_profile_github`, etc.
@@ -138,6 +144,8 @@ Register these fields on the user profile edit screen. Output them in `byline:pe
 
 ### Phase 4: affiliation and organization
 
+> **Adoption gate:** Same gate as Phases 2-3, plus the spec should be at v1.0+ before investing in affiliation/org elements, as these are the most likely to change during spec development.
+
 These require the most new UI work and are editorially complex. Defer until the spec stabilizes and feed reader adoption provides validation signal.
 
 ## Strategic considerations
@@ -147,3 +155,13 @@ Being the first CMS plugin to implement the Byline spec would give this fork inf
 The implementation cost is low for Phase 1 (a few dozen lines hooking into existing WordPress feed actions with data Authorship already has). The risk is also low since Byline elements are ignored by feed readers that don't support them — standard `<author>` elements should always be present alongside Byline data for backward compatibility.
 
 The Byline spec explicitly states: "Always include standard elements for maximum compatibility. Byline is additive."
+
+### Adoption gate definition
+
+The spec currently has 4 GitHub stars, 3 commits, zero implementations, and zero feed reader support (as of March 2026). Phase 1 is a low-cost, low-risk bet that's worth making regardless of adoption trajectory. Phases 2-4 require new editorial data and UI work with diminishing returns if the spec stalls.
+
+**Go/no-go criteria for Phases 2-4:**
+- **Go signal (any one):** At least one feed reader ships Byline namespace support; the spec reaches v0.5.0+; a second CMS or plugin implements Phase 1-level support.
+- **No-go signal:** Spec repo inactive for 12+ months with no adoption. In this case, Phase 1 output remains harmless (additive namespace elements ignored by non-supporting readers) and requires no maintenance.
+
+Re-evaluate at each phase boundary rather than committing to the full 4-phase plan upfront.

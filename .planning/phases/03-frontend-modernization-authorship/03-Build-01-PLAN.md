@@ -12,6 +12,10 @@ files_modified:
   - "src/components/AuthorsSelect.tsx"
   - "tests/js/**/*.test.*"
   - "docs/audit/roadmap-global.md"
+files_deleted:
+  - ".babelrc.js"
+  - ".config/webpack.config.js"
+  - ".config/webpack.config.prod.js"
 autonomous: true
 user_setup: []
 must_haves:
@@ -37,6 +41,11 @@ Migrate the frontend toolchain baseline to Node 20 + @wordpress/scripts and esta
     - Replace custom webpack helper scripts with @wordpress/scripts entry points.
     - Update Node engine baseline to 20.
     - Keep lint scripts functional.
+    - **Destructive changes:** Delete legacy build config files that are replaced by @wordpress/scripts defaults:
+      - `.babelrc.js` (Babel config — replaced by @wordpress/scripts built-in Babel preset)
+      - `.config/webpack.config.js` (dev webpack config — replaced by @wordpress/scripts or custom `webpack.config.js` at root)
+      - `.config/webpack.config.prod.js` (prod webpack config — replaced by @wordpress/scripts `build` command)
+      - The `.config/` directory itself if empty after removal.
   </action>
   <verify>`npm run lint:js` and `npm run build` pass with the new toolchain.</verify>
   <done>Toolchain migration baseline is implemented.</done>

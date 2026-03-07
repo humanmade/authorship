@@ -238,17 +238,19 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 15 | CPT capability test depth | `map_meta_cap` edge cases |
 | 16 | Cache invalidation tests | Object cache interactions |
 | 17 | Hook/filter contract tests | `authorship_default_author`, etc. |
+| 18 | `post_author` field synchronization | Sync `post_author` with first attributed author on `set_authors()` to close theme/SEO/caching compatibility gap. See `.planning/known-gaps.md` §`post_author` field divergence. |
+| 19 | Schema.org / JSON-LD author markup in HTML | Structured author data in page output for SEO. Competitors (PPA Pro, Molongui) already provide this. Independent of feed/Byline work. |
 
 ### P3 — Product features (future, no phase assigned)
 
 | # | Item | Notes |
 |---|------|-------|
-| 18 | Classic editor support | README marks incomplete |
-| 19 | Atom feed support | README marks incomplete |
-| 20 | `init_taxonomy` "Mine" count performance | `get_term_by` on every `init`; cache or lazy-load |
-| 21 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
-| 22 | Site builder implementation guidance | README aspirational item |
-| 23 | REST API embedding depth tests | Embedded author data structure |
+| 20 | Classic editor support | README marks incomplete |
+| 21 | Atom feed support | README marks incomplete |
+| 22 | `init_taxonomy` "Mine" count performance | `get_term_by` on every `init`; cache or lazy-load |
+| 23 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
+| 24 | Site builder implementation guidance | README aspirational item |
+| 25 | REST API embedding depth tests | Embedded author data structure |
 
 ---
 

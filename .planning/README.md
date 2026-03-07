@@ -4,7 +4,8 @@ Technical documentation for the Authorship fork. These documents cover the upstr
 
 ## Architecture and internals
 
-- **[Architecture Reference](architecture.md)** — Source-verified walkthrough of the data model, query rewriting, capability mapping, guest author mechanics, REST API, and file structure. Based on direct code audit of the `develop` branch (v0.2.17).
+- **[Architecture Reference](architecture.md)** — Source-verified walkthrough of the data model, query rewriting, capability mapping, guest author mechanics, REST API, and file structure. Based on direct code audit of the `develop` branch (v0.2.17). Includes a fork divergence section documenting changes since the baseline audit.
+- **[Architecture Diagram](authorship-architecture.mermaid)** — Mermaid graph of the plugin's data flow, subsystem relationships, and WordPress core table interactions. Maintained with fork progress annotations.
 
 ## Competitive landscape
 
