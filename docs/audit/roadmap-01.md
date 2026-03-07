@@ -5,6 +5,7 @@
 - `01-01` exists as the initial planning stub at `.planning/phases/01-audit-roadmap-authorship/01-01-PLAN.md`.
 - `01-02` now has a repo-grounded audit deliverable in `docs/audit/HM_WPCS_audit.md`.
 - `01-Build-01` through `01-Build-04` have been executed on the fork integration branch (`codex/restack-audit-queue`).
+- `02-Build-01` and `02-Build-02` are executed in the fork integration branch with deterministic CLI migration pause coverage.
 - Focused upstream PR for Build-04 is open: `https://github.com/humanmade/authorship/pull/161`.
 
 ## What Phase 01 established
@@ -18,6 +19,10 @@
 - `01-Build-03`: completed
 - `01-Build-04`: completed
 
+## Phase 02 Build queue status
+- `02-Build-01`: completed
+- `02-Build-02`: completed
+
 ## Next step
-- Start Phase 02 fork-first delivery plan: `.planning/phases/02-fork-first-delivery-authorship/02-01-PLAN.md`.
-- Execute `02-Build-01` to expand deterministic PHPUnit coverage for CLI migration pacing controls.
+- Define and execute `02-Build-03` scope for the next fork-first delivery increment.
+- Triage and resolve baseline multisite failure `Authorship\Tests\TestMultisite::testSuperAdminWithNoRoleOnSite` so full `composer test` can return to green.
