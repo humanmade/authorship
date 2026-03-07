@@ -41,6 +41,13 @@ To start the file watcher which will watch for changes and automatically build t
 
 ## Running the Tests
 
+### PHP standards environment
+
+- Standards tooling is maintained to run on both PHP `7.4` and modern PHP (`8.4+`), matching the CI standards matrix.
+- `composer test:phpcs` suppresses runtime deprecation notices from third-party sniffs on modern PHP so standards checks stay runnable.
+- `composer test:phpstan` runs with an explicit memory limit (`1G`) for consistent local and CI execution.
+- Existing PHPStan technical debt is tracked in `phpstan-baseline.neon`. Do not add new baseline entries for newly introduced issues.
+
 To run the whole test suite which includes unit tests and linting:
 
 	composer test
