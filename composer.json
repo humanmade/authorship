@@ -65,6 +65,11 @@
       "wp db reset --yes --path=tests/wordpress #",
       "export WP_MULTISITE=0 && phpunit --verbose --colors=always --exclude-group=ms-required",
       "export WP_MULTISITE=1 && phpunit --verbose --colors=always --exclude-group=ms-excluded"
+    ],
+    "test:coverage": [
+      "wp db reset --yes --path=tests/wordpress #",
+      "export WP_MULTISITE=0 && phpdbg -qrr vendor/bin/phpunit --colors=always --exclude-group=ms-required --coverage-clover=tests/cache/coverage/clover.xml",
+      "php tests/phpunit/includes/check-coverage-threshold.php tests/cache/coverage/clover.xml 60"
     ]
   }
 }

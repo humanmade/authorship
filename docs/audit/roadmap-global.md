@@ -37,38 +37,40 @@ At this stage, the work is focused on making the plugin safer to operate and eas
   - `1d02511` `Execute 01-Build-04 performance hardening and stabilize tests`
 
 ### Phase 02: Fork-first delivery stabilization (active)
-- Executed `02-Build-01` through `02-Build-08` on `codex/restack-audit-queue`.
+- Executed `02-Build-01` through `02-Build-09` on `codex/restack-audit-queue`.
 - Main theme: deterministic and test-covered CLI migration behavior.
 - Highlights:
   - pause filter/clamping coverage
   - pause-resolution hook contract and multi-batch behavior
   - multisite stabilization for migration tests
   - post-type input normalization, validation, and `post-type=any` compatibility
+  - baseline statement-coverage gate via `composer test:coverage` (`64.03%` vs `60%` threshold)
 - Recent commits:
   - `eededb0` `Build-06: harden wp-authors post-type input handling`
   - `2a9d813` `Build-07: validate migration post types against registered types`
   - `bdbc20d` `Build-08: preserve wp-authors post-type any compatibility`
+  - `Build-09` coverage-gate adoption commit on `codex/restack-audit-queue`
 
 ## Current status snapshot
 - Branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#160` current branch integration PR
   - `#161` focused Build-04 PR
-- Quality state: local `composer test`, `composer test:phpstan`, and `composer test:phpcs` are green in current branch context.
+- Quality state: local `composer test`, `composer test:phpstan`, `composer test:phpcs`, and `composer test:coverage` are green in current branch context.
 - Known process constraint: `wordpress-plugin-engineer` gate command names (`test:integration`, `analyse:*`, `lint`) are not defined in this repo; local equivalent gates are used.
 
 ## Backlog (human-readable)
 
 ### Ready now (next execution item)
-1. `02-Build-09` Coverage baseline and gate (queued, not started)
-   - Add a dedicated coverage command (`test:coverage`)
-   - Enable a coverage driver in local test runtime
-   - Produce a baseline report and set an initial enforceable threshold
+1. `02-Build-10` CI parity for coverage gate (queued, not started)
+   - Run `composer test:coverage` in CI with reliable environment setup
+   - Align local and CI coverage command behavior
+   - Document threshold-ratcheting policy for incremental tightening
 
-### Next after Build-09 (recommended)
-1. CI parity follow-through for coverage reporting
-   - Ensure coverage command can run in CI environment, not only local
-   - Keep threshold realistic and ratchet upward only with passing builds
+### Next after Build-10 (recommended)
+1. Coverage threshold ratcheting
+   - Raise baseline only when the branch is consistently green in CI
+   - Track changes as explicit planned increments
 2. Migration reliability deepening
    - Add additional edge-case tests for long-running migration scenarios and mixed post-type inputs
 3. Documentation consolidation
@@ -80,6 +82,6 @@ At this stage, the work is focused on making the plugin safer to operate and eas
 3. Broader implementation guidance for site builders
 
 ## What happens next
-Immediate next step is to execute `02-Build-09` and make coverage measurable and enforceable.
+Immediate next step is to execute `02-Build-10` and make the new coverage gate run consistently in CI.
 
 After that, continue iterative fork-first hardening with small, test-first increments and periodic roadmap refreshes in this file.

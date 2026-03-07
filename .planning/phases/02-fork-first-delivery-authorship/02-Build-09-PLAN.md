@@ -7,6 +7,8 @@ depends_on: ["02-Build-08"]
 files_modified:
   - "composer.json"
   - "phpunit.xml.dist"
+  - "tests/phpunit/includes/check-coverage-threshold.php"
+  - "CONTRIBUTING.md"
   - ".planning/phases/02-fork-first-delivery-authorship/02-01-PLAN.md"
   - "docs/audit/roadmap-01.md"
 autonomous: true
@@ -27,13 +29,15 @@ Add deterministic test coverage tooling and a baseline coverage gate for fork-fi
 </objective>
 
 <status>
-Queued on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
+Executed on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
 
-Planned scope:
-- Enable a coverage driver in the local test environment (pcov or xdebug-backed).
-- Add `composer test:coverage` and generate a baseline report for tracked source paths.
-- Define and document an initial minimum threshold that can be raised incrementally.
+Delivered:
+- Added `composer test:coverage` using `phpdbg` as the coverage driver.
+- Added a deterministic statement-coverage threshold gate via `tests/phpunit/includes/check-coverage-threshold.php`.
+- Expanded coverage scope to include `plugin.php` plus `inc/` via `phpunit.xml.dist`.
+- Documented the new coverage workflow in `CONTRIBUTING.md`.
 
-Execution state:
-- Not started.
+Verification:
+- `composer test:coverage` passes with statement coverage `64.03%` (`566/884`) against a `60.00%` threshold.
+- `composer test` passes (`157 tests, 391 assertions`).
 </status>

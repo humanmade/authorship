@@ -7,7 +7,7 @@ See also: [Global Roadmap](/Users/danknauss/Documents/GitHub/authorship/docs/aud
 - `01-01` exists as the initial planning stub at `.planning/phases/01-audit-roadmap-authorship/01-01-PLAN.md`.
 - `01-02` now has a repo-grounded audit deliverable in `docs/audit/HM_WPCS_audit.md`.
 - `01-Build-01` through `01-Build-04` have been executed on the fork integration branch (`codex/restack-audit-queue`).
-- `02-Build-01` through `02-Build-08` are executed in the fork integration branch with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, and registration-aware post-type input hardening that preserves `post-type=any` compatibility.
+- `02-Build-01` through `02-Build-09` are executed in the fork integration branch with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, registration-aware post-type input hardening, and a new baseline coverage gate (`composer test:coverage`).
 - Focused upstream PR for Build-04 is open: `https://github.com/humanmade/authorship/pull/161`.
 
 ## What Phase 01 established
@@ -30,7 +30,8 @@ See also: [Global Roadmap](/Users/danknauss/Documents/GitHub/authorship/docs/aud
 - `02-Build-06`: completed
 - `02-Build-07`: completed
 - `02-Build-08`: completed
-- `02-Build-09`: queued (coverage tooling and baseline gate), not started
+- `02-Build-09`: completed
+- `02-Build-10`: queued (CI parity for coverage gate), not started
 
 ## Next step
-- Execute `02-Build-09` to add coverage tooling (`test:coverage`), baseline reporting, and an initial threshold gate.
+- Execute `02-Build-10` to add CI parity for coverage-gate execution and threshold-ratcheting policy.

@@ -56,6 +56,10 @@ To run just the PHPUnit tests:
 
 	composer test:ut
 
+To run PHPUnit with coverage and enforce the baseline threshold:
+
+	composer test:coverage
+
 To run just the code sniffer:
 
 	composer test:phpcs
@@ -67,6 +71,11 @@ To run just the PHP Static Analysis tool:
 To lint the JS and CSS:
 
 	npm run lint
+
+### Coverage notes
+
+- `composer test:coverage` uses `phpdbg` as the coverage driver, so no Xdebug/PCOV extension is required.
+- The current gate enforces statement coverage from `tests/cache/coverage/clover.xml` against the baseline threshold defined in `composer.json`.
 
 ## Releasing a New Version
 
