@@ -21,3 +21,13 @@ must_haves:
 <objective>
 Harden post insert author-assignment flow by surfacing failures through a controlled, testable path.
 </objective>
+
+<status>
+Executed on 2026-03-06 in local fork context (`dknauss/authorship`).
+
+Verification:
+- `composer test:phpcs` passes after observability changes.
+- `composer test:phpstan` passes after observability changes.
+- `vendor/bin/phpunit --filter TestPostSaving` passes, including new failure-signaling coverage.
+- Full `composer test` still reports legacy WordPress/PHPUnit deprecation-output failures on PHP 8.5 in unrelated REST property tests.
+</status>

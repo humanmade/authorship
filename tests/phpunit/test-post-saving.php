@@ -153,4 +153,40 @@ class TestPostSaving extends TestCase {
 
 		$this->assertSame( $before, $after );
 	}
+
+	public function testAuthorAssignmentFailureIsSignaledOnInsert() : void {
+		$failures = [];
+
+		$callback = function( int $post_id, \WP_Post $post, bool $update, array $author_ids, \Exception $exception ) use ( &$failures ) : void {
+			$failures[] = [
+				'post_id'    => $post_id,
+				'post'       => $post,
+				'update'     => $update,
+				'author_ids' => $author_ids,
+				'exception'  => $exception,
+			];
+		};
+
+		add_action( 'authorship_author_assignment_failure', $callback, 10, 5 );
+
+		$post_id = wp_insert_post(
+			[
+				'post_title'  => 'Observable assignment failure',
+				'post_author' => self::$users['author']->ID,
+				POSTS_PARAM   => [ 999999 ],
+			],
+			true
+		);
+
+		remove_action( 'authorship_author_assignment_failure', $callback, 10 );
+
+		$this->assertIsInt( $post_id );
+		$this->assertGreaterThan( 0, $post_id );
+		$this->assertCount( 1, $failures );
+		$this->assertSame( $post_id, $failures[0]['post_id'] );
+		$this->assertFalse( $failures[0]['update'] );
+		$this->assertSame( [ 999999 ], $failures[0]['author_ids'] );
+		$this->assertInstanceOf( \Exception::class, $failures[0]['exception'] );
+		$this->assertSame( 'One or more user IDs are not valid for this site.', $failures[0]['exception']->getMessage() );
+	}
 }

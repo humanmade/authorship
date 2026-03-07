@@ -82,10 +82,21 @@ class InsertPostHandler {
 			return;
 		}
 
+		$author_ids = wp_parse_id_list( $authors );
+
 		try {
-			set_authors( $post, wp_parse_id_list( $authors ) );
+			set_authors( $post, $author_ids );
 		} catch ( Exception $e ) {
-			// Nothing at the moment.
+			/**
+			 * Fires when assigning authors to a post fails during insert/update.
+			 *
+			 * @param int       $post_ID    Post ID.
+			 * @param WP_Post   $post       Post object.
+			 * @param bool      $update     Whether this is an existing post being updated.
+			 * @param int[]     $author_ids Parsed list of requested author IDs.
+			 * @param Exception $e          Exception thrown while assigning authors.
+			 */
+			do_action( 'authorship_author_assignment_failure', $post_ID, $post, $update, $author_ids, $e );
 		}
 	}
 }
