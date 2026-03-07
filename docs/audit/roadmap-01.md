@@ -26,6 +26,7 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - `03-Build-09` executed on `codex/phase-03-build-09-runtime-a11y-validation` (runtime validation + `onDragOver` regression fix + README accessibility statement alignment)
   - `03-Build-10` executed on `codex/phase-03-build-10-at-matrix-hardening` (non-admin edit-context request-path hardening + regression test coverage + NVDA/VoiceOver matrix protocol checklist)
   - `03-Build-11` executed on `codex/phase-03-build-11-coverage-psalm-advisory` (admin PHPUnit coverage expansion + JS coverage threshold gate + Psalm advisory tooling)
+  - `03-Build-12` in progress on `codex/phase-03-build-12-at-matrix-evidence` (automation evidence captured; manual NVDA/VoiceOver transcript rows and keyboard-reorder residual-risk disposition pending)
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -70,4 +71,4 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Execute `03-Build-12` to run host-native NVDA/VoiceOver matrix sessions, capture transcripted outcomes, and close remaining accessibility residual risk.
+- Complete `03-Build-12` by running host-native NVDA/VoiceOver sessions, filling transcript rows in `docs/manual-testing-checklist.md`, and resolving/dispositioning the keyboard-reorder residual risk captured in the accessibility audit.

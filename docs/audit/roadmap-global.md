@@ -212,6 +212,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - added `npm run test:js:coverage` with explicit global threshold enforcement
   - added fork-local Psalm advisory tooling (`composer analyse:psalm`) with config/baseline and runtime wrapper safeguards
   - verified with `composer test:integration`, `WP_MULTISITE=1 composer test:integration`, `composer analyse:phpstan`, `composer analyse:psalm`, `composer lint`, `composer test:coverage`, and `npm run test:js:coverage`
+- `03-Build-12` in progress on `codex/phase-03-build-12-at-matrix-evidence`:
+  - captured automation evidence for selector label/instructions/live-region behavior in local editor
+  - added Build-12 AT transcript ledger in `docs/manual-testing-checklist.md` for NVDA + VoiceOver final runs
+  - documented host automation blockers for spoken-output capture (VoiceOver keystroke automation permission boundary)
+  - identified residual risk requiring manual closeout: spoken transcript rows are still pending, and scripted keyboard reorder attempts emitted announcements without DOM order change
 
 ### Scope
 
@@ -307,7 +312,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-11-coverage-psalm-advisory`
+- Active execution branch: `codex/phase-03-build-12-at-matrix-evidence`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -323,9 +328,10 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - JS coverage state (`npm run test:js:coverage`): statements `82.06%`, branches `59.37%`, functions `74.35%`, lines `81.95%` against enforced thresholds (80/55/70/80).
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-11 executed.
+- Phase 03 status: active; Build-01 through Build-11 executed, Build-12 in progress (manual transcript gate open).
 
 ## What happens next
 
-1. Execute `03-Build-12` to run host-native NVDA/VoiceOver matrix sessions and attach transcripted outcomes to the accessibility audit.
-2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.
+1. Complete `03-Build-12` by running host-native NVDA/VoiceOver sessions and filling transcript rows in `docs/manual-testing-checklist.md`.
+2. Resolve or explicitly disposition the Build-12 keyboard-reorder residual risk before Phase 03 close.
+3. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

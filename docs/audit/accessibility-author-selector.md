@@ -130,12 +130,28 @@ Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post.p
 | Editor no longer triggers `wp/v2/users/<id>?context=edit` noise path | Pass | Playwright network capture for non-admin edit session contains no `wp/v2/users/*?context=edit` request. |
 | NVDA/VoiceOver matrix outcome capture | Pending manual execution | Checklist now includes explicit NVDA and VoiceOver run steps and result fields; host-native SR session still required. |
 
+## Build-12 execution update (automation evidence + host-native blocker capture)
+
+Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post-new.php` with browser automation and local operator feasibility checks.
+
+| Check | Result | Runtime evidence |
+|---|---|---|
+| Selector label + DnD keyboard instructions exposed | Pass | `input[aria-label="Authors"]` present; `#DndDescribedBy-0` text confirms `Space`/arrow/`Space` interaction model. |
+| Live-region create/clear announcements emitted | Pass | Observed polite-region strings: `Added author admin.` and `Author selection cleared.` |
+| Reorder announcement channel emits status text | Pass (announcement channel), behavior verification still required | `#DndLiveRegion-0` emitted reorder-oriented strings (`Moving to position ...` / `Moved ...`). |
+| Keyboard reorder deterministically changes visual token order | Inconclusive in automation run | Attempted `Space` + arrow + `Space`; announcement text updated but token order remained unchanged in captured DOM sequence. |
+| VoiceOver scripted transcript capture via AppleScript | Blocked | `System Events` keystroke automation is denied (`osascript is not allowed to send keystrokes`); no deterministic API found to extract spoken-output transcript text. |
+
+Build-12 artifact evidence:
+- Screenshot: `output/playwright/build12-authors-field.png`
+- Manual transcript ledger updated: `docs/manual-testing-checklist.md` (`UI-06`)
+
 Post-validation remediation status:
 
 | Remediation item | Status | Evidence |
 |---|---|---|
-| R1 keyboard-operable reorder path | Implemented and runtime-validated | Runtime reorder result + `src/components/SortableSelectContainer.tsx:58-84` |
-| R2 screen reader status announcements | Implemented and runtime-validated at DOM/status level; NVDA/VoiceOver execution protocol documented and awaiting manual host run | Runtime status strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150`, `docs/manual-testing-checklist.md` |
+| R1 keyboard-operable reorder path | Implemented, but final behavioral confirmation pending manual SR matrix | Keyboard interaction instructions and announcer strings verified; manual transcript run still required to confirm stable reorder behavior in host AT sessions. |
+| R2 screen reader status announcements | Implemented and runtime-validated at DOM/status level; NVDA/VoiceOver transcript capture pending | Runtime polite-region strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150`, `docs/manual-testing-checklist.md` |
 | R3 explicit labeling/instructions | Implemented and runtime-validated | Runtime `combobox "Authors"` + instruction text + `src/components/SortableSelectContainer.tsx:19-23,141-143` |
 | R4 component replacement decision | Pending | Route to Build-11+ design decision |
 
@@ -150,5 +166,7 @@ When implementation starts, verify with:
 ## Residual risk
 
 - Full assistive-tech matrix is still pending: NVDA/VoiceOver manual verification and transcripted results are not yet captured.
+- Keyboard reorder behavior is not yet conclusively demonstrated in the Build-12 automation run: announcer text updates were observed, but DOM order did not change during scripted key sequence attempts.
+- Runtime token remove control currently exposes `aria-label=\"Remove [object Object]\"` in captured DOM, which needs follow-up accessibility review/fix before claiming full control-label quality.
 - Non-admin request-path hardening is implemented, but should be watched for regressions if core editor embed behavior changes.
 - Upstream adoption risk: if upstream PR cadence is slow, fork should treat accessibility remediation as fork-local delivery scope and proceed.

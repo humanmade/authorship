@@ -116,6 +116,21 @@ Expected:
 - Add/remove/reorder actions are announced with clear status messages.
 - No dead-end keyboard traps occur during token reorder flow.
 
+Build-12 preflight notes (2026-03-07, macOS 26.3.1):
+- Browser automation confirms the `Authors` combobox and DnD keyboard instructions are exposed:
+  - `DndDescribedBy-0`: `To pick up a draggable item, press the space bar...`
+- Live-region updates were observed for create/clear events:
+  - `Added author admin.`
+  - `Author selection cleared.`
+- Screenshot artifact: `output/playwright/build12-authors-field.png`.
+
+AT transcript ledger (complete this to close Build-12):
+
+| SR | OS | Browser | Version(s) | Field label announced | Instructions announced | Create announced | Remove announced | Reorder announced | Reorder changed order | Result | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| NVDA | Windows |  |  |  |  |  |  |  |  | Pending | Manual host run required |
+| VoiceOver | macOS | Safari or Chrome |  |  |  |  |  |  |  | Pending | Manual host run required |
+
 ## REST API tests
 
 Use Basic auth with Application Password credentials.
