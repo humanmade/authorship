@@ -120,6 +120,8 @@ class Migrate_Command extends WP_CLI_Command {
 				break;
 			}
 
+			$processed_in_batch = 0;
+
 			foreach ( $posts as $post ) {
 				$authorship_authors = \Authorship\get_authors( $post );
 
@@ -135,12 +137,13 @@ class Migrate_Command extends WP_CLI_Command {
 				}
 
 				$count++;
+				$processed_in_batch++;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
 
-			$this->pause_between_batches( $assoc_args, 'wp-authors', $count );
+			$this->pause_between_batches( $assoc_args, 'wp-authors', $count, $processed_in_batch );
 
 			$paged++;
 		} while ( count( $posts ) );
@@ -254,6 +257,8 @@ class Migrate_Command extends WP_CLI_Command {
 				break;
 			}
 
+			$processed_in_batch = 0;
+
 			foreach ( $posts as $post ) {
 				$authorship_authors = \Authorship\get_authors( $post );
 
@@ -307,12 +312,13 @@ class Migrate_Command extends WP_CLI_Command {
 				}
 
 				$count++;
+				$processed_in_batch++;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
 
-			$this->pause_between_batches( $assoc_args, 'ppa', $count );
+			$this->pause_between_batches( $assoc_args, 'ppa', $count, $processed_in_batch );
 
 			$paged++;
 		} while ( count( $posts ) );
@@ -391,8 +397,13 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string,mixed> $assoc_args CLI assoc args.
 	 * @param string              $migration Migration subcommand identifier.
 	 * @param int                 $count Number of processed posts so far.
+	 * @param int                 $processed_in_batch Number of posts processed in current batch.
 	 */
-	private function pause_between_batches( array $assoc_args, string $migration, int $count ) : void {
+	private function pause_between_batches( array $assoc_args, string $migration, int $count, int $processed_in_batch ) : void {
+		if ( $processed_in_batch <= 0 ) {
+			return;
+		}
+
 		$pause_seconds = $this->get_batch_pause_seconds( $assoc_args, $migration );
 		/**
 		 * Fires when migration batch pause duration is resolved.

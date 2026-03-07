@@ -198,6 +198,7 @@ Authorship also provides hook extension points for migration pacing:
 * `authorship_migrate_batch_pause_resolved` action
   * Parameters: `(float $pause_seconds, string $migration, array $assoc_args, int $count)`
   * Fires after pause resolution and before optional sleeping for each processed batch.
+  * Does not fire for batches that process zero posts.
 
 ## Email Notifications
 

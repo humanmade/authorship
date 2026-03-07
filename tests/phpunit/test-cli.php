@@ -343,6 +343,68 @@ class TestCLI extends TestCase {
 		}
 	}
 
+	public function testMigratePauseResolutionActionSkipsEmptyPpaBatches() : void {
+		$factory = self::factory()->post;
+		$author_taxonomy_preexisting = taxonomy_exists( 'author' );
+		$term_id = 0;
+
+		if ( ! $author_taxonomy_preexisting ) {
+			register_taxonomy(
+				'author',
+				'post',
+				[
+					'public'    => false,
+					'query_var' => false,
+					'rewrite'   => false,
+				]
+			);
+		}
+
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		$term = wp_insert_term( 'PPA Skip Author', 'author', [
+			'slug' => 'ppa-skip-author',
+		] );
+		$this->assertIsArray( $term );
+		$this->assertArrayHasKey( 'term_id', $term );
+
+		$term_id = (int) $term['term_id'];
+		wp_set_object_terms( $post->ID, [ $term_id ], 'author' );
+		\Authorship\set_authors( $post, [ self::$users['editor']->ID ] );
+
+		$command = new CLI\Migrate_Command();
+
+		add_action( 'authorship_migrate_batch_pause_resolved', [ $this, 'capturePauseResolution' ], 10, 4 );
+
+		try {
+			$command->ppa( [], [
+				'dry-run' => true,
+				'batch-pause' => '0',
+			] );
+		} finally {
+			remove_action( 'authorship_migrate_batch_pause_resolved', [ $this, 'capturePauseResolution' ], 10 );
+
+			if ( $term_id > 0 && taxonomy_exists( 'author' ) ) {
+				wp_delete_term( $term_id, 'author' );
+			}
+
+			if ( ! $author_taxonomy_preexisting && taxonomy_exists( 'author' ) ) {
+				unregister_taxonomy( 'author' );
+			}
+		}
+
+		$ppa_events = array_filter(
+			$this->pause_events,
+			function ( array $event ) : bool {
+				return $event['migration'] === 'ppa';
+			}
+		);
+
+		$this->assertEmpty( $ppa_events );
+	}
+
 	/**
 	 * Capture pause-resolution action payloads.
 	 *
