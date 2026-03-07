@@ -1,135 +1,146 @@
 # HM vs WPCS Audit - Authorship plugin
 
-This document replaces the earlier placeholder audit with repo-grounded notes taken from the current `develop` checkout.
+Repo-grounded audit with command evidence, rule references, and queued follow-up work.
 
 ## Scope
-- PHP plugin bootstrap and runtime files under `plugin.php` and `inc/`
-- Editor UI code under `src/`
-- Repository standards and CI configuration
-- Existing PHPUnit coverage and standards tooling
+- PHP plugin bootstrap and runtime files under `plugin.php` and `inc/`.
+- Editor UI code under `src/` where behavior affects author assignment.
+- Standards configuration and CI/runtime assumptions.
+- Existing PHPUnit coverage breadth relevant to authoring and attribution flows.
 
-## Verification performed
-- Confirmed that a root PHPCS ruleset exists at `phpcs.xml.dist`.
-- Ran `composer test:phpcs` on local PHP 8.5.1; the legacy PHPCS stack produced internal errors before a standards result.
-- Ran `php -d error_reporting='E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED' vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary plugin.php inc tests/phpunit`.
-- Attempted `composer test:phpstan` on local PHP 8.5.1. The toolchain failed with PHPStan/parser internal errors before reporting code issues.
+## Verification context
+- Audit date: 2026-03-06.
+- Local runtime observed during audit: PHP 8.5.1.
+- Standards profile source: `phpcs.xml.dist`.
 
-## Baseline findings
+## Command evidence log
+| Command | Intent | Result | Evidence summary |
+| --- | --- | --- | --- |
+| `composer test:phpcs` | Run default PHPCS gate used by contributors/CI scripts. | Failed (exit 1). | Internal exceptions from legacy PHPCS stack, including `Generic.WhiteSpace.ScopeIndentSniff` runtime errors before meaningful standards output. |
+| `php -d error_reporting='E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED' vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary plugin.php inc tests/phpunit` | Run targeted PHPCS verification against repo ruleset. | Passed (exit 0). | No standards violations reported for the selected surfaces; command required deprecation suppression for legacy tooling compatibility. |
+| `composer test:phpstan` | Run default static-analysis gate. | Failed (exit 1). | Internal parser/runtime errors (for example `PhpParser\\Lexer::getNextToken()`), plus ignored-error mismatch due tool/runtime incompatibility. |
 
-### Standards configuration is already present
-- The repository already defines a root PHPCS ruleset in `phpcs.xml.dist`.
-- That ruleset uses the HM standard, configures the `authorship` text domain, and sets a WordPress deprecated-function floor of 5.4.
-- The prior claim that the repo had no local PHPCS config was incorrect.
+## Standards profile and rule references
+| Type | Rule or property | Source | Audit implication |
+| --- | --- | --- | --- |
+| Standards baseline | `HM` | `phpcs.xml.dist:15` | HM coding standard is the primary PHPCS profile for the repo. |
+| PHP compatibility target | `testVersion=7.2-` | `phpcs.xml.dist:3` | PHPCS compatibility checks are aligned to plugin floor and newer versions. |
+| I18n constraint | `WordPress.WP.I18n` with `text_domain=authorship` | `phpcs.xml.dist:35-38` | Strings should be constrained to the plugin text domain. |
+| Deprecated API floor | `WordPress.WP.DeprecatedFunctions` with `minimum_supported_version=5.4` | `phpcs.xml.dist:41-44` | Deprecated-function checks are tied to WP 5.4 support floor. |
+| Intentional exclusions | `HM.Files`, `WordPress.Files`, `Generic.Commenting.DocComment.MissingShort`, `PSR2R.Namespaces.*` exclusions | `phpcs.xml.dist:17-27` | Some filename/docblock/namespace ordering checks are intentionally non-goals for this repo profile. |
+| Test commenting scope | `Squiz.Commenting` with tests excluded | `phpcs.xml.dist:30-33` | Commenting sniffs are intentionally not enforced for test files. |
 
+## Baseline findings with detailed evidence
+
+### A. Standards configuration exists and is explicit
 Evidence:
-- `phpcs.xml.dist`
-- `composer.json`
-- `.github/workflows/php-standards.yml`
+- Ruleset exists and is root-scoped: `phpcs.xml.dist:2-45`.
+- Composer scripts expose standards commands: `composer.json:48-63`.
+- Standards workflow executes both PHPCS and PHPStan on CI runtime pin: `.github/workflows/php-standards.yml:22,53-56`.
 
-### Current HM/WPCS baseline is strong
-- Runtime PHP files consistently use namespaces and `declare( strict_types=1 )`.
-- Output escaping is present in the admin column renderer.
-- REST permission checks are present on the custom users controller and post attribution field.
-- PHPUnit coverage exists for archives, capabilities, CLI, feeds, REST API, multisite, post saving, and template helpers.
-- PHPCS completed cleanly under the current repo ruleset when run via the targeted command with legacy-tooling deprecations suppressed.
+Assessment:
+- Prior "missing root PHPCS config" assumptions are not supported.
+- The repo has a clear standards profile; the current gap is runtime compatibility, not absence of configuration.
 
+### B. Codebase shows strong HM/WPCS-aligned patterns in reviewed paths
 Evidence:
-- `plugin.php`
-- `inc/admin.php`
-- `inc/class-users-controller.php`
-- `inc/namespace.php`
-- `tests/phpunit/`
+- Strict typing declarations across runtime entry points: `plugin.php:30`, `inc/namespace.php:8`, `inc/class-users-controller.php:8`, `inc/class-insert-post-handler.php:8`, `inc/admin.php:8`.
+- Output escaping in admin/template rendering: `inc/admin.php:94-96`, `inc/template.php:130`.
+- REST permission callbacks and capability checks: `inc/class-users-controller.php:56-63,77,151,161`.
+- REST update callback converts assignment exceptions into `WP_Error`: `inc/namespace.php:422-429`.
+- PHPUnit suite breadth includes archive/capabilities/CLI/feeds/multisite/post saving/REST: `tests/phpunit/test-*.php`.
 
-## Concrete follow-up items
+Assessment:
+- Reviewed runtime surfaces show deliberate permission and escaping controls.
+- Error surfacing is inconsistent between REST update path (`inc/namespace.php`) and insert hook path (`inc/class-insert-post-handler.php`).
 
-### 1. Tooling compatibility is lagging current PHP releases
-This repo pins older standards and analysis tooling:
-- `php_codesniffer` `3.5.8`
-- `phpstan/phpstan` `0.12.57`
-- `humanmade/coding-standards` `1.1.1`
+## Detailed follow-up items (evidence + rule/context references)
 
-Those versions are old enough that local runs on PHP 8.5 generate deprecation noise and, for PHPStan, hard failures before code analysis completes. CI avoids this today by running the standards job on PHP 7.4.
+### 1. Tooling compatibility lags modern PHP runtimes
+Evidence:
+- Dev tool versions are old and pinned: `composer.json:14,17,20`.
+- Composer platform pin is `7.4`: `composer.json:34-36`.
+- CI standards workflow runs PHP `7.4`: `.github/workflows/php-standards.yml:22`.
+- Local command outcomes show default gates failing on PHP 8.5.1 (see command log).
+
+Rule/context references:
+- PHPCS profile is valid (`HM` plus WordPress sniffs), but execution reliability is runtime-constrained.
 
 Impact:
-- Standards checks are not reliably runnable on a modern local PHP installation.
-- The repo currently depends on CI/runtime pinning rather than tool compatibility.
-
-Evidence:
-- `composer.json`
-- `.github/workflows/php-standards.yml`
+- Default quality gates are not reproducible on modern local runtimes.
 
 Recommendation:
-- Treat standards-tooling refresh as Build-mode work.
-- If a full dependency refresh is too disruptive, explicitly document that standards jobs must run on the supported PHP version from CI.
+- Execute Build `01-Build-01` first to restore reproducibility and documentation parity.
 
-### 2. Guest author username generation should be hardened
-Guest author creation currently derives `username` from `name`, then strips everything except lowercase ASCII letters and digits.
+### 2. Guest-author username normalization is brittle for edge-case names
+Evidence:
+- Username derives from name and strips to lowercase ASCII alphanumerics: `inc/class-users-controller.php:194-197`.
+- Existing tests cover simple creation and permissions but not non-ASCII/collision behavior: `tests/phpunit/test-rest-api-user-endpoint.php:30-265`.
+
+Rule/context references:
+- No direct HM/WPCS violation implied; this is correctness and data-integrity hardening.
 
 Impact:
-- Non-Latin or punctuation-heavy names can collapse to an empty or low-information username.
-- Distinct display names can normalize to the same login base.
-- The behavior is workable for simple English names but brittle for arbitrary guest-author data.
-
-Evidence:
-- `inc/class-users-controller.php`
+- Empty/low-information usernames and collisions are possible for real-world names.
 
 Recommendation:
-- Add explicit handling for empty normalized usernames.
-- Guarantee uniqueness with a deterministic fallback rather than relying on the current bare normalization path.
-- Add tests for duplicate names and non-ASCII names.
+- Add deterministic fallback + uniqueness strategy, and add explicit non-ASCII/collision test cases.
 
-### 3. Temporary signup validation filter is added but never removed
-`Users_Controller::create_item()` adds an anonymous `wpmu_validate_user_signup` filter and leaves it in place for the rest of the request.
+### 3. Signup-validation filter scope is broader than needed
+Evidence:
+- Anonymous `wpmu_validate_user_signup` filter added in `create_item()` and not removed: `inc/class-users-controller.php:211-219`.
+- Contrast: request-scoped query filter in `get_items()` is explicitly removed: `inc/class-users-controller.php:122-127`.
+
+Rule/context references:
+- This is lifecycle/scoping hygiene, not a standards-sniff failure.
 
 Impact:
-- The effect is request-scoped, not persistent, so it is not catastrophic.
-- It is still broader than needed and makes the method harder to reason about and test.
-
-Evidence:
-- `inc/class-users-controller.php`
+- Request-level side effects are harder to reason about and test.
 
 Recommendation:
-- Replace the anonymous callback with a removable callback and remove it immediately after `parent::create_item()` returns.
+- Replace anonymous callback with removable callback and remove it after `parent::create_item()`.
 
-### 4. Post insert errors are swallowed silently
-`InsertPostHandler::action_wp_insert_post()` catches `Exception` from `set_authors()` and discards it.
+### 4. Insert hook path swallows author-assignment exceptions
+Evidence:
+- Exceptions from `set_authors()` are caught and discarded in insert hook: `inc/class-insert-post-handler.php:85-89`.
+- REST update path handles similar exceptions by returning `WP_Error`: `inc/namespace.php:422-429`.
+
+Rule/context references:
+- Observability/correctness gap rather than HM/WPCS style issue.
 
 Impact:
-- Invalid or failed author assignment can fail with no log, no notice, and no test signal.
-- This weakens observability more than standards conformance.
-
-Evidence:
-- `inc/class-insert-post-handler.php`
+- Author-assignment failures can be silent in post-insert flows.
 
 Recommendation:
-- Surface the failure through logging, an admin notice, or a test-visible error path.
-- If silent failure is intentional, document that design choice explicitly.
+- Add deterministic failure signaling (hook/log/error object pathway) and test coverage.
 
-### 5. React editor code performs side effects during render
-`AuthorsSelect` initializes state and can trigger REST fetches directly from render-time conditionals rather than from effects.
+### 5. `AuthorsSelect` performs side effects during render
+Evidence:
+- State initialization and API fetch can run from render conditionals: `src/components/AuthorsSelect.tsx:59-79`.
+
+Rule/context references:
+- React correctness/performance concern outside PHPCS/HM rule scope.
 
 Impact:
-- This is not an HM/WPCS issue, but it is a real maintenance/performance concern.
-- It increases the chance of repeated fetches or render churn as the editor evolves.
-
-Evidence:
-- `src/components/AuthorsSelect.tsx`
+- Increased risk of repeated requests and render churn.
 
 Recommendation:
-- Move preload and fetch logic into `useEffect`.
-- Keep render pure and make request lifecycles explicit.
+- Move preload/fetch lifecycle to `useEffect`; keep render path pure.
 
-## Items not supported by the current evidence
-- I did not find repo evidence for missing root PHPCS configuration.
-- I did not find a custom admin form or AJAX workflow here that would justify generic “missing nonce” claims.
-- I did not find an immediate escaping gap in the reviewed PHP output paths.
+## Claims currently not supported by evidence
+- Missing root PHPCS configuration.
+- Broad nonce issues in custom admin/AJAX flows (not evidenced in reviewed paths).
+- Immediate output-escaping gaps in reviewed rendering paths.
 
-## Build-mode patch candidates
-- Standards/tooling compatibility refresh for PHPCS/PHPStan and contributor guidance.
-- Guest author creation hardening for username normalization and temporary filter scope.
-- Post insert observability hardening for swallowed exception paths.
-- Editor/CLI performance cleanup for render-time fetches and migration throttling.
+## Build queue mapping
+| Candidate | Plan | Scaffold | Primary files |
+| --- | --- | --- | --- |
+| Standards/tooling compatibility | `01-Build-01` | `docs/audit/patch_scaffolds/01-02-hm-wpcs_build.md` | `composer.json`, `composer.lock`, `.github/workflows/php-standards.yml`, `CONTRIBUTING.md` |
+| Guest-author hardening | `01-Build-02` | `docs/audit/patch_scaffolds/01-02-security_build.md` | `inc/class-users-controller.php`, `tests/phpunit/test-rest-api-user-endpoint.php` |
+| Post-insert observability hardening | `01-Build-03` | `docs/audit/patch_scaffolds/01-02-observability_build.md` | `inc/class-insert-post-handler.php`, `tests/phpunit/test-post-saving.php` |
+| Editor/CLI performance cleanup | `01-Build-04` | `docs/audit/patch_scaffolds/01-02-performance_build.md` | `src/components/AuthorsSelect.tsx`, `inc/cli/class-migrate-command.php` |
 
 ## Status
-- HM/WPCS baseline: code appears clean under targeted PHPCS verification, but default standards gates are not reproducible on modern local PHP.
-- Highest-value next work: tooling compatibility and targeted hardening (guest author and post insert observability) before performance cleanup.
+- Standards profile quality: explicit and repo-grounded.
+- Gate reproducibility: currently split between targeted diagnostics (passes) and default gate commands on modern runtime (fails).
+- Recommended sequence: tooling reproducibility first, then correctness/security hardening, then performance cleanup.

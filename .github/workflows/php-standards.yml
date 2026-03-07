@@ -10,8 +10,12 @@ on:
 
 jobs:
   build:
-    name: PHP Coding Standards
+    name: PHP Coding Standards (PHP ${{ matrix.php-version }})
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.4']
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -19,7 +23,7 @@ jobs:
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.4'
+        php-version: ${{ matrix.php-version }}
         coverage: none
 
     - name: Debugging
@@ -38,17 +42,17 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ steps.composer-cache-dir.outputs.DIR }}
-        key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
+        key: ${{ runner.os }}-composer-${{ matrix.php-version }}-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
       run: |
-        composer install --prefer-dist --no-progress --no-suggest --no-interaction
+        composer install --prefer-dist --no-progress --no-interaction
 
     - name: PHPCS cache
       uses: actions/cache@v4
       with:
         path: tests/cache
-        key: ${{ runner.os }}-phpcs-7.4-${{ hashFiles('plugin.php') }}
+        key: ${{ runner.os }}-phpcs-${{ matrix.php-version }}-${{ hashFiles('plugin.php') }}
 
     - name: Run the tests
       run: |

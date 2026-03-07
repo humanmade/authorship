@@ -504,33 +504,76 @@ function enqueue_assets() : void {
  * Enqueues the JS and CSS assets for the author selection control.
  */
 function enqueue_assets_for_post() : void {
-	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
+	$plugin_dir = plugin_dir_path( __DIR__ );
+	$plugin_url = plugin_dir_url( __DIR__ );
+	$manifest   = $plugin_dir . 'build/asset-manifest.json';
 
-	enqueue_asset(
-		$manifest,
-		'main.js',
-		[
-			'handle'       => SCRIPT_HANDLE,
-			// @TODO check:
-			'dependencies' => [
-				'react',
-				'wp-block-editor',
-				'wp-blocks',
-				'wp-components',
-				'wp-element',
-				'wp-i18n',
-				'wp-polyfill',
-			],
-		]
-	);
+	$script_dependencies = [
+		'lodash',
+		'react',
+		'wp-api-fetch',
+		'wp-block-editor',
+		'wp-blocks',
+		'wp-compose',
+		'wp-components',
+		'wp-data',
+		'wp-edit-post',
+		'wp-element',
+		'wp-i18n',
+		'wp-plugins',
+		'wp-polyfill',
+		'wp-url',
+	];
 
-	enqueue_asset(
-		$manifest,
-		'style.css',
-		[
-			'handle' => STYLE_HANDLE,
-		]
-	);
+	if ( file_exists( $manifest ) ) {
+		enqueue_asset(
+			$manifest,
+			'main.js',
+			[
+				'handle'       => SCRIPT_HANDLE,
+				'dependencies' => $script_dependencies,
+			]
+		);
+
+		enqueue_asset(
+			$manifest,
+			'style.css',
+			[
+				'handle' => STYLE_HANDLE,
+			]
+		);
+
+		return;
+	}
+
+	$script_relative_path = 'build/main.js';
+	$script_path          = $plugin_dir . $script_relative_path;
+
+	if ( file_exists( $script_path ) ) {
+		$script_version = filemtime( $script_path );
+
+		wp_enqueue_script(
+			SCRIPT_HANDLE,
+			$plugin_url . $script_relative_path,
+			$script_dependencies,
+			false !== $script_version ? (string) $script_version : null,
+			true
+		);
+	}
+
+	$style_relative_path = 'build/style.css';
+	$style_path          = $plugin_dir . $style_relative_path;
+
+	if ( file_exists( $style_path ) ) {
+		$style_version = filemtime( $style_path );
+
+		wp_enqueue_style(
+			STYLE_HANDLE,
+			$plugin_url . $style_relative_path,
+			[],
+			false !== $style_version ? (string) $style_version : null
+		);
+	}
 }
 
 /**
