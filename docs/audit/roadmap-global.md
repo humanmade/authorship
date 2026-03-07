@@ -203,6 +203,10 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - validated selector behavior in a live editor session (labeling, instruction text, live announcements, keyboard reorder)
   - fixed runtime regression (`onDragOver` announcement callback) discovered during validation
   - aligned README accessibility statement with validated runtime behavior and remaining gaps
+- `03-Build-10` executed on `codex/phase-03-build-10-at-matrix-hardening`:
+  - suppressed `wp:authorship` edit-context link emission for users without `list_users` to remove non-admin user-embed noise paths
+  - added REST regression coverage for non-admin edit-context link behavior
+  - documented explicit NVDA/VoiceOver matrix run steps in the manual checklist (manual host execution remains queued)
 
 ### Scope
 
@@ -298,7 +302,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-09-runtime-a11y-validation`
+- Active execution branch: `codex/phase-03-build-10-at-matrix-hardening`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -313,9 +317,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-09 executed.
+- Phase 03 status: active; Build-01 through Build-10 executed.
 
 ## What happens next
 
-1. Plan and execute `03-Build-10` for assistive-technology matrix capture (NVDA/VoiceOver) and non-admin request-path hardening.
+1. Execute `03-Build-11` to run host-native NVDA/VoiceOver matrix sessions and attach transcripted outcomes to the accessibility audit.
 2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

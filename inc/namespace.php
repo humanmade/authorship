@@ -330,6 +330,11 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
 		return $result;
 	}
 
+	// Avoid embedding-author link lookups that non-admin editors cannot resolve in edit context.
+	if ( 'edit' === $request->get_param( 'context' ) && ! current_user_can( 'list_users' ) ) {
+		return $result;
+	}
+
 	/** @var int $author */
 	foreach ( $data[ REST_PARAM ] as $author ) {
 		$result->add_link(

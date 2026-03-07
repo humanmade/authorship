@@ -97,6 +97,25 @@ Expected:
 - Add/remove/reorder actions emit status updates (for example `Removed author ...`, `Added guest author ...`, `Moved ... to position ...`).
 - Keyboard reorder changes author order without requiring pointer drag.
 
+### [ ] UI-06 Assistive technology matrix (NVDA + VoiceOver)
+
+Steps:
+1. Open a post in block editor with at least two assigned authors.
+2. Run NVDA matrix pass (Windows):
+   - Focus the `Authors` field.
+   - Add one author, remove one author, and reorder one token with keyboard (`Space` / arrow / `Space`).
+   - Record spoken output for field label, instruction text, and status messages.
+3. Run VoiceOver matrix pass (macOS):
+   - Focus the `Authors` field with VoiceOver cursor.
+   - Repeat add/remove/reorder flow.
+   - Record spoken output for field label, instruction text, and status messages.
+4. For each screen reader, log browser + OS version and pass/fail outcomes.
+
+Expected:
+- Both NVDA and VoiceOver announce the `Authors` field label and available instructions.
+- Add/remove/reorder actions are announced with clear status messages.
+- No dead-end keyboard traps occur during token reorder flow.
+
 ## REST API tests
 
 Use Basic auth with Application Password credentials.
@@ -180,6 +199,23 @@ curl -sS -u "$WP_USER:$WP_APP_PASS" \
 Expected:
 - `201` response for authorized users.
 - A new guest author account is created and can be assigned to posts.
+
+### [ ] API-06 Non-admin edit-context response does not expose inaccessible user embed links
+
+Steps:
+1. Authenticate as a non-admin user who can edit their own post (for example `author` role).
+2. Request that post in edit context with embed:
+
+```bash
+curl -sS -u "<author-user>:<author-app-pass>" \
+  "$WP_URL/wp-json/wp/v2/posts/<author-post-id>?context=edit&_embed=1"
+```
+
+3. Inspect response `_links` and `_embedded`.
+
+Expected:
+- `wp:authorship` relation is not emitted for this request class.
+- Response does not trigger follow-up `wp/v2/users/<id>?context=edit` embed requests.
 
 ## WP-CLI tests
 

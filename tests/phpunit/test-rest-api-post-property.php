@@ -225,6 +225,41 @@ class TestRESTAPIPostProperty extends RESTAPITestCase {
 		$this->assertSame( self::$users['editor']->display_name, $embedded[ REST_LINK_ID ][1]['name'] );
 	}
 
+	public function testAuthorshipLinksAreNotEmbeddableForEditContextWithoutListUsers() : void {
+		wp_set_current_user( self::$users['author']->ID );
+
+		$authors = [
+			self::$users['author']->ID,
+			self::$users['editor']->ID,
+		];
+
+		$post = self::factory()->post->create_and_get( [
+			'post_type'   => 'post',
+			'post_status' => 'draft',
+			'post_author' => self::$users['author']->ID,
+			POSTS_PARAM   => $authors,
+		] );
+
+		$request = new WP_REST_Request( 'GET', sprintf(
+			'/wp/v2/posts/%d',
+			$post->ID
+		) );
+		$request->set_param( 'context', 'edit' );
+
+		$response = self::rest_do_request( $request );
+		$message = self::get_message( $response );
+		$links    = $response->get_links();
+
+		$this->assertSame( WP_Http::OK, $response->get_status(), $message );
+		$this->assertArrayNotHasKey( REST_LINK_ID, $links );
+
+		// This is as close as we can get to mocking a `?_embed` request:
+		$data = rest_get_server()->response_to_data( $response, true );
+		$embedded = $data['_embedded'] ?? [];
+
+		$this->assertArrayNotHasKey( REST_LINK_ID, $embedded );
+	}
+
 	public function testRelLinksArePresent() : void {
 		wp_set_current_user( self::$users['admin']->ID );
 

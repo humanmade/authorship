@@ -116,18 +116,28 @@ Runtime regression discovered during validation:
 - Fixed in Build-09 by adding `onDragOver` announcements and extending JS test coverage.
 - Evidence: `src/components/SortableSelectContainer.tsx` announcements now include `onDragOver`; test coverage in `tests/js/components/sortable-select-container.test.tsx`.
 
-Known runtime caveats observed:
+Build-09 runtime caveats observed:
 - `403` for `wp-json/wp/v2/users/1?context=edit` when validating as non-admin role (did not block selector interactions).
 - Intermittent `net::ERR_NETWORK_CHANGED` noise from `wp-sync` endpoint in local environment.
+
+## Build-10 hardening + AT matrix protocol update
+
+Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post.php?post=29&action=edit` while logged in as non-admin role `author` (`test`).
+
+| Check | Result | Runtime evidence |
+|---|---|---|
+| Non-admin edit-context post response suppresses `wp:authorship` embed links | Pass | `tests/phpunit/test-rest-api-post-property.php` adds `testAuthorshipLinksAreNotEmbeddableForEditContextWithoutListUsers`; response links omit relation in this context. |
+| Editor no longer triggers `wp/v2/users/<id>?context=edit` noise path | Pass | Playwright network capture for non-admin edit session contains no `wp/v2/users/*?context=edit` request. |
+| NVDA/VoiceOver matrix outcome capture | Pending manual execution | Checklist now includes explicit NVDA and VoiceOver run steps and result fields; host-native SR session still required. |
 
 Post-validation remediation status:
 
 | Remediation item | Status | Evidence |
 |---|---|---|
 | R1 keyboard-operable reorder path | Implemented and runtime-validated | Runtime reorder result + `src/components/SortableSelectContainer.tsx:58-84` |
-| R2 screen reader status announcements | Implemented and runtime-validated at DOM/status level; full SR matrix still pending | Runtime status strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150` |
+| R2 screen reader status announcements | Implemented and runtime-validated at DOM/status level; NVDA/VoiceOver execution protocol documented and awaiting manual host run | Runtime status strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150`, `docs/manual-testing-checklist.md` |
 | R3 explicit labeling/instructions | Implemented and runtime-validated | Runtime `combobox "Authors"` + instruction text + `src/components/SortableSelectContainer.tsx:19-23,141-143` |
-| R4 component replacement decision | Pending | Route to Build-10+ design decision |
+| R4 component replacement decision | Pending | Route to Build-11+ design decision |
 
 ## Verification plan for remediation
 
@@ -140,5 +150,5 @@ When implementation starts, verify with:
 ## Residual risk
 
 - Full assistive-tech matrix is still pending: NVDA/VoiceOver manual verification and transcripted results are not yet captured.
-- Non-admin role path still produces a `wp/v2/users/<id>?context=edit` `403` request in editor console; behavior impact appears low but should be hardened/quieted.
+- Non-admin request-path hardening is implemented, but should be watched for regressions if core editor embed behavior changes.
 - Upstream adoption risk: if upstream PR cadence is slow, fork should treat accessibility remediation as fork-local delivery scope and proceed.
