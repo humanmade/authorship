@@ -58,6 +58,7 @@ class TestMultisite extends TestCase {
 	public function testSuperAdminWithNoRoleOnSite() {
 		// Change site.
 		switch_to_blog( self::$sub_site->blog_id );
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
 
 		// Confirm no role on current site.
 		$super_admin = get_user_by( 'ID', self::$super_admin->ID );
