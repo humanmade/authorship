@@ -103,4 +103,77 @@ class TestCLI extends TestCase {
 			'Expected wp authors migration to skip fixed delay when batch-pause is zero.'
 		);
 	}
+
+	public function testMigratePauseCanBeOverriddenByFilter() : void {
+		$factory = self::factory()->post;
+
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		wp_set_post_terms( $post->ID, [], TAXONOMY );
+
+		$command = new CLI\Migrate_Command();
+
+		add_filter( 'authorship_migrate_batch_pause_seconds', [ $this, 'disableMigrationPause' ], 10, 3 );
+
+		try {
+			$start_time = microtime( true );
+			$command->wp_authors( [], [
+				'dry-run' => true,
+				'post-type' => 'post',
+			] );
+			$elapsed = microtime( true ) - $start_time;
+		} finally {
+			remove_filter( 'authorship_migrate_batch_pause_seconds', [ $this, 'disableMigrationPause' ], 10 );
+		}
+
+		$this->assertLessThan(
+			1.5,
+			$elapsed,
+			'Expected filter override to disable migration batch pause.'
+		);
+	}
+
+	public function testMigrateNegativeBatchPauseIsClampedToZero() : void {
+		$factory = self::factory()->post;
+
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		wp_set_post_terms( $post->ID, [], TAXONOMY );
+
+		$command = new CLI\Migrate_Command();
+
+		$start_time = microtime( true );
+		$command->wp_authors( [], [
+			'dry-run' => true,
+			'post-type' => 'post',
+			'batch-pause' => '-5',
+		] );
+		$elapsed = microtime( true ) - $start_time;
+
+		$this->assertLessThan(
+			1.5,
+			$elapsed,
+			'Expected negative batch-pause values to be clamped to zero pause.'
+		);
+	}
+
+	/**
+	 * Disable migration pause for testing filter overrides.
+	 *
+	 * @param float               $pause_seconds Current pause value.
+	 * @param string              $migration Migration subcommand.
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 *
+	 * @return float
+	 */
+	public function disableMigrationPause( float $pause_seconds, string $migration, array $assoc_args ) : float {
+		$this->assertSame( 'wp-authors', $migration );
+		$this->assertArrayHasKey( 'post-type', $assoc_args );
+
+		return 0.0;
+	}
 }
