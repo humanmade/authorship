@@ -86,6 +86,54 @@ class TestCLI extends TestCase {
 		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
 
+	public function testMigratePostTypeDefaultsToPostWhenNotProvided() : void {
+		$factory = self::factory()->post;
+
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		wp_set_post_terms( $post->ID, [], TAXONOMY );
+
+		$authorship_authors = \Authorship\get_authors( $post );
+		$this->assertCount( 0, $authorship_authors );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'batch-pause' => '0',
+		] );
+
+		$authorship_authors = \Authorship\get_authors( $post );
+		$this->assertCount( 1, $authorship_authors );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+	}
+
+	public function testMigratePostTypeListIsTrimmedAndEmptyValuesIgnored() : void {
+		$factory = self::factory()->post;
+
+		$page = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+			'post_type' => 'page',
+		] );
+
+		wp_set_post_terms( $page->ID, [], TAXONOMY );
+
+		$authorship_authors = \Authorship\get_authors( $page );
+		$this->assertCount( 0, $authorship_authors );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'post-type' => ' post, page , , ',
+			'batch-pause' => '0',
+		] );
+
+		$authorship_authors = \Authorship\get_authors( $page );
+		$this->assertCount( 1, $authorship_authors );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+	}
+
 	public function testMigrateRespectsZeroBatchPause() : void {
 		$factory = self::factory()->post;
 

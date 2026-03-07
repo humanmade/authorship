@@ -91,7 +91,7 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::warning( 'Overwriting of previous Authorship data is set to true.' );
 		}
 
-		$post_types = explode( ',', $assoc_args['post-type'] );
+		$post_types = $this->get_migration_post_types( $assoc_args );
 		WP_CLI::line( sprintf( 'Updating post types: %s', implode( ', ', $post_types ) ) );
 
 		$tax_query = $overwrite ? [] : [
@@ -471,6 +471,33 @@ class Migrate_Command extends WP_CLI_Command {
 		}
 
 		return max( 0.0, floatval( $pause_seconds ) );
+	}
+
+	/**
+	 * Resolve and normalize target post types for wp-authors migration.
+	 *
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_migration_post_types( array $assoc_args ) : array {
+		$post_type_arg = $assoc_args['post-type'] ?? 'post';
+
+		if ( ! is_string( $post_type_arg ) ) {
+			return [ 'post' ];
+		}
+
+		$post_types = array_values(
+			array_filter(
+				array_unique( array_map( 'trim', explode( ',', $post_type_arg ) ) )
+			)
+		);
+
+		if ( empty( $post_types ) ) {
+			return [ 'post' ];
+		}
+
+		return $post_types;
 	}
 
 	/**
