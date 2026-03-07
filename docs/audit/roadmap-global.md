@@ -93,6 +93,7 @@ After these five items, Phase 02 is closed and Phase 03 begins.
 - Minimize the number of PRs (fewer is better for a likely low-bandwidth reviewer).
 - Do not depend on acceptance. Fork proceeds regardless.
 - Each PR must be independently mergeable and pass upstream CI.
+- Fork-local artifacts (`.planning/`, `docs/audit/`) are excluded from all upstream PR branches. These are process infrastructure for the fork only.
 
 ### PR plan (4 PRs)
 
