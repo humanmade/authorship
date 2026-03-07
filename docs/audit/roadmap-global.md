@@ -195,6 +195,10 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - added WCAG 2.1 AA selector audit at `docs/audit/accessibility-author-selector.md`
   - mapped code evidence to keyboard, labeling, and status-message accessibility findings
   - produced a phased remediation backlog and routed next implementation to Build-08
+- `03-Build-08` executed on `codex/phase-03-build-08-accessibility-remediation`:
+  - enabled keyboard DnD sensor configuration for author reordering
+  - added explicit selector labeling and screen-reader instruction metadata
+  - added drag/create/reorder announcements and JS tests for accessibility behavior
 
 ### Scope
 
@@ -260,7 +264,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 8 | Remove `lodash` dependency | WP core direction |
 | 9 | Add JS unit tests | Zero JS test coverage today |
 | 10 | Move `PluginPostStatusInfo` to `@wordpress/editor` | Site editor forward-compat |
-| 11 | Accessibility audit (WCAG 2.1 AA) | Documented gap in README |
+| 11 | Runtime AT validation + README alignment | Confirm NVDA/VoiceOver outcomes and update accessibility statement to match current behavior |
 
 ### P2 — Important, next after P1 (Phase 04)
 
@@ -290,7 +294,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-07-accessibility-audit`
+- Active execution branch: `codex/phase-03-build-08-accessibility-remediation`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -305,9 +309,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-07 executed.
+- Phase 03 status: active; Build-01 through Build-08 executed.
 
 ## What happens next
 
-1. Plan and execute `03-Build-08` for accessibility remediation implementation (keyboard reorder path, status announcements, and explicit labeling).
+1. Plan and execute `03-Build-09` for runtime assistive-technology validation and README accessibility statement alignment.
 2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

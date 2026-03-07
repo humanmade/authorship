@@ -1,4 +1,4 @@
-import { act, render, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 const mockApiFetch = jest.fn();
@@ -134,6 +134,7 @@ describe( 'AuthorsSelect initialization', () => {
 		} );
 
 		expect( onUpdate ).toHaveBeenCalledWith( [ 22, 33, 11 ] );
+		expect( screen.getByText( 'Moved Author A to position 3.' ) ).toBeTruthy();
 	} );
 
 	it( 'does not pass legacy sortable-hoc props to selector container', async () => {
@@ -287,6 +288,7 @@ describe( 'AuthorsSelect initialization', () => {
 			path: expect.stringContaining( '/authorship/v1/users/' ),
 		} ) );
 		expect( onUpdate ).toHaveBeenCalledWith( [ 11, 44 ] );
+		expect( screen.getByText( 'Added guest author Guest C.' ) ).toBeTruthy();
 	} );
 
 	it( 'emits an error when guest author creation fails', async () => {

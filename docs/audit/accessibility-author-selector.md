@@ -85,6 +85,20 @@ Post-Build-02 (`@dnd-kit`) and Build-03 (`react-select` v5) behavior needs re-va
 - Acceptance:
   - decision record with tradeoffs, effort estimate, and risk
 
+## Build-08 implementation update
+
+Implemented in `03-Build-08`:
+- Keyboard DnD sensor + coordinate getter for reorder interactions.
+- Explicit selector labeling and screen-reader instruction text.
+- Drag result announcements and live polite status messages for create/reorder/selection updates.
+
+| Remediation item | Status | Evidence |
+|---|---|---|
+| R1 keyboard-operable reorder path | Implemented in code, runtime assistive validation pending | `src/components/SortableSelectContainer.tsx:58-67` |
+| R2 screen reader status announcements | Implemented in code, manual SR validation pending | `src/components/SortableSelectContainer.tsx:105-134`, `src/components/AuthorsSelect.tsx:230-275` |
+| R3 explicit labeling/instructions | Implemented | `src/components/SortableSelectContainer.tsx:19-23`, `src/components/SortableSelectContainer.tsx:101-143` |
+| R4 component replacement decision | Pending | Follow-up Build-09+ decision record |
+
 ## Verification plan for remediation
 
 When implementation starts, verify with:
@@ -95,5 +109,5 @@ When implementation starts, verify with:
 
 ## Residual risk
 
-- Accessibility statement drift risk: README claims may not fully match post-modernization behavior until runtime re-validation is completed.
+- Runtime assistive-tech verification still pending: implementation-level fixes are in place but NVDA/VoiceOver manual validation is still required.
 - Upstream adoption risk: if upstream PR cadence is slow, fork should treat accessibility remediation as fork-local delivery scope and proceed.

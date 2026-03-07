@@ -7,6 +7,7 @@ import type {
 
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
@@ -72,6 +73,7 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 	const isDisabled = ! hasAssignAuthorAction;
 
 	const [ selected, setSelected ] = useState<Option[]>( [] );
+	const [ liveMessage, setLiveMessage ] = useState<string>( '' );
 	const hasInitializedSelection = useRef<boolean>( false );
 
 	useEffect( () => {
@@ -172,9 +174,39 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 	 */
 	const changeValue = ( options: MultiValue<Option> | null ) => {
 		const normalized = options ? [ ...options ] : [];
+		const normalizedIDs = normalized.map( option => option.value );
+		const selectedIDs = selected.map( option => option.value );
+
+		if ( ! areAuthorIDsEqual( normalizedIDs, selectedIDs ) ) {
+			if ( normalized.length === 0 ) {
+				setLiveMessage( __( 'Author selection cleared.', 'authorship' ) );
+			} else if ( normalized.length > selected.length ) {
+				const added = normalized.find( option => ! selectedIDs.includes( option.value ) );
+				setLiveMessage(
+					added
+						? sprintf(
+							/* translators: %s: selected author name. */
+							__( 'Added author %s.', 'authorship' ),
+							added.label
+						)
+						: __( 'Author selection updated.', 'authorship' )
+				);
+			} else if ( normalized.length < selected.length ) {
+				const removed = selected.find( option => ! normalizedIDs.includes( option.value ) );
+				setLiveMessage(
+					removed
+						? sprintf(
+							/* translators: %s: removed author name. */
+							__( 'Removed author %s.', 'authorship' ),
+							removed.label
+						)
+						: __( 'Author selection updated.', 'authorship' )
+				);
+			}
+		}
 
 		setSelected( normalized );
-		onUpdate( normalized.map( option => option.value ) );
+		onUpdate( normalizedIDs );
 	};
 
 	/**
@@ -199,6 +231,13 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 			const options = [ ...selected, createOption( user ) ];
 
 			setSelected( options );
+			setLiveMessage(
+				sprintf(
+					/* translators: %s: guest author name. */
+					__( 'Added guest author %s.', 'authorship' ),
+					user.name
+				)
+			);
 			onUpdate( options.map( option => option.value ) );
 		} ).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
@@ -211,21 +250,39 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 	 * @param {SortedOption} option Sorting information for the option.
 	 */
 	const onSortEnd = ( option: SortedOption ) => {
+		const movedOption = selected[ option.oldIndex ];
 		const value = arrayMove( selected, option.oldIndex, option.newIndex );
+
+		if ( movedOption ) {
+			setLiveMessage(
+				sprintf(
+					/* translators: 1: author name, 2: list position. */
+					__( 'Moved %1$s to position %2$d.', 'authorship' ),
+					movedOption.label,
+					option.newIndex + 1
+				)
+			);
+		}
+
 		setSelected( value );
 		onUpdate( value.map( option => option.value ) );
 	};
 
 	return (
-		<SortableSelectContainer
-			isDisabled={ isDisabled }
-			loadOptions={ loadOptions }
-			styles={ styles }
-			value={ selected }
-			onChange={ changeValue }
-			onCreateOption={ onCreateOption }
-			onSortEnd={ onSortEnd }
-		/>
+		<>
+			<span aria-atomic="true" aria-live="polite" className="screen-reader-text">
+				{ liveMessage }
+			</span>
+			<SortableSelectContainer
+				isDisabled={ isDisabled }
+				loadOptions={ loadOptions }
+				styles={ styles }
+				value={ selected }
+				onChange={ changeValue }
+				onCreateOption={ onCreateOption }
+				onSortEnd={ onSortEnd }
+			/>
+		</>
 	);
 };
 
