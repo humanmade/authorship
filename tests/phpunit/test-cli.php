@@ -220,7 +220,15 @@ class TestCLI extends TestCase {
 		$term_id = 0;
 
 		if ( ! $author_taxonomy_preexisting ) {
-			register_taxonomy( 'author', 'post' );
+			register_taxonomy(
+				'author',
+				'post',
+				[
+					'public'    => false,
+					'query_var' => false,
+					'rewrite'   => false,
+				]
+			);
 		}
 
 		$post = $factory->create_and_get( [

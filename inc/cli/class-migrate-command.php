@@ -201,7 +201,15 @@ class Migrate_Command extends WP_CLI_Command {
 	function ppa( $args, $assoc_args ) : void {
 		if ( ! taxonomy_exists( 'author' ) ) {
 			// register the `author` taxonomy so that we can query for PPA author terms.
-			register_taxonomy( 'author', 'post' );
+			register_taxonomy(
+				'author',
+				'post',
+				[
+					'public'    => false,
+					'query_var' => false,
+					'rewrite'   => false,
+				]
+			);
 		}
 
 		$posts_per_page = 100;
