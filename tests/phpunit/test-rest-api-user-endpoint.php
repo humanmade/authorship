@@ -41,6 +41,53 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( [ GUEST_ROLE ], $data['roles'] );
 	}
 
+	public function testGuestAuthorDuplicateNameGetsUniqueUsername() : void {
+		wp_set_current_user( self::$users['editor']->ID );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', 'Duplicate Name' );
+
+		$first_response = self::rest_do_request( $request );
+		$first_data     = $first_response->get_data();
+		$first_message  = self::get_message( $first_response );
+
+		$this->assertSame( WP_Http::CREATED, $first_response->get_status(), $first_message );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', 'Duplicate Name' );
+
+		$second_response = self::rest_do_request( $request );
+		$second_data     = $second_response->get_data();
+		$second_message  = self::get_message( $second_response );
+
+		$this->assertSame( WP_Http::CREATED, $second_response->get_status(), $second_message );
+
+		$first_user  = get_userdata( (int) $first_data['id'] );
+		$second_user = get_userdata( (int) $second_data['id'] );
+
+		$this->assertNotFalse( $first_user );
+		$this->assertNotFalse( $second_user );
+		$this->assertSame( 'duplicatename', $first_user->user_login );
+		$this->assertMatchesRegularExpression( '/^duplicatename-[0-9]+$/', $second_user->user_login );
+	}
+
+	public function testGuestAuthorNonAsciiNameGetsFallbackUsername() : void {
+		wp_set_current_user( self::$users['editor']->ID );
+
+		$request = new WP_REST_Request( 'POST', self::$route );
+		$request->set_param( 'name', '李小龍' );
+
+		$response = self::rest_do_request( $request );
+		$data     = $response->get_data();
+		$message  = self::get_message( $response );
+
+		$this->assertSame( WP_Http::CREATED, $response->get_status(), $message );
+
+		$user = get_userdata( (int) $data['id'] );
+		$this->assertNotFalse( $user );
+		$this->assertMatchesRegularExpression( '/^guestauthor(?:-[0-9]+)?$/', $user->user_login );
+	}
+
 	/**
 	 * @dataProvider dataDisallowedFields
 	 *

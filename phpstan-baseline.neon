@@ -6,11 +6,6 @@ parameters:
 			path: inc/class-insert-post-handler.php
 
 		-
-			message: "#^Parameter \\#1 \\$username of function sanitize_user expects string, mixed given\\.$#"
-			count: 1
-			path: inc/class-users-controller.php
-
-		-
 			message: "#^Parameter \\#1 \\$var of function intval expects array\\|bool\\|float\\|int\\|resource\\|string\\|null, mixed given\\.$#"
 			count: 1
 			path: inc/cli/class-migrate-command.php

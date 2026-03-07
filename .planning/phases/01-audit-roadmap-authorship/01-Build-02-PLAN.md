@@ -21,3 +21,13 @@ must_haves:
 <objective>
 Harden guest author creation by improving username normalization, collision handling, and request-local filter scoping.
 </objective>
+
+<status>
+Executed on 2026-03-06 in local fork context (`dknauss/authorship`).
+
+Verification:
+- `composer test:phpcs` passes after guest-author hardening changes.
+- `composer test:phpstan` passes with updated baseline alignment.
+- Added REST endpoint tests for duplicate-name and non-ASCII guest-author creation behavior.
+- Focused PHPUnit execution was blocked in this shell due local DB auth mismatch (`root@localhost` without configured password in test runtime).
+</status>
