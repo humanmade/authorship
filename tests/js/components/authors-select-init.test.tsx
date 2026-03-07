@@ -244,4 +244,87 @@ describe( 'AuthorsSelect initialization', () => {
 
 		expect( onUpdate ).toHaveBeenCalledWith( [] );
 	} );
+
+	it( 'appends created guest author IDs when create option succeeds', async () => {
+		const onUpdate = jest.fn();
+		const preloaded = [
+			{
+				value: 11,
+				label: 'Author A',
+				avatar: null,
+			},
+		];
+
+		mockApiFetch.mockResolvedValue( {
+			id: 44,
+			name: 'Guest C',
+			avatar_urls: {
+				48: 'https://example.com/guest.jpg',
+			},
+		} );
+
+		render(
+			<AuthorsSelectBase
+				{ ...baseProps }
+				currentAuthorIDs={ [ 11 ] }
+				preloadedAuthorOptions={ {
+					authors: preloaded,
+				} }
+				onUpdate={ onUpdate }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( mockSortableProps.value ).toEqual( preloaded );
+		} );
+
+		await act( async () => {
+			await ( mockSortableProps.onCreateOption as CallableFunction )( 'Guest C' );
+		} );
+
+		expect( mockApiFetch ).toHaveBeenCalledWith( expect.objectContaining( {
+			method: 'POST',
+			path: expect.stringContaining( '/authorship/v1/users/' ),
+		} ) );
+		expect( onUpdate ).toHaveBeenCalledWith( [ 11, 44 ] );
+	} );
+
+	it( 'emits an error when guest author creation fails', async () => {
+		const onError = jest.fn();
+		const onUpdate = jest.fn();
+		const preloaded = [
+			{
+				value: 11,
+				label: 'Author A',
+				avatar: null,
+			},
+		];
+
+		mockApiFetch.mockRejectedValue( {
+			message: 'Guest author creation failed.',
+		} );
+
+		render(
+			<AuthorsSelectBase
+				{ ...baseProps }
+				currentAuthorIDs={ [ 11 ] }
+				preloadedAuthorOptions={ {
+					authors: preloaded,
+				} }
+				onError={ onError }
+				onUpdate={ onUpdate }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( mockSortableProps.value ).toEqual( preloaded );
+		} );
+
+		await act( async () => {
+			await ( mockSortableProps.onCreateOption as CallableFunction )( 'Bad Guest' );
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( 'Guest author creation failed.' );
+		expect( onUpdate ).not.toHaveBeenCalled();
+	} );
 } );

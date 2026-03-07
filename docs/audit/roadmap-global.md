@@ -182,6 +182,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - removed lodash dependency usage (`get`, `isEqual`) from `AuthorsSelect`
   - added connected-component tests for hook wiring and assign-action disabled-state behavior
   - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
+- `03-Build-05` executed on `codex/phase-03-build-05-editor-import-guest-tests`:
+  - moved `PluginPostStatusInfo` import from `@wordpress/edit-post` to `@wordpress/editor`
+  - removed unused `@wordpress/edit-post` dependency
+  - added JS tests for guest-author creation success and failure paths in selector initialization flow
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
 
 ### Scope
 
@@ -277,7 +282,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-04-hooks-lodash`
+- Active execution branch: `codex/phase-03-build-05-editor-import-guest-tests`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -292,9 +297,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-04 executed.
+- Phase 03 status: active; Build-01 through Build-05 executed.
 
 ## What happens next
 
-1. Open and monitor the Build-04 Phase-03 PR from `codex/phase-03-build-04-hooks-lodash` after commit/push.
-2. Plan and execute `03-Build-05`: move `PluginPostStatusInfo` import path from `@wordpress/edit-post` to `@wordpress/editor` and extend JS behavior coverage for guest-author creation/error paths.
+1. Plan and execute `03-Build-06` for the accessibility audit slice (WCAG 2.1 AA checks and findings capture for author selector UX).
+2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

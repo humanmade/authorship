@@ -41,7 +41,6 @@
     "@typescript-eslint/parser": "^4.12.0",
     "@wordpress/api-fetch": "^3.20.0",
     "@wordpress/babel-preset-default": "^8.41.0",
-    "@wordpress/edit-post": "^3.25.4",
     "@wordpress/plugins": "^2.23.0",
     "@wordpress/scripts": "^24.0.0",
     "@wordpress/url": "^2.19.0",
