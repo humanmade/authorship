@@ -207,6 +207,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - suppressed `wp:authorship` edit-context link emission for users without `list_users` to remove non-admin user-embed noise paths
   - added REST regression coverage for non-admin edit-context link behavior
   - documented explicit NVDA/VoiceOver matrix run steps in the manual checklist (manual host execution remains queued)
+- `03-Build-11` executed on `codex/phase-03-build-11-coverage-psalm-advisory`:
+  - added admin-focused PHPUnit coverage for required-field filtering, column hooks, and author-column rendering output
+  - added `npm run test:js:coverage` with explicit global threshold enforcement
+  - added fork-local Psalm advisory tooling (`composer analyse:psalm`) with config/baseline and runtime wrapper safeguards
+  - verified with `composer test:integration`, `WP_MULTISITE=1 composer test:integration`, `composer analyse:phpstan`, `composer analyse:psalm`, `composer lint`, `composer test:coverage`, and `npm run test:js:coverage`
 
 ### Scope
 
@@ -302,7 +307,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-10-at-matrix-hardening`
+- Active execution branch: `codex/phase-03-build-11-coverage-psalm-advisory`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -313,13 +318,14 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - Legacy upstream-facing PRs:
   - `#160` previous integration PR (superseded in packaging, pending housekeeping decision)
   - `#161` previous focused Build-04 PR (superseded in packaging, pending housekeeping decision)
-- Quality state: `composer test`, `composer test:phpstan`, `composer test:phpcs`, and `composer test:coverage` all green.
-- 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
+- Quality state: `composer test:integration`, `WP_MULTISITE=1 composer test:integration`, `composer analyse:phpstan`, `composer analyse:psalm`, `composer lint`, `composer test:coverage`, and `npm run test:js:coverage` are all green.
+- PHPUnit coverage state: 163 tests in integration run and statement coverage `65.51%` (`625/954`) with threshold ratcheted to `63%`.
+- JS coverage state (`npm run test:js:coverage`): statements `82.06%`, branches `59.37%`, functions `74.35%`, lines `81.95%` against enforced thresholds (80/55/70/80).
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-10 executed.
+- Phase 03 status: active; Build-01 through Build-11 executed.
 
 ## What happens next
 
-1. Execute `03-Build-11` to run host-native NVDA/VoiceOver matrix sessions and attach transcripted outcomes to the accessibility audit.
+1. Execute `03-Build-12` to run host-native NVDA/VoiceOver matrix sessions and attach transcripted outcomes to the accessibility audit.
 2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.
