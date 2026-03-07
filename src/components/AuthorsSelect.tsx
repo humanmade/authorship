@@ -1,4 +1,3 @@
-import { get, isEqual } from 'lodash';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import type { MultiValue, StylesConfig } from 'react-select';
 import type {
@@ -7,8 +6,7 @@ import type {
 } from 'wp-types';
 
 import apiFetch from '@wordpress/api-fetch';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
@@ -27,6 +25,14 @@ interface AuthorsSelectProps {
 	preloadedAuthorOptions: authorshipDataFromWP,
 }
 
+interface EditorStore {
+	getCurrentPost?: () => {
+		_links?: Record<string, unknown>,
+	} | undefined,
+	getCurrentPostType?: () => string,
+	getEditedPostAttribute?: ( attribute: string ) => unknown,
+}
+
 /**
  * Creates an option from a REST API user response.
  *
@@ -38,6 +44,21 @@ const createOption = ( user: WP_REST_API_User ): Option => ( {
 	label: user.name,
 	avatar: user?.avatar_urls?.[48] || null,
 } );
+
+/**
+ * Compares author ID arrays while preserving order semantics.
+ *
+ * @param {number[]} left The first ID array.
+ * @param {number[]} right The second ID array.
+ * @returns {boolean} Whether both arrays are equal.
+ */
+const areAuthorIDsEqual = ( left: number[], right: number[] ): boolean => {
+	if ( left.length !== right.length ) {
+		return false;
+	}
+
+	return left.every( ( value, index ) => value === right[ index ] );
+};
 
 /**
  * Returns the author selector control.
@@ -60,7 +81,7 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 
 		const preloadedAuthorIDs = preloadedAuthorOptions.authors.map( author => author.value );
 
-		if ( isEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
+		if ( areAuthorIDsEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
 			setSelected( preloadedAuthorOptions.authors );
 			hasInitializedSelection.current = true;
 			return;
@@ -208,29 +229,60 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 	);
 };
 
-const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, CallableFunction> => ( {
-	onError( message: string ) {
-		dispatch( 'core/notices' ).createErrorNotice( message );
-	},
-	onUpdate( value: number[] ) {
-		dispatch( 'core/editor' ).editPost( {
-			authorship: value,
-		} );
-	},
-} );
+/**
+ * Returns connected editor data for the AuthorsSelect component.
+ *
+ * @param {CallableFunction} select Data select callback.
+ * @returns {Record<string, unknown>} Connected editor data.
+ */
+const selectConnectedProps = ( select: CallableFunction ): Record<string, unknown> => {
+	const editorStore = select( 'core/editor' ) as EditorStore | null;
 
-const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
-	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
-	postType: select( 'core/editor' ).getCurrentPostType(),
-	preloadedAuthorOptions: authorshipData,
-	hasAssignAuthorAction: Boolean( get(
-		select( 'core/editor' ).getCurrentPost(),
-		[ '_links', 'authorship:action-assign-authorship' ],
-		false
-	) ),
-} );
+	if ( ! editorStore ) {
+		return {
+			currentAuthorIDs: [],
+			hasAssignAuthorAction: false,
+			postType: 'post',
+		};
+	}
 
-export default compose( [
-	withDispatch( mapDispatchToProps ),
-	withSelect( mapSelectToProps ),
-] )( AuthorsSelectBase );
+	const currentPost = editorStore.getCurrentPost?.();
+	const currentAuthorIDs = editorStore.getEditedPostAttribute?.( 'authorship' );
+
+	return {
+		currentAuthorIDs: Array.isArray( currentAuthorIDs ) ? currentAuthorIDs : [],
+		hasAssignAuthorAction: Boolean( currentPost?._links?.['authorship:action-assign-authorship'] ),
+		postType: editorStore.getCurrentPostType?.() || 'post',
+	};
+};
+
+const AuthorsSelect = (): ReactElement => {
+	const { createErrorNotice } = useDispatch( 'core/notices' ) as {
+		createErrorNotice: ( message: string ) => void,
+	};
+	const { editPost } = useDispatch( 'core/editor' ) as {
+		editPost: ( value: Record<string, unknown> ) => void,
+	};
+	const {
+		currentAuthorIDs,
+		hasAssignAuthorAction,
+		postType,
+	} = useSelect( selectConnectedProps, [] ) as {
+		currentAuthorIDs: number[],
+		hasAssignAuthorAction: boolean,
+		postType: string,
+	};
+
+	return (
+		<AuthorsSelectBase
+			currentAuthorIDs={ currentAuthorIDs }
+			hasAssignAuthorAction={ hasAssignAuthorAction }
+			postType={ postType }
+			preloadedAuthorOptions={ authorshipData }
+			onError={ createErrorNotice }
+			onUpdate={ value => editPost( { authorship: value } ) }
+		/>
+	);
+};
+
+export default AuthorsSelect;

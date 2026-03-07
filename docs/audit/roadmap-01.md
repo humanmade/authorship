@@ -18,6 +18,7 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - `03-Build-01` executed on `codex/phase-03-build-01-toolchain` (tooling migration + initial JS tests)
   - `03-Build-02` executed on `codex/phase-03-build-02-dnd-migration` (DND migration from `react-sortable-hoc` to `@dnd-kit` with test coverage)
   - `03-Build-03` executed on `codex/phase-03-build-03-react-select` (`react-select` v5 migration + selection-change contract tests)
+  - `03-Build-04` executed on `codex/phase-03-build-04-hooks-lodash` (`withSelect`/`withDispatch` migration to hooks + lodash removal in `AuthorsSelect`)
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -62,4 +63,4 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Plan and execute `03-Build-04` (`withSelect`/`withDispatch` to hooks, then remove `lodash` dependencies from `AuthorsSelect`).
+- Plan and execute `03-Build-05` (move `PluginPostStatusInfo` import to `@wordpress/editor` and expand guest-author JS behavior coverage).

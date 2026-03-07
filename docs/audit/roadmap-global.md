@@ -177,6 +177,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - aligned selector adapter typing to v5-native interfaces (`AsyncCreatableProps`, `StylesConfig`, `MultiValue`)
   - added JS tests for selection-change and clearing callback behavior
   - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
+- `03-Build-04` executed on `codex/phase-03-build-04-hooks-lodash`:
+  - replaced `withSelect`/`withDispatch` composition in `AuthorsSelect` with `useSelect`/`useDispatch`
+  - removed lodash dependency usage (`get`, `isEqual`) from `AuthorsSelect`
+  - added connected-component tests for hook wiring and assign-action disabled-state behavior
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
 
 ### Scope
 
@@ -272,7 +277,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-03-react-select`
+- Active execution branch: `codex/phase-03-build-04-hooks-lodash`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -287,9 +292,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01, Build-02, and Build-03 executed.
+- Phase 03 status: active; Build-01 through Build-04 executed.
 
 ## What happens next
 
-1. Open and monitor the Build-03 Phase-03 PR from `codex/phase-03-build-03-react-select` after commit/push.
-2. Plan and execute `03-Build-04`: convert `withSelect`/`withDispatch` HOCs to hooks and remove `lodash` usage in `AuthorsSelect`.
+1. Open and monitor the Build-04 Phase-03 PR from `codex/phase-03-build-04-hooks-lodash` after commit/push.
+2. Plan and execute `03-Build-05`: move `PluginPostStatusInfo` import path from `@wordpress/edit-post` to `@wordpress/editor` and extend JS behavior coverage for guest-author creation/error paths.
