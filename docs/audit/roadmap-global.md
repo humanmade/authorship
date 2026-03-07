@@ -214,9 +214,9 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - verified with `composer test:integration`, `WP_MULTISITE=1 composer test:integration`, `composer analyse:phpstan`, `composer analyse:psalm`, `composer lint`, `composer test:coverage`, and `npm run test:js:coverage`
 - `03-Build-12` in progress on `codex/phase-03-build-12-at-matrix-evidence`:
   - captured automation evidence for selector label/instructions/live-region behavior in local editor
-  - added Build-12 AT transcript ledger in `docs/manual-testing-checklist.md` for NVDA + VoiceOver final runs
+  - added Build-12 AT transcript ledger in `docs/manual-testing-checklist.md` and recorded manual VoiceOver add/remove/reorder pass
   - documented host automation blockers for spoken-output capture (VoiceOver keystroke automation permission boundary)
-  - identified residual risk requiring manual closeout: spoken transcript rows are still pending, and scripted keyboard reorder attempts emitted announcements without DOM order change
+  - remaining manual closeout: NVDA transcript row is pending, and remove-control label quality still needs follow-up
 
 ### Scope
 
@@ -282,7 +282,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 8 | Remove `lodash` dependency | WP core direction |
 | 9 | Add JS unit tests | Zero JS test coverage today |
 | 10 | Move `PluginPostStatusInfo` to `@wordpress/editor` | Site editor forward-compat |
-| 11 | AT matrix validation + role-path hardening | Capture NVDA/VoiceOver outcomes and resolve non-admin selector request-noise paths |
+| 11 | AT matrix validation + role-path hardening | Complete NVDA outcome capture (VoiceOver already recorded) and track remaining selector accessibility follow-up |
 
 ### P2 — Important, next after P1 (Phase 04)
 
@@ -328,10 +328,10 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - JS coverage state (`npm run test:js:coverage`): statements `82.06%`, branches `59.37%`, functions `74.35%`, lines `81.95%` against enforced thresholds (80/55/70/80).
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-11 executed, Build-12 in progress (manual transcript gate open).
+- Phase 03 status: active; Build-01 through Build-11 executed, Build-12 in progress (VoiceOver pass recorded, NVDA transcript gate open).
 
 ## What happens next
 
-1. Complete `03-Build-12` by running host-native NVDA/VoiceOver sessions and filling transcript rows in `docs/manual-testing-checklist.md`.
-2. Resolve or explicitly disposition the Build-12 keyboard-reorder residual risk before Phase 03 close.
+1. Complete `03-Build-12` by running the remaining host-native NVDA session and filling the NVDA transcript row in `docs/manual-testing-checklist.md`.
+2. Resolve or explicitly disposition the remove-control `aria-label` residual risk captured in the accessibility audit before Phase 03 close.
 3. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

@@ -14,7 +14,7 @@ files_modified:
   - "output/playwright/build12-authors-field.png"
 autonomous: true
 user_setup:
-  - "Run host-native NVDA on Windows and VoiceOver on macOS, then record spoken-output transcripts in the checklist."
+  - "Run host-native NVDA on Windows and record the remaining spoken-output transcript row in the checklist (VoiceOver row already manually recorded)."
 must_haves:
   truths:
     - "AT matrix closure requires real screen-reader spoken-output capture, not only DOM/live-region checks."
@@ -28,7 +28,7 @@ must_haves:
 ---
 
 <objective>
-Execute the Build-12 accessibility matrix slice by capturing machine-verifiable runtime evidence now and recording the remaining host-native NVDA/VoiceOver transcript requirements needed to close Phase 03.
+Execute the Build-12 accessibility matrix slice by capturing machine-verifiable runtime evidence and closing remaining host-native AT transcript requirements for Phase 03.
 </objective>
 
 <tasks>
@@ -63,18 +63,18 @@ Execute the Build-12 accessibility matrix slice by capturing machine-verifiable 
     - Pre-fill machine-verifiable preflight notes from automated Build-12 checks.
   </action>
   <verify>Checklist contains one place to record final spoken-output evidence and closure status.</verify>
-  <done>Transcript ledger added; manual rows queued.</done>
+  <done>Transcript ledger added; VoiceOver row recorded and NVDA row remains queued.</done>
 </task>
 
 <task type="auto">
   <name>03-12-04 Update roadmap/phase status with manual closure gate</name>
   <files>.planning/phases/03-frontend-modernization-authorship/03-01-PLAN.md, docs/audit/roadmap-global.md, docs/audit/roadmap-01.md</files>
   <action>
-    - Mark Build-12 as in progress with completed automation evidence and pending host-native transcripts.
-    - Keep Phase 03 closeout tied to final NVDA/VoiceOver transcript capture.
+    - Mark Build-12 as in progress with completed automation evidence, VoiceOver confirmation, and pending NVDA transcript.
+    - Keep Phase 03 closeout tied to final NVDA transcript capture and residual-risk tracking.
   </action>
   <verify>Roadmap and phase docs agree on current state and exact remaining closure action.</verify>
-  <done>Status aligned: only host-native transcript capture remains for Phase 03 closure.</done>
+  <done>Status aligned: VoiceOver evidence recorded; NVDA transcript is the remaining Build-12 closure gate.</done>
 </task>
 
 </tasks>
@@ -85,6 +85,6 @@ Started on 2026-03-07 on branch `codex/phase-03-build-12-at-matrix-evidence`.
 Execution state:
 - 03-12-01 executed: captured runtime selector/evidence signals and screenshot artifact.
 - 03-12-02 executed: documented VoiceOver automation constraints and reproducible blockers.
-- 03-12-03 executed: added AT transcript ledger for final manual NVDA/VoiceOver runs.
-- 03-12-04 executed: roadmap/phase docs updated to reflect Build-12 in progress with a single manual closure gate.
+- 03-12-03 executed: added AT transcript ledger and recorded manual VoiceOver pass evidence.
+- 03-12-04 executed: roadmap/phase docs updated to reflect Build-12 in progress with NVDA transcript as the remaining closure gate.
 </status>

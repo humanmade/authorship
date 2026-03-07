@@ -124,12 +124,12 @@ Build-12 preflight notes (2026-03-07, macOS 26.3.1):
   - `Author selection cleared.`
 - Screenshot artifact: `output/playwright/build12-authors-field.png`.
 
-AT transcript ledger (complete this to close Build-12):
+AT transcript ledger (complete remaining rows to close Build-12):
 
 | SR | OS | Browser | Version(s) | Field label announced | Instructions announced | Create announced | Remove announced | Reorder announced | Reorder changed order | Result | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | NVDA | Windows |  |  |  |  |  |  |  |  | Pending | Manual host run required |
-| VoiceOver | macOS | Safari or Chrome |  |  |  |  |  |  |  | Pending | Manual host run required |
+| VoiceOver | macOS | Safari or Chrome | Not captured | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Pass | Manual operator report on 2026-03-07: "VoiceOver is good for add/remove/reorder." Detailed spoken transcript strings were not captured. |
 
 ## REST API tests
 

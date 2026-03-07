@@ -128,7 +128,7 @@ Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post.p
 |---|---|---|
 | Non-admin edit-context post response suppresses `wp:authorship` embed links | Pass | `tests/phpunit/test-rest-api-post-property.php` adds `testAuthorshipLinksAreNotEmbeddableForEditContextWithoutListUsers`; response links omit relation in this context. |
 | Editor no longer triggers `wp/v2/users/<id>?context=edit` noise path | Pass | Playwright network capture for non-admin edit session contains no `wp/v2/users/*?context=edit` request. |
-| NVDA/VoiceOver matrix outcome capture | Pending manual execution | Checklist now includes explicit NVDA and VoiceOver run steps and result fields; host-native SR session still required. |
+| NVDA/VoiceOver matrix outcome capture | Partial: VoiceOver complete, NVDA pending | Checklist now includes explicit NVDA and VoiceOver run steps and result fields; VoiceOver add/remove/reorder pass was manually reported on 2026-03-07. |
 
 ## Build-12 execution update (automation evidence + host-native blocker capture)
 
@@ -139,19 +139,21 @@ Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post-n
 | Selector label + DnD keyboard instructions exposed | Pass | `input[aria-label="Authors"]` present; `#DndDescribedBy-0` text confirms `Space`/arrow/`Space` interaction model. |
 | Live-region create/clear announcements emitted | Pass | Observed polite-region strings: `Added author admin.` and `Author selection cleared.` |
 | Reorder announcement channel emits status text | Pass (announcement channel), behavior verification still required | `#DndLiveRegion-0` emitted reorder-oriented strings (`Moving to position ...` / `Moved ...`). |
-| Keyboard reorder deterministically changes visual token order | Inconclusive in automation run | Attempted `Space` + arrow + `Space`; announcement text updated but token order remained unchanged in captured DOM sequence. |
+| Keyboard reorder deterministically changes visual token order | Pass in manual VoiceOver run; automation run remained inconclusive | Automation attempt (`Space` + arrow + `Space`) updated announcement text but not captured DOM order; manual operator reported add/remove/reorder as working in VoiceOver on 2026-03-07. |
 | VoiceOver scripted transcript capture via AppleScript | Blocked | `System Events` keystroke automation is denied (`osascript is not allowed to send keystrokes`); no deterministic API found to extract spoken-output transcript text. |
+| VoiceOver manual add/remove/reorder pass | Pass | Operator confirmation in live editor session: "VoiceOver is good for add/remove/reorder." Transcript ledger updated in checklist. |
 
 Build-12 artifact evidence:
 - Screenshot: `output/playwright/build12-authors-field.png`
 - Manual transcript ledger updated: `docs/manual-testing-checklist.md` (`UI-06`)
+- Manual VoiceOver result recorded (2026-03-07): add/remove/reorder flow reported good.
 
 Post-validation remediation status:
 
 | Remediation item | Status | Evidence |
 |---|---|---|
-| R1 keyboard-operable reorder path | Implemented, but final behavioral confirmation pending manual SR matrix | Keyboard interaction instructions and announcer strings verified; manual transcript run still required to confirm stable reorder behavior in host AT sessions. |
-| R2 screen reader status announcements | Implemented and runtime-validated at DOM/status level; NVDA/VoiceOver transcript capture pending | Runtime polite-region strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150`, `docs/manual-testing-checklist.md` |
+| R1 keyboard-operable reorder path | Implemented and manually confirmed in VoiceOver; NVDA confirmation pending | Keyboard interaction instructions and announcer strings verified in automation; VoiceOver add/remove/reorder manual pass recorded in `docs/manual-testing-checklist.md` (`UI-06`). |
+| R2 screen reader status announcements | Implemented and runtime-validated; VoiceOver pass recorded, NVDA capture pending | Runtime polite-region strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150`, `docs/manual-testing-checklist.md` |
 | R3 explicit labeling/instructions | Implemented and runtime-validated | Runtime `combobox "Authors"` + instruction text + `src/components/SortableSelectContainer.tsx:19-23,141-143` |
 | R4 component replacement decision | Pending | Route to Build-11+ design decision |
 
@@ -165,8 +167,8 @@ When implementation starts, verify with:
 
 ## Residual risk
 
-- Full assistive-tech matrix is still pending: NVDA/VoiceOver manual verification and transcripted results are not yet captured.
-- Keyboard reorder behavior is not yet conclusively demonstrated in the Build-12 automation run: announcer text updates were observed, but DOM order did not change during scripted key sequence attempts.
+- Full assistive-tech matrix is not yet complete: VoiceOver pass is recorded, but NVDA transcript capture is still pending.
+- Automation-based reorder verification is still inconclusive, but manual VoiceOver confirmation indicates reorder behavior is functional in host AT usage.
 - Runtime token remove control currently exposes `aria-label=\"Remove [object Object]\"` in captured DOM, which needs follow-up accessibility review/fix before claiming full control-label quality.
 - Non-admin request-path hardening is implemented, but should be watched for regressions if core editor embed behavior changes.
 - Upstream adoption risk: if upstream PR cadence is slow, fork should treat accessibility remediation as fork-local delivery scope and proceed.
