@@ -1,0 +1,115 @@
+---
+title: "Human Made Authorship Plugin — Architecture"
+---
+
+graph TB
+    subgraph WordPress Core Tables
+        direction TB
+        WPUsers["<b>wp_users</b><br/>Regular users AND guest authors<br/>Guest authors have role: guest-author<br/>Random 24-char password, blank email"]
+        WPPosts["<b>wp_posts</b><br/>Posts, Pages, CPTs<br/>post_author field still exists<br/>but is NOT the source of truth"]
+        WPTerms["<b>wp_terms</b><br/>Term slugs = User IDs<br/>e.g. slug '42' = User #42"]
+        WPTermTax["<b>wp_term_taxonomy</b><br/>taxonomy = 'authorship'<br/>Hidden: public=false<br/>show_in_rest=false"]
+        WPTermRel["<b>wp_term_relationships</b><br/>Links posts → author terms<br/>Ordered via term_order"]
+    end
+
+    subgraph "Authorship Plugin (inc/)"
+        direction TB
+
+        subgraph "Bootstrap (plugin.php)"
+            Boot["bootstrap()<br/>Registers all hooks"]
+        end
+
+        subgraph "Roles & Caps (namespace.php)"
+            Role["register_roles_and_caps()<br/>add_role( 'guest-author', [], <b>no caps</b> )<br/>⚠️ No authenticate filter exists"]
+            MapCap["filter_map_meta_cap_for_editing()<br/>Grants attributed authors<br/>edit/delete/read on their posts"]
+            UserCap["filter_user_has_cap()<br/>Maps custom caps:<br/>• create_guest_authors → edit_others_posts<br/>• attribute_post_type → edit_others_posts"]
+        end
+
+        subgraph "Taxonomy Bridge (taxonomy.php)"
+            Tax["init_taxonomy()<br/>register_taxonomy( 'authorship' )<br/>Hidden, non-hierarchical, sorted"]
+            MineView["'Mine' filter on edit.php<br/>Uses term count for post count"]
+        end
+
+        subgraph "Template Functions (template.php)"
+            SetAuth["<b>set_authors( $post, $user_ids )</b><br/>wp_set_post_terms( $post_id,<br/>  user_ids_as_strings, 'authorship' )"]
+            GetIds["<b>get_author_ids( $post )</b><br/>wp_get_post_terms() → intval(slug)"]
+            GetAuth["<b>get_authors( $post )</b><br/>get_users( include: $ids )"]
+            GetNames["get_author_names() → 'A, B, C'<br/>get_author_names_sentence() → 'A, B, and C'<br/>get_author_names_list() → &lt;ul&gt;...&lt;/ul&gt;"]
+            IsAuthor["user_is_author( $user, $post )<br/>Checks term membership"]
+        end
+
+        subgraph "Query Rewriting (namespace.php)"
+            PreGet["action_pre_get_posts()<br/>Intercepts: author, author_name,<br/>author__in, author__not_in<br/><br/>Replaces with tax_query on<br/>'authorship' taxonomy<br/><br/>Restores vars via posts_pre_query"]
+        end
+
+        subgraph "REST API"
+            RestField["<b>authorship</b> field on wp/v2/posts<br/>Read: returns array of user IDs<br/>Write: calls set_authors()"]
+            RestEmbed["_embedded['wp:authorship']<br/>Full user objects when _embed set"]
+            UsersCtrl["<b>authorship/v1/users</b><br/>GET: Search attributable users<br/>POST: Create guest authors"]
+        end
+
+        subgraph "Guest Author Creation (class-users-controller.php)"
+            Create["prepare_item_for_database()<br/>• password = wp_generate_password(24)<br/>• email = '' (unless Admin provides)<br/>• roles = ['guest-author']<br/>• username = sanitized display name"]
+            Perms["Permission checks:<br/>• GET: attribute_post_type cap<br/>• POST: create_guest_authors cap<br/>• Email: create_users cap only<br/>• Roles/Password params: FORBIDDEN"]
+        end
+
+        subgraph "Feed & Notifications"
+            RSS["filter_the_author_for_rss()<br/>Shows all attributed authors<br/>in RSS2 feeds"]
+            Email["Comment moderation &<br/>notification emails sent to<br/>all attributed authors"]
+        end
+
+        subgraph "WP-CLI (inc/cli/)"
+            CLI["--authorship=4,11 flag<br/>wp authorship migrate wp-authors<br/>wp authorship migrate ppa"]
+        end
+    end
+
+    subgraph "Block Editor UI (src/)"
+        TSX["TypeScript + React<br/>Author selection component<br/>Search-as-you-type"]
+        Preload["authorshipData localized<br/>Pre-loaded current authors<br/>with avatars"]
+    end
+
+    %% Data Flow
+    WPUsers -->|"User IDs become<br/>term slugs"| WPTerms
+    WPTerms --> WPTermTax
+    WPTermTax --> WPTermRel
+    WPTermRel -->|"Links posts<br/>to author terms"| WPPosts
+
+    Boot --> Role
+    Boot --> Tax
+    Boot --> PreGet
+    Boot --> RestField
+
+    SetAuth -->|"wp_set_post_terms()"| WPTermRel
+    GetIds -->|"wp_get_post_terms()"| WPTermRel
+    GetIds --> GetAuth
+    GetAuth -->|"get_users()"| WPUsers
+    GetAuth --> GetNames
+
+    RestField --> GetAuth
+    RestField --> SetAuth
+    UsersCtrl --> Create
+    Create -->|"wp_insert_user()"| WPUsers
+
+    PreGet -->|"Rewrites author queries<br/>to tax_query"| WPTermRel
+
+    TSX -->|"REST API calls"| RestField
+    TSX -->|"User search"| UsersCtrl
+    Preload --> TSX
+
+    RSS --> GetNames
+    Email --> GetAuth
+
+    MapCap --> IsAuthor
+    UserCap --> Perms
+
+    %% Styling
+    classDef db fill:#e8e0f0,stroke:#7b68ae,stroke-width:2px
+    classDef core fill:#f0f4e8,stroke:#6b8e23,stroke-width:2px
+    classDef api fill:#e8f0f4,stroke:#4682b4,stroke-width:2px
+    classDef warn fill:#fff3cd,stroke:#d4a017,stroke-width:2px
+    classDef ui fill:#f4e8e8,stroke:#b44646,stroke-width:2px
+
+    class WPUsers,WPPosts,WPTerms,WPTermTax,WPTermRel db
+    class Role,MapCap,UserCap,Tax,MineView core
+    class RestField,RestEmbed,UsersCtrl,Create,Perms api
+    class TSX,Preload ui
