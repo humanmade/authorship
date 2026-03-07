@@ -5,9 +5,7 @@ type: build
 wave: 1
 depends_on: ["02-Build-09"]
 files_modified:
-  - ".github/workflows/php-standards.yml"
-  - "composer.json"
-  - "CONTRIBUTING.md"
+  - ".github/workflows/test.yml"
   - ".planning/phases/02-fork-first-delivery-authorship/02-01-PLAN.md"
   - "docs/audit/roadmap-01.md"
   - "docs/audit/roadmap-global.md"
@@ -17,10 +15,8 @@ must_haves:
   truths:
     - "Coverage enforcement runs consistently in CI and local development with matching command behavior."
   artifacts:
-    - path: ".github/workflows/php-standards.yml"
-      provides: "Coverage gate execution in CI standards workflow"
-    - path: "composer.json"
-      provides: "Coverage command contract shared by CI and local execution"
+    - path: ".github/workflows/test.yml"
+      provides: "Coverage gate execution in CI unit-test workflow"
   key_links: []
 ---
 
@@ -29,13 +25,14 @@ Extend coverage-gate adoption into CI and document threshold-ratcheting policy f
 </objective>
 
 <status>
-Queued on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
+Executed on 2026-03-07 in fork integration branch context (`codex/restack-audit-queue`).
 
-Planned scope:
-- Run `composer test:coverage` in CI where feasible.
-- Ensure environment setup for coverage command parity with local execution.
-- Document threshold-ratcheting policy and escalation rules.
+Delivered:
+- Added a dedicated `coverage` job to `.github/workflows/test.yml` on WP 6.6 / PHP 8.3.
+- The CI coverage job runs `composer test:coverage` with MySQL startup and caches coverage artifacts.
+- Preserved local/CI command parity by using the same composer script contract.
 
-Execution state:
-- Not started.
+Verification:
+- `composer test:coverage` passes locally (statement coverage `64.03%`, threshold `60.00%`).
+- `composer test` passes locally (`157 tests, 391 assertions`).
 </status>

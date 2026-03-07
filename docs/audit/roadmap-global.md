@@ -37,7 +37,7 @@ At this stage, the work is focused on making the plugin safer to operate and eas
   - `1d02511` `Execute 01-Build-04 performance hardening and stabilize tests`
 
 ### Phase 02: Fork-first delivery stabilization (active)
-- Executed `02-Build-01` through `02-Build-09` on `codex/restack-audit-queue`.
+- Executed `02-Build-01` through `02-Build-10` on `codex/restack-audit-queue`.
 - Main theme: deterministic and test-covered CLI migration behavior.
 - Highlights:
   - pause filter/clamping coverage
@@ -45,11 +45,13 @@ At this stage, the work is focused on making the plugin safer to operate and eas
   - multisite stabilization for migration tests
   - post-type input normalization, validation, and `post-type=any` compatibility
   - baseline statement-coverage gate via `composer test:coverage` (`64.03%` vs `60%` threshold)
+  - CI parity for coverage gate in the WP unit-test workflow
 - Recent commits:
   - `eededb0` `Build-06: harden wp-authors post-type input handling`
   - `2a9d813` `Build-07: validate migration post types against registered types`
   - `bdbc20d` `Build-08: preserve wp-authors post-type any compatibility`
   - `Build-09` coverage-gate adoption commit on `codex/restack-audit-queue`
+  - `Build-10` CI coverage-parity commit on `codex/restack-audit-queue`
 
 ## Current status snapshot
 - Branch: `codex/restack-audit-queue`
@@ -62,15 +64,15 @@ At this stage, the work is focused on making the plugin safer to operate and eas
 ## Backlog (human-readable)
 
 ### Ready now (next execution item)
-1. `02-Build-10` CI parity for coverage gate (queued, not started)
-   - Run `composer test:coverage` in CI with reliable environment setup
-   - Align local and CI coverage command behavior
-   - Document threshold-ratcheting policy for incremental tightening
+1. `02-Build-11` Coverage threshold ratcheting policy (queued, not started)
+   - Define explicit rules for raising/rolling back the floor
+   - Raise threshold in controlled increments only after stable CI signal
+   - Record each increase in roadmap + planning artifacts
 
-### Next after Build-10 (recommended)
-1. Coverage threshold ratcheting
-   - Raise baseline only when the branch is consistently green in CI
-   - Track changes as explicit planned increments
+### Next after Build-11 (recommended)
+1. Coverage floor tightening
+   - Continue gradual threshold raises based on stable CI results
+   - Keep each raise small and reversible
 2. Migration reliability deepening
    - Add additional edge-case tests for long-running migration scenarios and mixed post-type inputs
 3. Documentation consolidation
@@ -82,6 +84,6 @@ At this stage, the work is focused on making the plugin safer to operate and eas
 3. Broader implementation guidance for site builders
 
 ## What happens next
-Immediate next step is to execute `02-Build-10` and make the new coverage gate run consistently in CI.
+Immediate next step is to execute `02-Build-11` and establish threshold-ratcheting policy with the first controlled floor increase.
 
 After that, continue iterative fork-first hardening with small, test-first increments and periodic roadmap refreshes in this file.
