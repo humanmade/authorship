@@ -185,6 +185,20 @@ The command will perform a dry run by default, setting `--dry-run=false` will ma
 
 This command will not overwrite or update Authorship data unless the `--overwrite-authors=true` flag is set.
 
+### Migration pacing controls
+
+Both migration commands support `--batch-pause=<seconds>` (default `2`).
+Set `--batch-pause=0` to run without intentional pauses between processed batches.
+
+Authorship also provides hook extension points for migration pacing:
+
+* `authorship_migrate_batch_pause_seconds` filter
+  * Parameters: `(float $pause_seconds, string $migration, array $assoc_args)`
+  * Return a numeric pause value in seconds.
+* `authorship_migrate_batch_pause_resolved` action
+  * Parameters: `(float $pause_seconds, string $migration, array $assoc_args, int $count)`
+  * Fires after pause resolution and before optional sleeping for each processed batch.
+
 ## Email Notifications
 
 Authorship does not send any email notifications itself, but it does instruct WordPress core to additionally send its emails to attributed authors when appropriate.

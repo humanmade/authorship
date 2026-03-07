@@ -280,6 +280,69 @@ class TestCLI extends TestCase {
 		$this->assertSame( '0', $event['assoc_args']['batch-pause'] );
 	}
 
+	public function testMigratePauseResolutionActionFiresPerProcessedBatch() : void {
+		$factory = self::factory()->post;
+
+		$baseline_count = count(
+			get_posts( [
+				'fields' => 'ids',
+				'posts_per_page' => -1,
+				'post_type' => 'post',
+				'post_status' => 'any',
+				'ignore_sticky_posts' => true,
+				'suppress_filters' => false,
+				'tax_query' => [
+					[
+						'taxonomy' => TAXONOMY,
+						'operator' => 'NOT EXISTS',
+					],
+				],
+			] )
+		);
+
+		for ( $i = 0; $i < 101; $i++ ) {
+			$post = $factory->create_and_get( [
+				'post_author' => self::$users['editor']->ID,
+			] );
+			wp_set_post_terms( $post->ID, [], TAXONOMY );
+		}
+
+		$expected_total = $baseline_count + 101;
+		$expected_batches = (int) ceil( $expected_total / 100 );
+
+		$command = new CLI\Migrate_Command();
+
+		add_action( 'authorship_migrate_batch_pause_resolved', [ $this, 'capturePauseResolution' ], 10, 4 );
+
+		try {
+			$command->wp_authors( [], [
+				'dry-run' => true,
+				'post-type' => 'post',
+				'batch-pause' => '0',
+			] );
+		} finally {
+			remove_action( 'authorship_migrate_batch_pause_resolved', [ $this, 'capturePauseResolution' ], 10 );
+		}
+
+		$events = array_values(
+			array_filter(
+				$this->pause_events,
+				function ( array $event ) : bool {
+					return $event['migration'] === 'wp-authors';
+				}
+			)
+		);
+
+		$this->assertCount( $expected_batches, $events );
+		$this->assertSame( min( 100, $expected_total ), $events[0]['count'] );
+		$this->assertSame( $expected_total, $events[ $expected_batches - 1 ]['count'] );
+
+		foreach ( $events as $event ) {
+			$this->assertSame( 0.0, $event['pause_seconds'] );
+			$this->assertSame( '0', $event['assoc_args']['batch-pause'] );
+		}
+	}
+
 	/**
 	 * Capture pause-resolution action payloads.
 	 *
