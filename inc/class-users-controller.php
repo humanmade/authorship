@@ -264,9 +264,9 @@ class Users_Controller extends WP_REST_Users_Controller {
 
 		while ( username_exists( $candidate ) ) {
 			$suffix_string   = (string) $suffix;
-			$max_base_length = max( 1, self::MAX_USERNAME_LENGTH - strlen( $suffix_string ) - 1 );
+			$max_base_length = max( 1, self::MAX_USERNAME_LENGTH - strlen( $suffix_string ) );
 			$base            = substr( $username, 0, $max_base_length );
-			$candidate       = "{$base}-{$suffix_string}";
+			$candidate       = "{$base}{$suffix_string}";
 			++$suffix;
 		}
 

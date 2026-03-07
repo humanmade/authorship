@@ -68,7 +68,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertNotFalse( $first_user );
 		$this->assertNotFalse( $second_user );
 		$this->assertSame( 'duplicatename', $first_user->user_login );
-		$this->assertMatchesRegularExpression( '/^duplicatename-[0-9]+$/', $second_user->user_login );
+		$this->assertMatchesRegularExpression( '/^duplicatename[0-9]+$/', $second_user->user_login );
 	}
 
 	public function testGuestAuthorNonAsciiNameGetsFallbackUsername() : void {
