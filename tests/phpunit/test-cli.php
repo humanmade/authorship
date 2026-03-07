@@ -202,6 +202,31 @@ class TestCLI extends TestCase {
 		}
 	}
 
+	public function testMigratePostTypeAnyProcessesSupportedTypes() : void {
+		$factory = self::factory()->post;
+
+		$page = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+			'post_type' => 'page',
+		] );
+
+		wp_set_post_terms( $page->ID, [], TAXONOMY );
+
+		$authorship_authors = \Authorship\get_authors( $page );
+		$this->assertCount( 0, $authorship_authors );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'post-type' => 'any',
+			'batch-pause' => '0',
+		] );
+
+		$authorship_authors = \Authorship\get_authors( $page );
+		$this->assertCount( 1, $authorship_authors );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+	}
+
 	public function testMigrateRespectsZeroBatchPause() : void {
 		$factory = self::factory()->post;
 

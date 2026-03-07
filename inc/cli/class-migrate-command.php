@@ -489,12 +489,21 @@ class Migrate_Command extends WP_CLI_Command {
 
 		$post_types = array_values(
 			array_filter(
-				array_unique( array_map( 'trim', explode( ',', $post_type_arg ) ) )
+				array_unique(
+					array_map(
+						'strtolower',
+						array_map( 'trim', explode( ',', $post_type_arg ) )
+					)
+				)
 			)
 		);
 
 		if ( empty( $post_types ) ) {
 			return [ 'post' ];
+		}
+
+		if ( in_array( 'any', $post_types, true ) ) {
+			return [ 'any' ];
 		}
 
 		$registered_post_types = array_values(
