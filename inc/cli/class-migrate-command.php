@@ -386,6 +386,21 @@ class Migrate_Command extends WP_CLI_Command {
 	 */
 	private function pause_between_batches( array $assoc_args, string $migration, int $count ) : void {
 		$pause_seconds = $this->get_batch_pause_seconds( $assoc_args, $migration );
+		/**
+		 * Fires when migration batch pause duration is resolved.
+		 *
+		 * @param float               $pause_seconds Resolved pause length in seconds.
+		 * @param string              $migration Migration subcommand identifier.
+		 * @param array<string,mixed> $assoc_args Original CLI assoc args.
+		 * @param int                 $count Number of processed posts at pause point.
+		 */
+		do_action(
+			'authorship_migrate_batch_pause_resolved',
+			$pause_seconds,
+			$migration,
+			$assoc_args,
+			$count
+		);
 
 		if ( $pause_seconds <= 0 ) {
 			WP_CLI::line( sprintf( 'Processed %d posts, continuing without pause.', $count ) );
