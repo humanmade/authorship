@@ -167,7 +167,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - migrated to `@wordpress/scripts` with Node 20 baseline
   - added editor enqueue compatibility for `*.asset.php` metadata and CSS filename variants
   - introduced first JS unit tests for `AuthorsSelect` initialization behavior
-- `03-Build-02` is next: replace `react-sortable-hoc` with `@dnd-kit` via TDD-first reorder tests.
+- `03-Build-02` executed on `codex/phase-03-build-02-dnd-migration`:
+  - replaced `react-sortable-hoc` with `@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`
+  - migrated multi-value sorting components while preserving legacy `onSortEnd({ oldIndex, newIndex })` callback shape
+  - added JS tests for DND drag-end index mapping and removed legacy sortable-hoc prop assumptions
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
 
 ### Scope
 
@@ -263,7 +267,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-01-toolchain`
+- Active execution branch: `codex/phase-03-build-02-dnd-migration`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -278,9 +282,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: started; Build-01 executed, Build-02 planning/TDD starting.
+- Phase 03 status: active; Build-01 and Build-02 executed.
 
 ## What happens next
 
-1. Open and monitor the Build-01 Phase-03 PR from `codex/phase-03-build-01-toolchain`.
-2. Execute `03-Build-02`: replace `react-sortable-hoc` with `@dnd-kit` using a TDD reorder-behavior test-first flow.
+1. Open and monitor the Build-02 Phase-03 PR from `codex/phase-03-build-02-dnd-migration` after commit/push.
+2. Plan and execute `03-Build-03`: evaluate `react-select` v5 upgrade versus replacement with `@wordpress/components` `FormTokenField`, with accessibility acceptance criteria and tests.

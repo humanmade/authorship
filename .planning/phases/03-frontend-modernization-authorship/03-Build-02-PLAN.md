@@ -14,6 +14,7 @@ files_modified:
   - "src/components/AuthorsSelect.tsx"
   - "tests/js/components/*.test.tsx"
   - "docs/audit/roadmap-global.md"
+  - "docs/audit/roadmap-01.md"
 autonomous: true
 user_setup: []
 must_haves:
@@ -72,7 +73,13 @@ Replace `react-sortable-hoc` with `@dnd-kit` in the author selector while preser
 Started on 2026-03-07 on branch `codex/phase-03-build-02-dnd-migration`.
 
 Execution state:
-- 03-02-01 in progress.
-- 03-02-02 pending.
-- 03-02-03 pending.
+- 03-02-01 completed.
+- 03-02-02 completed.
+- 03-02-03 completed.
+
+Verification:
+- `npm run lint:js` passed.
+- `npm run test:js -- --ci` passed.
+- `npm run build` passed.
+- `composer test` passed.
 </status>

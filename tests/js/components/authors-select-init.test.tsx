@@ -135,4 +135,38 @@ describe( 'AuthorsSelect initialization', () => {
 
 		expect( onUpdate ).toHaveBeenCalledWith( [ 22, 33, 11 ] );
 	} );
+
+	it( 'does not pass legacy sortable-hoc props to selector container', async () => {
+		render(
+			<AuthorsSelectBase
+				{ ...baseProps }
+				currentAuthorIDs={ [ 9 ] }
+				preloadedAuthorOptions={ {
+					authors: [
+						{
+							value: 9,
+							label: 'Author',
+							avatar: null,
+						},
+					],
+				} }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( mockSortableProps.value ).toEqual( [
+				{
+					value: 9,
+					label: 'Author',
+					avatar: null,
+				},
+			] );
+		} );
+
+		expect( mockSortableProps.axis ).toBeUndefined();
+		expect( mockSortableProps.distance ).toBeUndefined();
+		expect( mockSortableProps.helperContainer ).toBeUndefined();
+		expect( mockSortableProps.lockAxis ).toBeUndefined();
+		expect( mockSortableProps.lockToContainerEdges ).toBeUndefined();
+	} );
 } );

@@ -14,7 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
-import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
+import SortableSelectContainer from './SortableSelectContainer';
 
 declare const authorshipData: authorshipDataFromWP;
 
@@ -38,8 +38,6 @@ const createOption = ( user: WP_REST_API_User ): Option => ( {
 	label: user.name,
 	avatar: user?.avatar_urls?.[48] || null,
 } );
-
-const getHelperContainer = (): HTMLElement => document.querySelector( `.${ containerClassName}` );
 
 /**
  * Returns the author selector control.
@@ -197,13 +195,8 @@ export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => 
 
 	return (
 		<SortableSelectContainer
-			axis="y"
-			distance={ 4 }
-			helperContainer={ getHelperContainer }
 			isDisabled={ isDisabled }
 			loadOptions={ loadOptions }
-			lockAxis="y"
-			lockToContainerEdges
 			styles={ styles }
 			value={ selected }
 			onChange={ changeValue }
