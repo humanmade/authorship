@@ -497,7 +497,18 @@ class Migrate_Command extends WP_CLI_Command {
 			return [ 'post' ];
 		}
 
-		return $post_types;
+		$registered_post_types = array_values(
+			array_filter(
+				$post_types,
+				'post_type_exists'
+			)
+		);
+
+		if ( empty( $registered_post_types ) ) {
+			return [ 'post' ];
+		}
+
+		return $registered_post_types;
 	}
 
 	/**

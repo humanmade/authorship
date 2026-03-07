@@ -5,7 +5,7 @@
 - `01-01` exists as the initial planning stub at `.planning/phases/01-audit-roadmap-authorship/01-01-PLAN.md`.
 - `01-02` now has a repo-grounded audit deliverable in `docs/audit/HM_WPCS_audit.md`.
 - `01-Build-01` through `01-Build-04` have been executed on the fork integration branch (`codex/restack-audit-queue`).
-- `02-Build-01` through `02-Build-06` are executed in the fork integration branch with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, and post-type input hardening.
+- `02-Build-01` through `02-Build-07` are executed in the fork integration branch with deterministic CLI migration pause coverage, multisite stabilization, pacing hook contract hardening, and registration-aware post-type input hardening.
 - Focused upstream PR for Build-04 is open: `https://github.com/humanmade/authorship/pull/161`.
 
 ## What Phase 01 established
@@ -26,6 +26,7 @@
 - `02-Build-04`: completed
 - `02-Build-05`: completed
 - `02-Build-06`: completed
+- `02-Build-07`: completed
 
 ## Next step
-- Define and execute `02-Build-07` scope for the next fork-first delivery increment.
+- Define and execute `02-Build-08` scope for the next fork-first delivery increment.

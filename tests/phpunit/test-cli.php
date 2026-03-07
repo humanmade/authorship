@@ -134,6 +134,74 @@ class TestCLI extends TestCase {
 		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
 
+	public function testMigratePostTypeFallsBackToPostWhenUnknownTypeProvided() : void {
+		$factory = self::factory()->post;
+
+		$post = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		wp_set_post_terms( $post->ID, [], TAXONOMY );
+
+		$authorship_authors = \Authorship\get_authors( $post );
+		$this->assertCount( 0, $authorship_authors );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'post-type' => 'not-a-real-post-type',
+			'batch-pause' => '0',
+		] );
+
+		$authorship_authors = \Authorship\get_authors( $post );
+		$this->assertCount( 1, $authorship_authors );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+	}
+
+	public function testMigratePostTypeIncludesRegisteredCustomType() : void {
+		$factory = self::factory()->post;
+		$post_type = 'book';
+		$post_type_preexisting = post_type_exists( $post_type );
+
+		if ( ! $post_type_preexisting ) {
+			register_post_type(
+				$post_type,
+				[
+					'public' => true,
+					'supports' => [ 'author' ],
+				]
+			);
+			register_taxonomy_for_object_type( TAXONOMY, $post_type );
+		}
+
+		try {
+			$book = $factory->create_and_get( [
+				'post_author' => self::$users['editor']->ID,
+				'post_type' => $post_type,
+			] );
+
+			wp_set_post_terms( $book->ID, [], TAXONOMY );
+
+			$authorship_authors = \Authorship\get_authors( $book );
+			$this->assertCount( 0, $authorship_authors );
+
+			$command = new CLI\Migrate_Command();
+			$command->wp_authors( [], [
+				'dry-run' => false,
+				'post-type' => $post_type,
+				'batch-pause' => '0',
+			] );
+
+			$authorship_authors = \Authorship\get_authors( $book );
+			$this->assertCount( 1, $authorship_authors );
+			$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+		} finally {
+			if ( ! $post_type_preexisting && post_type_exists( $post_type ) ) {
+				unregister_post_type( $post_type );
+			}
+		}
+	}
+
 	public function testMigrateRespectsZeroBatchPause() : void {
 		$factory = self::factory()->post;
 
