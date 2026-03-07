@@ -20,6 +20,7 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - `03-Build-03` executed on `codex/phase-03-build-03-react-select` (`react-select` v5 migration + selection-change contract tests)
   - `03-Build-04` executed on `codex/phase-03-build-04-hooks-lodash` (`withSelect`/`withDispatch` migration to hooks + lodash removal in `AuthorsSelect`)
   - `03-Build-05` executed on `codex/phase-03-build-05-editor-import-guest-tests` (`PluginPostStatusInfo` import migration to `@wordpress/editor` + guest-author create/error JS tests)
+  - `03-Build-06` executed on `codex/phase-03-build-06-manual-testing-checklist` (manual UI/REST/WP-CLI/XML-RPC verification checklist in `docs/manual-testing-checklist.md`)
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -64,4 +65,4 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Plan and execute `03-Build-06` (accessibility audit and remediation planning for the author selector against WCAG 2.1 AA).
+- Plan and execute `03-Build-07` (accessibility audit and remediation planning for the author selector against WCAG 2.1 AA).
