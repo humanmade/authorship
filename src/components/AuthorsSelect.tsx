@@ -47,7 +47,7 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @param {AuthorsSelectProps} props Component props.
  * @returns {ReactElement} An element.
  */
-const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
+export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => {
 	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate, postType, preloadedAuthorOptions } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
@@ -238,4 +238,4 @@ const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> =
 export default compose( [
 	withDispatch( mapDispatchToProps ),
 	withSelect( mapSelectToProps ),
-] )( AuthorsSelect );
+] )( AuthorsSelectBase );

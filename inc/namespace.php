@@ -513,7 +513,7 @@ function enqueue_assets() : void {
 
 	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
 		return;
-	}
+	}//end if
 
 	enqueue_assets_for_post();
 	preload_author_data( $post );
@@ -526,6 +526,16 @@ function enqueue_assets_for_post() : void {
 	$plugin_dir = plugin_dir_path( __DIR__ );
 	$plugin_url = plugin_dir_url( __DIR__ );
 	$manifest   = $plugin_dir . 'build/asset-manifest.json';
+	$script_relative_path = 'build/main.js';
+	$script_path          = $plugin_dir . $script_relative_path;
+	$style_relative_path  = 'build/style.css';
+	$style_path           = $plugin_dir . $style_relative_path;
+	$asset_file           = $plugin_dir . 'build/main.asset.php';
+
+	if ( ! file_exists( $style_path ) ) {
+		$style_relative_path = 'build/style-style.css';
+		$style_path          = $plugin_dir . $style_relative_path;
+	}
 
 	$script_dependencies = [
 		'lodash',
@@ -563,10 +573,49 @@ function enqueue_assets_for_post() : void {
 		);
 
 		return;
-	}
+	}//end if
 
-	$script_relative_path = 'build/main.js';
-	$script_path          = $plugin_dir . $script_relative_path;
+	if ( file_exists( $asset_file ) && file_exists( $script_path ) ) {
+		$asset_metadata = require $asset_file;
+		$dependencies   = $script_dependencies;
+		$version        = null;
+
+		if ( is_array( $asset_metadata ) ) {
+			if ( isset( $asset_metadata['dependencies'] ) && is_array( $asset_metadata['dependencies'] ) ) {
+				$dependencies = $asset_metadata['dependencies'];
+			}
+
+			if ( isset( $asset_metadata['version'] ) && is_scalar( $asset_metadata['version'] ) ) {
+				$version = (string) $asset_metadata['version'];
+			}
+		}
+
+		wp_enqueue_script(
+			SCRIPT_HANDLE,
+			$plugin_url . $script_relative_path,
+			$dependencies,
+			$version,
+			true
+		);
+
+		if ( file_exists( $style_path ) ) {
+			$style_version = $version;
+
+			if ( null === $style_version ) {
+				$style_file_mtime = filemtime( $style_path );
+				$style_version    = false !== $style_file_mtime ? (string) $style_file_mtime : null;
+			}
+
+			wp_enqueue_style(
+				STYLE_HANDLE,
+				$plugin_url . $style_relative_path,
+				[],
+				$style_version
+			);
+		}
+
+		return;
+	}//end if
 
 	if ( file_exists( $script_path ) ) {
 		$script_version = filemtime( $script_path );
@@ -579,9 +628,6 @@ function enqueue_assets_for_post() : void {
 			true
 		);
 	}
-
-	$style_relative_path = 'build/style.css';
-	$style_path          = $plugin_dir . $style_relative_path;
 
 	if ( file_exists( $style_path ) ) {
 		$style_version = filemtime( $style_path );

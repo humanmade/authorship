@@ -19,6 +19,7 @@
         "FunctionDeclaration": true
       }
     } ],
+    "jsdoc/no-undefined-types": "off",
 
     // Superseded by TypeScript.
     "jsdoc/require-param": "off",
@@ -33,5 +34,26 @@
     "node_modules/**",
     "tests/wordpress/**",
     "vendor/**"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "rules": {
+        "import/named": "off"
+      }
+    },
+    {
+      "files": [
+        "tests/js/**/*.ts",
+        "tests/js/**/*.tsx"
+      ],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "import/first": "off"
+      }
+    }
   ]
 }
