@@ -1,5 +1,7 @@
 # Phase 01 Audit Roadmap for Authorship
 
+See also: [Global Roadmap](/Users/danknauss/Documents/GitHub/authorship/docs/audit/roadmap-global.md) for project-wide purpose, history, backlog, and next-step narrative.
+
 ## Current state
 - `00-01` foundation baseline now defines support matrix and gate assumptions in `docs/audit/foundation-quality-baseline.md`.
 - `01-01` exists as the initial planning stub at `.planning/phases/01-audit-roadmap-authorship/01-01-PLAN.md`.
@@ -28,6 +30,7 @@
 - `02-Build-06`: completed
 - `02-Build-07`: completed
 - `02-Build-08`: completed
+- `02-Build-09`: queued (coverage tooling and baseline gate), not started
 
 ## Next step
-- Define and execute `02-Build-09` scope for the next fork-first delivery increment.
+- Execute `02-Build-09` to add coverage tooling (`test:coverage`), baseline reporting, and an initial threshold gate.
