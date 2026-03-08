@@ -93,6 +93,7 @@ After these five items, Phase 02 is closed and Phase 03 begins.
 - Minimize the number of PRs (fewer is better for a likely low-bandwidth reviewer).
 - Do not depend on acceptance. Fork proceeds regardless.
 - Each PR must be independently mergeable and pass upstream CI.
+- Fork-local artifacts (`.planning/`, `docs/audit/`) are excluded from all upstream PR branches. These are process infrastructure for the fork only.
 
 ### PR plan (4 PRs)
 
@@ -156,10 +157,36 @@ Submit all four PRs at the same time, after `02-Build-13` is complete. Reference
 
 ---
 
-## Phase 03: Frontend modernization (next)
+## Phase 03: Frontend modernization (active)
 
 ### Goal
 Replace the deprecated and accessibility-impaired frontend stack with current WordPress-ecosystem tooling. This is the highest-impact remaining work.
+
+### Execution status (2026-03-07)
+- `03-Build-01` executed on `codex/phase-03-build-01-toolchain`:
+  - migrated to `@wordpress/scripts` with Node 20 baseline
+  - added editor enqueue compatibility for `*.asset.php` metadata and CSS filename variants
+  - introduced first JS unit tests for `AuthorsSelect` initialization behavior
+- `03-Build-02` executed on `codex/phase-03-build-02-dnd-migration`:
+  - replaced `react-sortable-hoc` with `@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`
+  - migrated multi-value sorting components while preserving legacy `onSortEnd({ oldIndex, newIndex })` callback shape
+  - added JS tests for DND drag-end index mapping and removed legacy sortable-hoc prop assumptions
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
+- `03-Build-03` executed on `codex/phase-03-build-03-react-select`:
+  - upgraded `react-select` from v3 to v5 and removed `@types/react-select`
+  - aligned selector adapter typing to v5-native interfaces (`AsyncCreatableProps`, `StylesConfig`, `MultiValue`)
+  - added JS tests for selection-change and clearing callback behavior
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
+- `03-Build-04` executed on `codex/phase-03-build-04-hooks-lodash`:
+  - replaced `withSelect`/`withDispatch` composition in `AuthorsSelect` with `useSelect`/`useDispatch`
+  - removed lodash dependency usage (`get`, `isEqual`) from `AuthorsSelect`
+  - added connected-component tests for hook wiring and assign-action disabled-state behavior
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
+- `03-Build-05` executed on `codex/phase-03-build-05-editor-import-guest-tests`:
+  - moved `PluginPostStatusInfo` import from `@wordpress/edit-post` to `@wordpress/editor`
+  - removed unused `@wordpress/edit-post` dependency
+  - added JS tests for guest-author creation success and failure paths in selector initialization flow
+  - verified with `npm run lint:js`, `npm run test:js -- --ci`, `npm run build`, and `composer test`
 
 ### Scope
 
@@ -237,23 +264,26 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 15 | CPT capability test depth | `map_meta_cap` edge cases |
 | 16 | Cache invalidation tests | Object cache interactions |
 | 17 | Hook/filter contract tests | `authorship_default_author`, etc. |
+| 18 | `post_author` field synchronization | Sync `post_author` with first attributed author on `set_authors()` to close theme/SEO/caching compatibility gap. See `.planning/known-gaps.md` §`post_author` field divergence. |
+| 19 | Schema.org / JSON-LD author markup in HTML | Structured author data in page output for SEO. Competitors (PPA Pro, Molongui) already provide this. Independent of feed/Byline work. |
 
 ### P3 — Product features (future, no phase assigned)
 
 | # | Item | Notes |
 |---|------|-------|
-| 18 | Classic editor support | README marks incomplete |
-| 19 | Atom feed support | README marks incomplete |
-| 20 | `init_taxonomy` "Mine" count performance | `get_term_by` on every `init`; cache or lazy-load |
-| 21 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
-| 22 | Site builder implementation guidance | README aspirational item |
-| 23 | REST API embedding depth tests | Embedded author data structure |
+| 20 | Classic editor support | README marks incomplete |
+| 21 | Atom feed support | README marks incomplete |
+| 22 | `init_taxonomy` "Mine" count performance | `get_term_by` on every `init`; cache or lazy-load |
+| 23 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
+| 24 | Site builder implementation guidance | README aspirational item |
+| 25 | REST API embedding depth tests | Embedded author data structure |
 
 ---
 
 ## Current status snapshot
 
-- Branch: `codex/restack-audit-queue`
+- Active execution branch: `codex/phase-03-build-05-editor-import-guest-tests`
+- Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
   - `#163` guest author + post-insert hardening
@@ -267,8 +297,9 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - 82 PHPUnit test methods, ~64% statement coverage (`64.03%`) with threshold ratcheted to `63%`.
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
+- Phase 03 status: active; Build-01 through Build-05 executed.
 
 ## What happens next
 
-1. Tag the Phase 02 submission point on `codex/restack-audit-queue`.
-2. Start Phase 03 planning on a new branch with Node 20 + `@wordpress/scripts` migration as first build item.
+1. Plan and execute `03-Build-06` for the accessibility audit slice (WCAG 2.1 AA checks and findings capture for author selector UX).
+2. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.

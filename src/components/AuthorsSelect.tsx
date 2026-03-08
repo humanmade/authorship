@@ -1,20 +1,18 @@
-import { get, isEqual } from 'lodash';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import { Styles } from 'react-select';
+import type { MultiValue, StylesConfig } from 'react-select';
 import type {
 	WP_REST_API_Error,
 	WP_REST_API_User,
 } from 'wp-types';
 
 import apiFetch from '@wordpress/api-fetch';
-import { compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 
 import { authorshipDataFromWP, Option, SortedOption } from '../types';
 import arrayMove from '../utils/arrayMove';
 
-import SortableSelectContainer, { className as containerClassName } from './SortableSelectContainer';
+import SortableSelectContainer from './SortableSelectContainer';
 
 declare const authorshipData: authorshipDataFromWP;
 
@@ -25,6 +23,14 @@ interface AuthorsSelectProps {
 	onUpdate: ( value: number[] ) => void,
 	postType: string,
 	preloadedAuthorOptions: authorshipDataFromWP,
+}
+
+interface EditorStore {
+	getCurrentPost?: () => {
+		_links?: Record<string, unknown>,
+	} | undefined,
+	getCurrentPostType?: () => string,
+	getEditedPostAttribute?: ( attribute: string ) => unknown,
 }
 
 /**
@@ -39,7 +45,20 @@ const createOption = ( user: WP_REST_API_User ): Option => ( {
 	avatar: user?.avatar_urls?.[48] || null,
 } );
 
-const getHelperContainer = (): HTMLElement => document.querySelector( `.${ containerClassName}` );
+/**
+ * Compares author ID arrays while preserving order semantics.
+ *
+ * @param {number[]} left The first ID array.
+ * @param {number[]} right The second ID array.
+ * @returns {boolean} Whether both arrays are equal.
+ */
+const areAuthorIDsEqual = ( left: number[], right: number[] ): boolean => {
+	if ( left.length !== right.length ) {
+		return false;
+	}
+
+	return left.every( ( value, index ) => value === right[ index ] );
+};
 
 /**
  * Returns the author selector control.
@@ -47,7 +66,7 @@ const getHelperContainer = (): HTMLElement => document.querySelector( `.${ conta
  * @param {AuthorsSelectProps} props Component props.
  * @returns {ReactElement} An element.
  */
-const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
+export const AuthorsSelectBase = ( props: AuthorsSelectProps ): ReactElement => {
 	const { currentAuthorIDs, hasAssignAuthorAction, onError, onUpdate, postType, preloadedAuthorOptions } = props;
 
 	const isDisabled = ! hasAssignAuthorAction;
@@ -62,7 +81,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 		const preloadedAuthorIDs = preloadedAuthorOptions.authors.map( author => author.value );
 
-		if ( isEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
+		if ( areAuthorIDsEqual( preloadedAuthorIDs, currentAuthorIDs ) ) {
 			setSelected( preloadedAuthorOptions.authors );
 			hasInitializedSelection.current = true;
 			return;
@@ -139,7 +158,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	/**
 	 * Declares styles for elements that can't easily be targeted with a CSS selector.
 	 */
-	const styles: Styles<Option, true> = {
+	const styles: StylesConfig<Option, true> = {
 		input: () => ( {
 			margin: 0,
 			width: '100%',
@@ -149,11 +168,13 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	/**
 	 * Handles changes to the selected authors.
 	 *
-	 * @param {Option[]} [options] The selected options.
+	 * @param {MultiValue<Option> | null} options The selected options.
 	 */
-	const changeValue = ( options?: Option[] ) => {
-		setSelected( options || [] );
-		onUpdate( options ? ( options.map( option => option.value ) ) : [] );
+	const changeValue = ( options: MultiValue<Option> | null ) => {
+		const normalized = options ? [ ...options ] : [];
+
+		setSelected( normalized );
+		onUpdate( normalized.map( option => option.value ) );
 	};
 
 	/**
@@ -197,13 +218,8 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 
 	return (
 		<SortableSelectContainer
-			axis="y"
-			distance={ 4 }
-			helperContainer={ getHelperContainer }
 			isDisabled={ isDisabled }
 			loadOptions={ loadOptions }
-			lockAxis="y"
-			lockToContainerEdges
 			styles={ styles }
 			value={ selected }
 			onChange={ changeValue }
@@ -213,29 +229,60 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	);
 };
 
-const mapDispatchToProps = ( dispatch: CallableFunction ): Record<string, CallableFunction> => ( {
-	onError( message: string ) {
-		dispatch( 'core/notices' ).createErrorNotice( message );
-	},
-	onUpdate( value: number[] ) {
-		dispatch( 'core/editor' ).editPost( {
-			authorship: value,
-		} );
-	},
-} );
+/**
+ * Returns connected editor data for the AuthorsSelect component.
+ *
+ * @param {CallableFunction} select Data select callback.
+ * @returns {Record<string, unknown>} Connected editor data.
+ */
+const selectConnectedProps = ( select: CallableFunction ): Record<string, unknown> => {
+	const editorStore = select( 'core/editor' ) as EditorStore | null;
 
-const mapSelectToProps = ( select: CallableFunction ): Record<string, unknown> => ( {
-	currentAuthorIDs: select( 'core/editor' ).getEditedPostAttribute( 'authorship' ),
-	postType: select( 'core/editor' ).getCurrentPostType(),
-	preloadedAuthorOptions: authorshipData,
-	hasAssignAuthorAction: Boolean( get(
-		select( 'core/editor' ).getCurrentPost(),
-		[ '_links', 'authorship:action-assign-authorship' ],
-		false
-	) ),
-} );
+	if ( ! editorStore ) {
+		return {
+			currentAuthorIDs: [],
+			hasAssignAuthorAction: false,
+			postType: 'post',
+		};
+	}
 
-export default compose( [
-	withDispatch( mapDispatchToProps ),
-	withSelect( mapSelectToProps ),
-] )( AuthorsSelect );
+	const currentPost = editorStore.getCurrentPost?.();
+	const currentAuthorIDs = editorStore.getEditedPostAttribute?.( 'authorship' );
+
+	return {
+		currentAuthorIDs: Array.isArray( currentAuthorIDs ) ? currentAuthorIDs : [],
+		hasAssignAuthorAction: Boolean( currentPost?._links?.['authorship:action-assign-authorship'] ),
+		postType: editorStore.getCurrentPostType?.() || 'post',
+	};
+};
+
+const AuthorsSelect = (): ReactElement => {
+	const { createErrorNotice } = useDispatch( 'core/notices' ) as {
+		createErrorNotice: ( message: string ) => void,
+	};
+	const { editPost } = useDispatch( 'core/editor' ) as {
+		editPost: ( value: Record<string, unknown> ) => void,
+	};
+	const {
+		currentAuthorIDs,
+		hasAssignAuthorAction,
+		postType,
+	} = useSelect( selectConnectedProps, [] ) as {
+		currentAuthorIDs: number[],
+		hasAssignAuthorAction: boolean,
+		postType: string,
+	};
+
+	return (
+		<AuthorsSelectBase
+			currentAuthorIDs={ currentAuthorIDs }
+			hasAssignAuthorAction={ hasAssignAuthorAction }
+			postType={ postType }
+			preloadedAuthorOptions={ authorshipData }
+			onError={ createErrorNotice }
+			onUpdate={ value => editPost( { authorship: value } ) }
+		/>
+	);
+};
+
+export default AuthorsSelect;

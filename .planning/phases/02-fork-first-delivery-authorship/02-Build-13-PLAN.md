@@ -15,6 +15,7 @@ must_haves:
   truths:
     - "Each PR is independently mergeable against upstream develop and passes upstream CI."
     - "PRs are submitted but not depended on — fork proceeds regardless of upstream response."
+    - "Fork-local artifacts (.planning/, docs/audit/) are excluded from all upstream PR branches."
   artifacts:
     - path: "docs/audit/roadmap-global.md"
       provides: "PR submission record with numbers and links"
