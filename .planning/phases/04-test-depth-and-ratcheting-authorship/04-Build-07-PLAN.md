@@ -119,6 +119,6 @@ The `action_deleted_user` handler and `sync_deleted_user_authorship_for_current_
 Planned on 2026-03-08.
 
 Execution state:
-- Not started (planning artifact only).
+- Explicit Build-07 execution not started.
 - Implementation exists in groundwork commit 380ba2c; this build adds verification depth and coverage hardening.
 </status>

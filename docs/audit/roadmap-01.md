@@ -27,8 +27,8 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - `03-Build-10` executed on `codex/phase-03-build-10-at-matrix-hardening` (non-admin edit-context request-path hardening + regression test coverage + NVDA/VoiceOver matrix protocol checklist)
   - `03-Build-11` executed on `codex/phase-03-build-11-coverage-psalm-advisory` (admin PHPUnit coverage expansion + JS coverage threshold gate + Psalm advisory tooling)
   - `03-Build-12` completed on `codex/phase-03-build-12-at-matrix-evidence` (automation evidence captured; manual VoiceOver pass recorded for add/remove/reorder; optional NVDA transcript capture moved to backlog)
-- Phase 04 planning started on 2026-03-08:
-  - `04-01` planned at `.planning/phases/04-test-depth-and-ratcheting-authorship/04-01-PLAN.md`
+- Phase 04 started on 2026-03-08 via groundwork commit `380ba2c`, then had its queue formalized in plans:
+  - `04-01` documents the actual started state and the explicit-build execution boundary at `.planning/phases/04-test-depth-and-ratcheting-authorship/04-01-PLAN.md`
   - `04-Build-01` and `04-Build-02` plans created and queued for multisite/test-depth and ratchet work
   - `04-Build-03` through `04-Build-07` plans created and queued for blocker remediation:
     - deterministic `wp-authors` batching
@@ -36,7 +36,9 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
     - implicit author-query post-type semantics
     - author-query callback lifecycle cleanup
     - user-deletion authorship sync verification and coverage hardening
+  - Next explicit execution slice is `04-Build-03`
   - Phase 04 execution priority is `04-Build-03` through `04-Build-07`, then `04-Build-01` and `04-Build-02`
+  - Further Phase 04 work should continue only through explicit build-scoped branches/PRs
 - Strict fork-first upstream policy centralized at `docs/fork-first-policy.md`.
 - Upstream PR hygiene completed on 2026-03-08: superseded HM PRs `#160`, `#161`, and `#167`-`#172` closed; maintained open packaging set is `#162`-`#165`.
 
@@ -83,6 +85,6 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Keep Phase 04 execution paused; start `04-Build-03` first after explicit go-ahead.
+- Continue Phase 04 only through explicit build-scoped branches/PRs; `04-Build-03` is the next slice.
 - Blocker-remediation lane is `04-Build-03` through `04-Build-07`; keep `04-Build-01` and `04-Build-02` queued behind it.
 - Keep NVDA transcript capture in backlog as optional `UI-06` evidence work (non-blocking).

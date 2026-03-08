@@ -836,6 +836,29 @@ function preload_author_data( WP_Post $post ) : void {
  */
 function action_pre_get_posts( WP_Query $query ) : void {
 	$post_type = $query->get( 'post_type' );
+	$stored_values = [];
+
+	// Different query args and their default values.
+	$concerns = [
+		'author_name' => '',
+		'author' => '',
+		'author__in' => [],
+		'author__not_in' => [],
+	];
+
+	// Record the original values of concerned query vars.
+	foreach ( array_keys( $concerns ) as $concern ) {
+		$value = $query->get( $concern );
+		if ( ! empty( $value ) ) {
+			$stored_values[ $concern ] = $value;
+		}//end if
+	}
+
+	// None of the set query vars concern us? Then we have nothing more to do.
+	if ( empty( $stored_values ) ) {
+		return;
+	}
+
 	$supported_post_types = get_supported_post_types();
 
 	if ( empty( $post_type ) ) {
@@ -862,28 +885,11 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		}
 	}
 
-	$stored_values = [];
-
-	// Different query args and their default values.
-	$concerns = [
-		'author_name' => '',
-		'author' => '',
-		'author__in' => [],
-		'author__not_in' => [],
-	];
-
-	// Record the original values of concerned query vars and remove them from the query.
+	// Remove the author query vars now that we've confirmed this query needs rewriting.
 	foreach ( $concerns as $concern => $concern_default_value ) {
-		$value = $query->get( $concern );
-		if ( ! empty( $value ) ) {
-			$stored_values[ $concern ] = $value;
+		if ( array_key_exists( $concern, $stored_values ) ) {
 			$query->set( $concern, $concern_default_value );
-		}//end if
-	}
-
-	// None of the set query vars concern us? Then we have nothing more to do.
-	if ( empty( $stored_values ) ) {
-		return;
+		}
 	}
 
 	$user_ids = [ 0 ];
@@ -973,7 +979,11 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		}
 
 		// Specifically set `author` when `author_name` is in use as WP_Query also sets `author` internally.
-		if ( ! empty( $stored_values['author_name'] ) ) {
+		if (
+			array_key_exists( 'author_name', $stored_values )
+			&& is_string( $stored_values['author_name'] )
+			&& '' !== $stored_values['author_name']
+		) {
 			$query->set( 'author', $user_ids[0] );
 		}
 

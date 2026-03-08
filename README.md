@@ -63,10 +63,11 @@ Fork development history is tracked in `CHANGELOG.md`.
 
 ## Current Status
 
-**Alpha** upstream product status. The fork has completed Phase 03 modernization/hardening and is currently in Phase 04 planning (execution not started):
+**Alpha** upstream product status. The fork has completed Phase 03 modernization/hardening and has entered early Phase 04 execution after groundwork landed on 2026-03-08 (`380ba2c`):
 
 * Phase 01 and Phase 02 are complete fork-locally.
 * Phase 03 Build-12 execution is complete fork-locally: VoiceOver add/remove/reorder pass is recorded; optional NVDA transcript capture is now tracked as backlog evidence (not a delivery gate).
+* Phase 04 groundwork has already landed across query handling, migration hardening, multisite behavior, and user-deletion sync; follow-on work is queued in explicit Build-03 through Build-07 slices.
 
 ## Features
 

@@ -322,6 +322,43 @@ class TestWPQuery extends TestCase {
 		$this->assertSame( [ $yes_post->ID, $yes_page->ID ], $posts );
 	}
 
+	public function testQueryWithoutAuthorFilterKeepsAnyAndMixedPostTypeSelection() : void {
+		$factory = self::factory()->post;
+
+		register_post_type( 'testing', [
+			'public' => true,
+		] );
+		remove_post_type_support( 'testing', 'author' );
+
+		$post = $factory->create_and_get();
+		$page = $factory->create_and_get( [
+			'post_type' => 'page',
+		] );
+		$testing_post = $factory->create_and_get( [
+			'post_type' => 'testing',
+		] );
+
+		$query = new WP_Query();
+		$posts = $query->query( [
+			'post_type' => 'any',
+			'fields'    => 'ids',
+			'orderby'   => 'ID',
+			'order'     => 'ASC',
+		] );
+
+		$this->assertSame( [ $post->ID, $page->ID, $testing_post->ID ], $posts );
+
+		$query = new WP_Query();
+		$posts = $query->query( [
+			'post_type' => [ 'post', 'testing' ],
+			'fields'    => 'ids',
+			'orderby'   => 'ID',
+			'order'     => 'ASC',
+		] );
+
+		$this->assertSame( [ $post->ID, $testing_post->ID ], $posts );
+	}
+
 	public function testQueryForAuthorWithMixedPostTypesNarrowsToSupportedTypes() : void {
 		$factory = self::factory()->post;
 

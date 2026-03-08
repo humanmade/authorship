@@ -19,6 +19,7 @@ must_haves:
   truths:
     - "Build-01 expands test depth and coverage signal without introducing intentional runtime behavior changes."
     - "Hook/filter tests validate contract behavior, not private implementation details."
+    - "Cross-site attribution remains disabled by default and is enabled only via an explicit network mode control."
   artifacts:
     - path: "tests/phpunit/test-multisite.php"
       provides: "Expanded multisite behavior regression coverage"
@@ -28,7 +29,7 @@ must_haves:
 ---
 
 <objective>
-Expand PHPUnit coverage for multisite and public hooks/filters to raise confidence in cross-site behavior and extension contracts.
+Expand PHPUnit coverage for multisite and public hooks/filters to raise confidence in cross-site behavior and extension contracts while preserving explicit network-mode control for cross-site attribution.
 </objective>
 
 <tasks>
@@ -39,6 +40,7 @@ Expand PHPUnit coverage for multisite and public hooks/filters to raise confiden
   <action>
     - Catalog missing assertions for multisite author attribution and capability behavior.
     - Catalog missing tests for public filters such as `authorship_default_author` and `authorship_supported_post_types`.
+    - Catalog required contract points for explicit network-mode behavior (default-off, opt-in enablement path, and capability boundaries).
   </action>
   <verify>Gap list is explicit and mapped to test files.</verify>
   <done>Coverage-gap map documented in implementation notes.</done>
@@ -49,9 +51,11 @@ Expand PHPUnit coverage for multisite and public hooks/filters to raise confiden
   <files>tests/phpunit/test-multisite.php, tests/phpunit/includes/testcase.php</files>
   <action>
     - Add cross-site attribution read/write checks and role/capability-path assertions.
+    - Add coverage proving default behavior stays site-local unless explicit network mode is enabled.
+    - Add coverage proving explicit network mode enables cross-site attribution/search behavior when enabled.
     - Add deterministic setup helpers needed for multisite fixtures.
   </action>
-  <verify>`WP_MULTISITE=1 composer test:integration` passes with added multisite tests.</verify>
+  <verify>`WP_MULTISITE=1 composer test:integration` passes with added multisite tests and explicit-mode default-off assertions.</verify>
   <done>Multisite regression coverage expanded and green.</done>
 </task>
 
@@ -83,5 +87,6 @@ Expand PHPUnit coverage for multisite and public hooks/filters to raise confiden
 Planned on 2026-03-08.
 
 Execution state:
-- Not started (planning artifact only).
+- Explicit Build-01 execution not started.
+- Groundwork commit `380ba2c` landed partial multisite/runtime changes inside this scope; remaining work is coverage expansion and gate re-verification.
 </status>

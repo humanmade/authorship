@@ -68,5 +68,6 @@ Harden PublishPress migration so stale linked-user metadata is validated and saf
 Planned on 2026-03-08.
 
 Execution state:
-- Not started (planning artifact only).
+- Explicit Build-04 execution not started.
+- Groundwork commit `380ba2c` already changed `get_ppa_user_id()` to prefer login-first, slug-second fallback; this build remains responsible for stale linked-user validation and gate re-verification.
 </status>
