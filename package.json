@@ -7,7 +7,7 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "lint": "concurrently -n CSS,JS -c cyan.bold,yellow.bold \"npm run lint:css\" \"npm run lint:js\"",
-    "lint:css": "stylelint src/",
+    "lint:css": "stylelint \"src/**/*.scss\"",
     "lint:js": "eslint --ext .js,.jsx,.ts,.tsx src/ tests/js/",
     "test:js": "wp-scripts test-unit-js tests/js --runInBand",
     "test:js:coverage": "wp-scripts test-unit-js tests/js --runInBand --coverage --coverageReporters=text-summary --coverageThreshold=\"{\\\"global\\\":{\\\"branches\\\":55,\\\"functions\\\":70,\\\"lines\\\":80,\\\"statements\\\":80}}\"",
