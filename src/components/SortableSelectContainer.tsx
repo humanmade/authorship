@@ -1,7 +1,8 @@
 import { DndContext, DragEndEvent, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import React, { ReactElement } from 'react';
-import type { GroupBase } from 'react-select';
+import { components as selectComponents } from 'react-select';
+import type { GroupBase, MultiValueRemoveProps } from 'react-select';
 import AsyncCreatableSelect, { AsyncCreatableProps } from 'react-select/async-creatable';
 
 import { __, sprintf } from '@wordpress/i18n';
@@ -10,8 +11,25 @@ import { Option, SortedOption } from '../types';
 
 import SortableMultiValueElement from './SortableMultiValueElement';
 
+const { MultiValueRemove } = selectComponents;
+
+const MultiValueRemoveElement = ( props: MultiValueRemoveProps<Option> ): ReactElement => (
+	<MultiValueRemove
+		{ ...props }
+		innerProps={ {
+			...( props.innerProps || {} ),
+			'aria-label': sprintf(
+				/* translators: %s: selected author label. */
+				__( 'Remove author %s', 'authorship' ),
+				props.data.label
+			),
+		} }
+	/>
+);
+
 const components = {
 	MultiValue: SortableMultiValueElement,
+	MultiValueRemove: MultiValueRemoveElement,
 };
 
 const isValidNewOption = ( value: string ) => value.length >= 2;

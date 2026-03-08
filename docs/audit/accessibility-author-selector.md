@@ -142,6 +142,7 @@ Validated on 2026-03-07 against `https://single-site-local.local/wp-admin/post-n
 | Keyboard reorder deterministically changes visual token order | Pass in manual VoiceOver run; automation run remained inconclusive | Automation attempt (`Space` + arrow + `Space`) updated announcement text but not captured DOM order; manual operator reported add/remove/reorder as working in VoiceOver on 2026-03-07. |
 | VoiceOver scripted transcript capture via AppleScript | Blocked | `System Events` keystroke automation is denied (`osascript is not allowed to send keystrokes`); no deterministic API found to extract spoken-output transcript text. |
 | VoiceOver manual add/remove/reorder pass | Pass | Operator confirmation in live editor session: "VoiceOver is good for add/remove/reorder." Transcript ledger updated in checklist. |
+| Remove token control exposes descriptive text `aria-label` | Pass (Build-12 follow-up) | `src/components/SortableSelectContainer.tsx` now overrides `MultiValueRemove` label text to `Remove author <name>`. Covered by `tests/js/components/sortable-select-container.test.tsx`. |
 
 Build-12 artifact evidence:
 - Screenshot: `output/playwright/build12-authors-field.png`
@@ -154,7 +155,7 @@ Post-validation remediation status:
 |---|---|---|
 | R1 keyboard-operable reorder path | Implemented and manually confirmed in VoiceOver; NVDA confirmation pending | Keyboard interaction instructions and announcer strings verified in automation; VoiceOver add/remove/reorder manual pass recorded in `docs/manual-testing-checklist.md` (`UI-06`). |
 | R2 screen reader status announcements | Implemented and runtime-validated; VoiceOver pass recorded, NVDA capture pending | Runtime polite-region strings + `src/components/AuthorsSelect.tsx:175-286`, `src/components/SortableSelectContainer.tsx:105-150`, `docs/manual-testing-checklist.md` |
-| R3 explicit labeling/instructions | Implemented and runtime-validated | Runtime `combobox "Authors"` + instruction text + `src/components/SortableSelectContainer.tsx:19-23,141-143` |
+| R3 explicit labeling/instructions | Implemented and runtime-validated (including remove-control label quality fix) | Runtime `combobox "Authors"` + instruction text + `src/components/SortableSelectContainer.tsx:19-23,157-178` + `tests/js/components/sortable-select-container.test.tsx` |
 | R4 component replacement decision | Pending | Route to Build-11+ design decision |
 
 ## Verification plan for remediation
@@ -169,6 +170,5 @@ When implementation starts, verify with:
 
 - Full assistive-tech matrix is not yet complete: VoiceOver pass is recorded, but NVDA transcript capture is still pending.
 - Automation-based reorder verification is still inconclusive, but manual VoiceOver confirmation indicates reorder behavior is functional in host AT usage.
-- Runtime token remove control currently exposes `aria-label=\"Remove [object Object]\"` in captured DOM, which needs follow-up accessibility review/fix before claiming full control-label quality.
 - Non-admin request-path hardening is implemented, but should be watched for regressions if core editor embed behavior changes.
 - Upstream adoption risk: if upstream PR cadence is slow, fork should treat accessibility remediation as fork-local delivery scope and proceed.

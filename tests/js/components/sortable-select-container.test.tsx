@@ -4,6 +4,13 @@ import React from 'react';
 let capturedDragEnd: CallableFunction | undefined;
 let capturedAccessibility: Record<string, unknown> = {};
 let capturedSelectProps: Record<string, unknown> = {};
+const mockMultiValueRemove = jest.fn( ( props: Record<string, unknown> ) => (
+	<button
+		data-testid="multi-value-remove"
+		type="button"
+		{ ...( props.innerProps as Record<string, unknown> ) }
+	/>
+) );
 
 jest.mock( '../../../src/components/SortableMultiValueElement', () => ( {
 	__esModule: true,
@@ -15,6 +22,12 @@ jest.mock( 'react-select/async-creatable', () => ( {
 	default: ( props: Record<string, unknown> ) => {
 		capturedSelectProps = props;
 		return null;
+	},
+} ) );
+
+jest.mock( 'react-select', () => ( {
+	components: {
+		MultiValueRemove: ( props: Record<string, unknown> ) => mockMultiValueRemove( props ),
 	},
 } ) );
 
@@ -234,5 +247,48 @@ describe( 'SortableSelectContainer', () => {
 		expect( announcements.onDragOver( {
 			over: { id: 22 },
 		} ) ).toContain( 'Moving to position 2 of 3.' );
+	} );
+
+	it( 'provides a text-based remove aria-label for selected author tokens', () => {
+		render(
+			<Select
+				loadOptions={ jest.fn() }
+				value={ [
+					{
+						value: 11,
+						label: 'Author A',
+						avatar: null,
+					},
+				] }
+				onChange={ jest.fn() }
+				onSortEnd={ jest.fn() }
+			/>
+		);
+
+		const selectComponents = capturedSelectProps.components as {
+			MultiValueRemove: ( props: Record<string, unknown> ) => unknown,
+		};
+
+		render(
+			<>
+				{ selectComponents.MultiValueRemove( {
+					data: {
+						value: 11,
+						label: 'Author A',
+						avatar: null,
+					},
+					innerProps: {},
+				} ) as React.ReactElement }
+			</>
+		);
+
+		const removeButton = screen.getByTestId( 'multi-value-remove' );
+
+		expect( removeButton.getAttribute( 'aria-label' ) ).toBe( 'Remove author Author A' );
+		expect( mockMultiValueRemove ).toHaveBeenCalledWith( expect.objectContaining( {
+			innerProps: expect.objectContaining( {
+				'aria-label': 'Remove author Author A',
+			} ),
+		} ) );
 	} );
 } );
