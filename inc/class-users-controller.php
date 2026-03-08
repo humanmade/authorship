@@ -29,6 +29,8 @@ class Users_Controller extends WP_REST_Users_Controller {
 
 	const _NAMESPACE = 'authorship/v1';
 	const BASE = 'users';
+	const DEFAULT_GUEST_USERNAME = 'guestauthor';
+	const MAX_USERNAME_LENGTH = 60;
 
 	/**
 	 * Constructor.
@@ -191,8 +193,10 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$username = sanitize_title( sanitize_user( $request->get_param( 'name' ), true ) );
-		$username = preg_replace( '/[^a-z0-9]/', '', $username );
+		$name_param = $request->get_param( 'name' );
+		$name       = is_string( $name_param ) ? $name_param : '';
+		$username   = $this->normalize_guest_username( $name );
+		$username   = $this->get_unique_guest_username( $username );
 
 		$request->set_param( 'username', $username );
 
@@ -208,15 +212,65 @@ class Users_Controller extends WP_REST_Users_Controller {
 		 *     @type WP_Error $errors        WP_Error object containing any errors found.
 		 * }
 		 */
-		add_filter( 'wpmu_validate_user_signup', function( array $result ) : array {
-			/** @var WP_Error $errors */
-			$errors = $result['errors'];
-			$errors->remove( 'user_email' );
+		add_filter( 'wpmu_validate_user_signup', [ $this, 'filter_guest_author_signup_validation' ] );
 
-			return $result;
-		} );
+		try {
+			return parent::create_item( $request );
+		} finally {
+			remove_filter( 'wpmu_validate_user_signup', [ $this, 'filter_guest_author_signup_validation' ] );
+		}
+	}
 
-		return parent::create_item( $request );
+	/**
+	 * Filters validated signup data for guest author creation.
+	 *
+	 * @param mixed[] $result Signup validation result.
+	 * @return mixed[] Signup validation result.
+	 */
+	public function filter_guest_author_signup_validation( array $result ) : array {
+		if ( isset( $result['errors'] ) && $result['errors'] instanceof WP_Error ) {
+			$result['errors']->remove( 'user_email' );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Normalizes a guest author username from the provided name.
+	 *
+	 * @param string $name Guest author display name.
+	 * @return string Normalized username candidate.
+	 */
+	protected function normalize_guest_username( string $name ) : string {
+		$username = sanitize_title( sanitize_user( $name, true ) );
+		$username = preg_replace( '/[^a-z0-9]/', '', $username );
+
+		if ( ! is_string( $username ) || '' === $username ) {
+			$username = self::DEFAULT_GUEST_USERNAME;
+		}
+
+		return substr( $username, 0, self::MAX_USERNAME_LENGTH );
+	}
+
+	/**
+	 * Ensures the guest author username is unique.
+	 *
+	 * @param string $username Username candidate.
+	 * @return string Unique username.
+	 */
+	protected function get_unique_guest_username( string $username ) : string {
+		$candidate = $username;
+		$suffix    = 2;
+
+		while ( username_exists( $candidate ) ) {
+			$suffix_string   = (string) $suffix;
+			$max_base_length = max( 1, self::MAX_USERNAME_LENGTH - strlen( $suffix_string ) );
+			$base            = substr( $username, 0, $max_base_length );
+			$candidate       = "{$base}{$suffix_string}";
+			++$suffix;
+		}
+
+		return $candidate;
 	}
 
 	/**

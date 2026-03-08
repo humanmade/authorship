@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 
-import { PluginPostStatusInfo } from '@wordpress/edit-post';
+import { PluginPostStatusInfo } from '@wordpress/editor';
 
 import AuthorsSelect from './components/AuthorsSelect';
 

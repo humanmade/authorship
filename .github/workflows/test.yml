@@ -63,3 +63,56 @@ jobs:
       env:
         MYSQL_DATABASE: wordpress
         WP_TESTS_DB_PASS: root
+
+  coverage:
+    name: Coverage Gate (WP 6.6 / PHP 8.3)
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mysqli, xmlwriter
+        coverage: none
+        tools: composer:v2
+
+    - name: Debugging
+      run: |
+        php --version
+        php -m
+        phpdbg --version
+        composer --version
+        mysql --version
+
+    - name: Get Composer Cache Directory
+      id: composer-cache-dir
+      run: |
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache PHP Dependencies
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.composer-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-composer-coverage-8.3-${{ hashFiles('composer.lock') }}-wp6.6
+
+    - name: Install PHP Dependencies
+      run: |
+        composer install --prefer-dist --no-progress --no-suggest --no-interaction --ignore-platform-reqs
+
+    - name: Coverage cache
+      uses: actions/cache@v4
+      with:
+        path: tests/cache/coverage
+        key: ${{ runner.os }}-coverage-8.3-${{ hashFiles('composer.lock', 'composer.json', 'phpunit.xml.dist') }}
+
+    - name: Run coverage gate
+      run: |
+        sudo systemctl start mysql.service
+        composer test:coverage
+      env:
+        MYSQL_DATABASE: wordpress
+        WP_TESTS_DB_PASS: root

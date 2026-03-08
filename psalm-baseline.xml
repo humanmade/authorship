@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.26.1@d747f6500b38ac4f7dfc5edbcae6e4b637d7add0">
+  <file src="inc/admin.php">
+    <MixedArgument>
+      <code><![CDATA[$code]]></code>
+      <code><![CDATA[$user->display_name]]></code>
+    </MixedArgument>
+    <MixedAssignment>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$code]]></code>
+      <code><![CDATA[$post_type]]></code>
+      <code><![CDATA[$user]]></code>
+    </MixedAssignment>
+    <MixedPropertyFetch>
+      <code><![CDATA[$user->ID]]></code>
+      <code><![CDATA[$user->display_name]]></code>
+    </MixedPropertyFetch>
+    <UndefinedConstant>
+      <code><![CDATA[GUEST_ROLE]]></code>
+    </UndefinedConstant>
+    <UndefinedFunction>
+      <code><![CDATA[get_authors( $post )]]></code>
+      <code><![CDATA[get_supported_post_types()]]></code>
+    </UndefinedFunction>
+  </file>
+  <file src="inc/class-insert-post-handler.php">
+    <MixedArgument>
+      <code><![CDATA[$authors]]></code>
+    </MixedArgument>
+    <MixedArrayOffset>
+      <code><![CDATA[$tax_input[ TAXONOMY ]]]></code>
+      <code><![CDATA[$unsanitized_postarr[ POSTS_PARAM ]]]></code>
+      <code><![CDATA[$unsanitized_postarr[ POSTS_PARAM ]]]></code>
+    </MixedArrayOffset>
+    <MixedAssignment>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$existing_authors]]></code>
+      <code><![CDATA[$tax_input]]></code>
+    </MixedAssignment>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$postarr]]></code>
+    </PossiblyUnusedParam>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[mixed[]]]></code>
+    </PossiblyUnusedReturnValue>
+    <TooManyArguments>
+      <code><![CDATA[apply_filters(
+				'authorship_default_author',
+				[ isset( $unsanitized_postarr['post_author'] ) ? $unsanitized_postarr['post_author'] : null ],
+				$post
+			)]]></code>
+    </TooManyArguments>
+    <UndefinedConstant>
+      <code><![CDATA[POSTS_PARAM]]></code>
+      <code><![CDATA[POSTS_PARAM]]></code>
+      <code><![CDATA[POSTS_PARAM]]></code>
+      <code><![CDATA[TAXONOMY]]></code>
+    </UndefinedConstant>
+    <UndefinedFunction>
+      <code><![CDATA[get_authors( $post )]]></code>
+      <code><![CDATA[set_authors( $post, $author_ids )]]></code>
+    </UndefinedFunction>
+  </file>
+  <file src="inc/class-users-controller.php">
+    <MixedArrayAccess>
+      <code><![CDATA[$schema['properties']['capabilities']]]></code>
+      <code><![CDATA[$schema['properties']['description']]]></code>
+      <code><![CDATA[$schema['properties']['extra_capabilities']]]></code>
+      <code><![CDATA[$schema['properties']['url']]]></code>
+    </MixedArrayAccess>
+    <MixedArrayAssignment>
+      <code><![CDATA[$query_params['orderby']['enum']]]></code>
+      <code><![CDATA[$schema['properties']['email']]]></code>
+      <code><![CDATA[$schema['properties']['email']['required']]]></code>
+      <code><![CDATA[$schema['properties']['name']]]></code>
+      <code><![CDATA[$schema['properties']['name']['required']]]></code>
+      <code><![CDATA[$schema['properties']['password']]]></code>
+      <code><![CDATA[$schema['properties']['password']]]></code>
+      <code><![CDATA[$schema['properties']['password']['readonly']]]></code>
+      <code><![CDATA[$schema['properties']['password']['required']]]></code>
+      <code><![CDATA[$schema['properties']['username']]]></code>
+      <code><![CDATA[$schema['properties']['username']['required']]]></code>
+    </MixedArrayAssignment>
+    <MixedAssignment>
+      <code><![CDATA[$name_param]]></code>
+    </MixedAssignment>
+    <MixedInferredReturnType>
+      <code><![CDATA[mixed[]]]></code>
+    </MixedInferredReturnType>
+    <MixedReturnStatement>
+      <code><![CDATA[apply_filters( 'authorship_rest_user_collection_params', $query_params )]]></code>
+    </MixedReturnStatement>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$request]]></code>
+    </PossiblyUnusedParam>
+    <PossiblyUnusedReturnValue>
+      <code><![CDATA[mixed[]]]></code>
+      <code><![CDATA[mixed[]]]></code>
+    </PossiblyUnusedReturnValue>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[Users_Controller]]></code>
+      <code><![CDATA[Users_Controller]]></code>
+    </PropertyNotSetInConstructor>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$request->get_param( 'capabilities' )]]></code>
+      <code><![CDATA[$request->get_param( 'email' )]]></code>
+      <code><![CDATA[$request->get_param( 'password' )]]></code>
+      <code><![CDATA[$request->get_param( 'roles' )]]></code>
+      <code><![CDATA[$request->get_param( 'roles' )]]></code>
+      <code><![CDATA[$request->get_param( 'slug' )]]></code>
+      <code><![CDATA[$request->get_param( 'who' )]]></code>
+      <code><![CDATA[empty( $request->get_param( 'email' ) )]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UndefinedConstant>
+      <code><![CDATA[GUEST_ROLE]]></code>
+    </UndefinedConstant>
+  </file>
+  <file src="inc/cli/class-migrate-command.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[(int) round( $pause_seconds * 1000000 )]]></code>
+    </ArgumentTypeCoercion>
+    <DocblockTypeContradiction>
+      <code><![CDATA[is_object( $wp_object_cache )]]></code>
+    </DocblockTypeContradiction>
+    <InvalidReturnStatement>
+      <code><![CDATA[$ppa_user_id]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[integer]]></code>
+    </InvalidReturnType>
+    <MixedArgumentTypeCoercion>
+      <code><![CDATA[$args]]></code>
+      <code><![CDATA[$assoc_args]]></code>
+      <code><![CDATA[$assoc_args]]></code>
+      <code><![CDATA[$assoc_args]]></code>
+    </MixedArgumentTypeCoercion>
+    <MixedAssignment>
+      <code><![CDATA[$authorship_authors]]></code>
+      <code><![CDATA[$authorship_authors]]></code>
+      <code><![CDATA[$pause_seconds]]></code>
+      <code><![CDATA[$ppa_user_id]]></code>
+    </MixedAssignment>
+    <PossibleRawObjectIteration>
+      <code><![CDATA[$ppa_terms]]></code>
+    </PossibleRawObjectIteration>
+    <PossiblyUnusedParam>
+      <code><![CDATA[$args]]></code>
+      <code><![CDATA[$args]]></code>
+    </PossiblyUnusedParam>
+    <RedundantCondition>
+      <code><![CDATA[count( $posts )]]></code>
+      <code><![CDATA[count( $posts )]]></code>
+    </RedundantCondition>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[empty( $ppa_terms )]]></code>
+    </RiskyTruthyFalsyComparison>
+    <TooManyArguments>
+      <code><![CDATA[apply_filters(
+			'authorship_migrate_batch_pause_seconds',
+			$pause_seconds,
+			$migration,
+			$assoc_args
+		)]]></code>
+    </TooManyArguments>
+    <UndefinedConstant>
+      <code><![CDATA[GUEST_ROLE]]></code>
+    </UndefinedConstant>
+    <UndefinedFunction>
+      <code><![CDATA[\Authorship\get_authors( $post )]]></code>
+      <code><![CDATA[\Authorship\get_authors( $post )]]></code>
+      <code><![CDATA[\Authorship\set_authors( $post, $new_authors )]]></code>
+      <code><![CDATA[\Authorship\set_authors( $post, [ intval( $post->post_author ) ] )]]></code>
+    </UndefinedFunction>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[WP_User|false]]></code>
+    </UnnecessaryVarAnnotation>
+    <UnusedClass>
+      <code><![CDATA[Migrate_Command]]></code>
+    </UnusedClass>
+  </file>
+  <file src="inc/namespace.php">
+    <MissingClosureParamType>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$value]]></code>
+    </MissingClosureParamType>
+    <MixedArgument>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$links['self'][0]['href']]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$post->ID]]></code>
+      <code><![CDATA[$post->ID]]></code>
+      <code><![CDATA[$post->post_status]]></code>
+      <code><![CDATA[$post->post_type]]></code>
+      <code><![CDATA[$post['id']]]></code>
+      <code><![CDATA[$post_type_caps->edit_others_posts]]></code>
+      <code><![CDATA[$value]]></code>
+      <code><![CDATA[get_authors( $post )]]></code>
+    </MixedArgument>
+    <MixedArgumentTypeCoercion>
+      <code><![CDATA[$dependencies]]></code>
+    </MixedArgumentTypeCoercion>
+    <MixedArrayAccess>
+      <code><![CDATA[$links['self'][0]]]></code>
+      <code><![CDATA[$links['self'][0]['href']]]></code>
+    </MixedArrayAccess>
+    <MixedAssignment>
+      <code><![CDATA[$asset_metadata]]></code>
+      <code><![CDATA[$author_id]]></code>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$authors]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$caps[]]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$post_type]]></code>
+      <code><![CDATA[$status]]></code>
+      <code><![CDATA[$status]]></code>
+      <code><![CDATA[$stored_values[ $concern ]]]></code>
+      <code><![CDATA[$stored_values['tax_query']]]></code>
+      <code><![CDATA[$tax_query]]></code>
+      <code><![CDATA[$value]]></code>
+      <code><![CDATA[$value]]></code>
+    </MixedAssignment>
+    <MixedInferredReturnType>
+      <code><![CDATA[string[]]]></code>
+      <code><![CDATA[string|null]]></code>
+    </MixedInferredReturnType>
+    <MixedPropertyFetch>
+      <code><![CDATA[$post->ID]]></code>
+      <code><![CDATA[$post->ID]]></code>
+      <code><![CDATA[$post->post_status]]></code>
+      <code><![CDATA[$post->post_type]]></code>
+    </MixedPropertyFetch>
+    <MixedReturnStatement>
+      <code><![CDATA[apply_filters( 'authorship_supported_post_types', $post_types )]]></code>
+      <code><![CDATA[get_author_names( $post )]]></code>
+    </MixedReturnStatement>
+    <MixedReturnTypeCoercion>
+      <code><![CDATA[$caps]]></code>
+      <code><![CDATA[string[]]]></code>
+    </MixedReturnTypeCoercion>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$avatar]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UndefinedConstant>
+      <code><![CDATA[TAXONOMY]]></code>
+    </UndefinedConstant>
+    <UndefinedFunction>
+      <code><![CDATA[enqueue_asset(
+			$manifest,
+			'main.js',
+			[
+				'handle'       => SCRIPT_HANDLE,
+				'dependencies' => $script_dependencies,
+			]
+		)]]></code>
+      <code><![CDATA[enqueue_asset(
+			$manifest,
+			'style.css',
+			[
+				'handle' => STYLE_HANDLE,
+			]
+		)]]></code>
+      <code><![CDATA[get_author_names( $post )]]></code>
+      <code><![CDATA[get_authors( $post )]]></code>
+      <code><![CDATA[get_authors( $post )]]></code>
+      <code><![CDATA[get_authors( $post )]]></code>
+      <code><![CDATA[get_authors( $post )]]></code>
+      <code><![CDATA[set_authors( $post, wp_parse_id_list( $value ) )]]></code>
+      <code><![CDATA[user_is_author( $user, $post )]]></code>
+    </UndefinedFunction>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[stdClass]]></code>
+      <code><![CDATA[stdClass]]></code>
+    </UnnecessaryVarAnnotation>
+    <UnresolvableInclude>
+      <code><![CDATA[require $asset_file]]></code>
+    </UnresolvableInclude>
+    <UnusedClosureParam>
+      <code><![CDATA[$field]]></code>
+      <code><![CDATA[$post_type]]></code>
+      <code><![CDATA[$request]]></code>
+    </UnusedClosureParam>
+    <UnusedParam>
+      <code><![CDATA[$post]]></code>
+      <code><![CDATA[$request]]></code>
+      <code><![CDATA[$server]]></code>
+      <code><![CDATA[$wp]]></code>
+    </UnusedParam>
+  </file>
+  <file src="inc/taxonomy.php">
+    <MixedArgument>
+      <code><![CDATA[$post_types]]></code>
+    </MixedArgument>
+    <MixedAssignment>
+      <code><![CDATA[$post_type]]></code>
+      <code><![CDATA[$post_types]]></code>
+    </MixedAssignment>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[! $text]]></code>
+    </RiskyTruthyFalsyComparison>
+    <UndefinedFunction>
+      <code><![CDATA[get_supported_post_types()]]></code>
+    </UndefinedFunction>
+  </file>
+  <file src="inc/template.php">
+    <MixedArgumentTypeCoercion>
+      <code><![CDATA[array_column( $authors, 'display_name' )]]></code>
+    </MixedArgumentTypeCoercion>
+    <UndefinedFunction>
+      <code><![CDATA[is_post_type_supported( $post->post_type )]]></code>
+      <code><![CDATA[is_post_type_supported( $post->post_type )]]></code>
+      <code><![CDATA[is_post_type_supported( $post->post_type )]]></code>
+    </UndefinedFunction>
+    <UnnecessaryVarAnnotation>
+      <code><![CDATA[int[]]]></code>
+    </UnnecessaryVarAnnotation>
+  </file>
+  <file src="lib/asset-loader/asset-loader.php">
+    <UnresolvableInclude>
+      <code><![CDATA[require plugin_dir_path( __FILE__ ) . 'inc/admin.php']]></code>
+      <code><![CDATA[require plugin_dir_path( __FILE__ ) . 'inc/manifest.php']]></code>
+      <code><![CDATA[require plugin_dir_path( __FILE__ ) . 'inc/namespace.php']]></code>
+      <code><![CDATA[require plugin_dir_path( __FILE__ ) . 'inc/paths.php']]></code>
+    </UnresolvableInclude>
+  </file>
+  <file src="plugin.php">
+    <UndefinedFunction>
+      <code><![CDATA[CLI\bootstrap()]]></code>
+    </UndefinedFunction>
+  </file>
+</files>

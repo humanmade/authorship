@@ -55,6 +55,12 @@ class Migrate_Command extends WP_CLI_Command {
 	 * default: post
 	 * ---
 	 *
+	 * [--batch-pause=<batch-pause>]
+	 * : Seconds to pause between processed batches.
+	 * ---
+	 * default: 2
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp authorship migrate wp-authors --dry-run=true
@@ -85,7 +91,7 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::warning( 'Overwriting of previous Authorship data is set to true.' );
 		}
 
-		$post_types = explode( ',', $assoc_args['post-type'] );
+		$post_types = $this->get_migration_post_types( $assoc_args );
 		WP_CLI::line( sprintf( 'Updating post types: %s', implode( ', ', $post_types ) ) );
 
 		$tax_query = $overwrite ? [] : [
@@ -114,6 +120,8 @@ class Migrate_Command extends WP_CLI_Command {
 				break;
 			}
 
+			$processed_in_batch = 0;
+
 			foreach ( $posts as $post ) {
 				$authorship_authors = \Authorship\get_authors( $post );
 
@@ -129,14 +137,13 @@ class Migrate_Command extends WP_CLI_Command {
 				}
 
 				$count++;
+				$processed_in_batch++;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
 
-			// Pause for a moment to let the database catch up.
-			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
-			sleep( 2 );
+			$this->pause_between_batches( $assoc_args, 'wp-authors', $count, $processed_in_batch );
 
 			$paged++;
 		} while ( count( $posts ) );
@@ -179,6 +186,12 @@ class Migrate_Command extends WP_CLI_Command {
 	 *   - false
 	 * ---
 	 *
+	 * [--batch-pause=<batch-pause>]
+	 * : Seconds to pause between processed batches.
+	 * ---
+	 * default: 2
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp authorship migrate ppa --dry-run=true
@@ -191,7 +204,15 @@ class Migrate_Command extends WP_CLI_Command {
 	function ppa( $args, $assoc_args ) : void {
 		if ( ! taxonomy_exists( 'author' ) ) {
 			// register the `author` taxonomy so that we can query for PPA author terms.
-			register_taxonomy( 'author', 'post' );
+			register_taxonomy(
+				'author',
+				'post',
+				[
+					'public'    => false,
+					'query_var' => false,
+					'rewrite'   => false,
+				]
+			);
 		}
 
 		$posts_per_page = 100;
@@ -236,6 +257,8 @@ class Migrate_Command extends WP_CLI_Command {
 				break;
 			}
 
+			$processed_in_batch = 0;
+
 			foreach ( $posts as $post ) {
 				$authorship_authors = \Authorship\get_authors( $post );
 
@@ -258,9 +281,12 @@ class Migrate_Command extends WP_CLI_Command {
 				// If PPA is deactivated the terms can be an error object.
 				// Usually invalid taxonomy, lets catch and report this.
 				if ( is_wp_error( $ppa_terms ) ) {
-					WP_CLI::error( 'There was an error fetching the PublishPress Author data, is the plugin activated?', false );
-					WP_CLI::error( $ppa_terms, false );
-					exit( 1 );
+					WP_CLI::error(
+						sprintf(
+							'There was an error fetching the PublishPress Author data, is the plugin activated? (%s)',
+							$ppa_terms->get_error_message()
+						)
+					);
 				}
 
 				/**
@@ -289,14 +315,13 @@ class Migrate_Command extends WP_CLI_Command {
 				}
 
 				$count++;
+				$processed_in_batch++;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
 			$this->reset_local_object_cache();
 
-			// Pause for a moment to let the database catch up.
-			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
-			sleep( 2 );
+			$this->pause_between_batches( $assoc_args, 'ppa', $count, $processed_in_batch );
 
 			$paged++;
 		} while ( count( $posts ) );
@@ -326,7 +351,9 @@ class Migrate_Command extends WP_CLI_Command {
 
 		// If there is no mapped PPA user then resolve that.
 		if ( ! empty( $ppa_user_id ) ) {
-			return intval( $ppa_user_id );
+			if ( is_scalar( $ppa_user_id ) ) {
+				return (int) $ppa_user_id;
+			}
 		}
 
 		/**
@@ -361,12 +388,144 @@ class Migrate_Command extends WP_CLI_Command {
 		// If this fails we want the debug data, so print out the
 		// arguments so we can reproduce later.
 		if ( is_wp_error( $ppa_user_id ) ) {
-			WP_CLI::error( 'Could not create Authorship user with these arguments:', false );
-			WP_CLI::error( $ppa_user_id, false );
-			exit( 1 );
+			WP_CLI::error(
+				sprintf(
+					'Could not create Authorship user with these arguments: %s',
+					$ppa_user_id->get_error_message()
+				)
+			);
 		}
 
 		return $ppa_user_id;
+	}
+
+	/**
+	 * Pause between migration batches.
+	 *
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 * @param string              $migration Migration subcommand identifier.
+	 * @param int                 $count Number of processed posts so far.
+	 * @param int                 $processed_in_batch Number of posts processed in current batch.
+	 */
+	private function pause_between_batches( array $assoc_args, string $migration, int $count, int $processed_in_batch ) : void {
+		if ( $processed_in_batch <= 0 ) {
+			return;
+		}
+
+		$pause_seconds = $this->get_batch_pause_seconds( $assoc_args, $migration );
+		/**
+		 * Fires when migration batch pause duration is resolved.
+		 *
+		 * @param float               $pause_seconds Resolved pause length in seconds.
+		 * @param string              $migration Migration subcommand identifier.
+		 * @param array<string,mixed> $assoc_args Original CLI assoc args.
+		 * @param int                 $count Number of processed posts at pause point.
+		 */
+		do_action(
+			'authorship_migrate_batch_pause_resolved',
+			$pause_seconds,
+			$migration,
+			$assoc_args,
+			$count
+		);
+
+		if ( $pause_seconds <= 0 ) {
+			WP_CLI::line( sprintf( 'Processed %d posts, continuing without pause.', $count ) );
+			return;
+		}
+
+		WP_CLI::line(
+			sprintf(
+				'Processed %1$d posts, pausing for %2$s second(s)...',
+				$count,
+				$pause_seconds
+			)
+		);
+
+		usleep( (int) round( $pause_seconds * 1000000 ) );
+	}
+
+	/**
+	 * Resolve pause seconds between migration batches.
+	 *
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 * @param string              $migration Migration subcommand identifier.
+	 *
+	 * @return float
+	 */
+	private function get_batch_pause_seconds( array $assoc_args, string $migration ) : float {
+		$pause_seconds = 2.0;
+		if ( isset( $assoc_args['batch-pause'] ) && is_numeric( $assoc_args['batch-pause'] ) ) {
+			$pause_seconds = floatval( $assoc_args['batch-pause'] );
+		}
+		$pause_seconds = max( 0.0, $pause_seconds );
+
+		/**
+		 * Filter the pause duration between migration batches.
+		 *
+		 * @param float               $pause_seconds Pause length in seconds.
+		 * @param string              $migration Migration subcommand identifier.
+		 * @param array<string,mixed> $assoc_args Original CLI assoc args.
+		 */
+		$pause_seconds = apply_filters(
+			'authorship_migrate_batch_pause_seconds',
+			$pause_seconds,
+			$migration,
+			$assoc_args
+		);
+
+		if ( ! is_numeric( $pause_seconds ) ) {
+			return 0.0;
+		}
+
+		return max( 0.0, floatval( $pause_seconds ) );
+	}
+
+	/**
+	 * Resolve and normalize target post types for wp-authors migration.
+	 *
+	 * @param array<string,mixed> $assoc_args CLI assoc args.
+	 *
+	 * @return array<int,string>
+	 */
+	private function get_migration_post_types( array $assoc_args ) : array {
+		$post_type_arg = $assoc_args['post-type'] ?? 'post';
+
+		if ( ! is_string( $post_type_arg ) ) {
+			return [ 'post' ];
+		}
+
+		$post_types = array_values(
+			array_filter(
+				array_unique(
+					array_map(
+						'strtolower',
+						array_map( 'trim', explode( ',', $post_type_arg ) )
+					)
+				)
+			)
+		);
+
+		if ( empty( $post_types ) ) {
+			return [ 'post' ];
+		}
+
+		if ( in_array( 'any', $post_types, true ) ) {
+			return [ 'any' ];
+		}
+
+		$registered_post_types = array_values(
+			array_filter(
+				$post_types,
+				'post_type_exists'
+			)
+		);
+
+		if ( empty( $registered_post_types ) ) {
+			return [ 'post' ];
+		}
+
+		return $registered_post_types;
 	}
 
 	/**
@@ -397,9 +556,7 @@ class Migrate_Command extends WP_CLI_Command {
 			$wp_object_cache->memcache_debug = [];
 		}
 
-		if ( isset( $wp_object_cache->cache ) ) {
 			$wp_object_cache->cache = [];
-		}
 
 		if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
 			// important!

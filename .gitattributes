@@ -4,6 +4,8 @@
 /.config export-ignore
 /.git export-ignore
 /.github export-ignore
+/.planning export-ignore
+/docs/audit export-ignore
 /node_modules export-ignore
 /tests export-ignore
 /vendor export-ignore

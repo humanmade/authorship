@@ -235,6 +235,21 @@ The command will perform a dry run by default, setting `--dry-run=false` will ma
 
 This command will not overwrite or update Authorship data unless the `--overwrite-authors=true` flag is set.
 
+### Migration pacing controls
+
+Both migration commands support `--batch-pause=<seconds>` (default `2`).
+Set `--batch-pause=0` to run without intentional pauses between processed batches.
+
+Authorship also provides hook extension points for migration pacing:
+
+* `authorship_migrate_batch_pause_seconds` filter
+  * Parameters: `(float $pause_seconds, string $migration, array $assoc_args)`
+  * Return a numeric pause value in seconds.
+* `authorship_migrate_batch_pause_resolved` action
+  * Parameters: `(float $pause_seconds, string $migration, array $assoc_args, int $count)`
+  * Fires after pause resolution and before optional sleeping for each processed batch.
+  * Does not fire for batches that process zero posts.
+
 ## Email Notifications
 
 Authorship does not send any email notifications itself, but it does instruct WordPress core to additionally send its emails to attributed authors when appropriate.
@@ -251,9 +266,11 @@ Authorship aims to conform to Web Content Accessibility Guidelines (WCAG) 2.1 at
 With regard to the author selection control on the post editing screen:
 
 * ✅ The visual styles are inherited from WordPress core and are WCAG 2.1 AA compliant
-* ✅ The control is fully accessible using only the keyboard
-* 🚫 The keyboard controls are not very intuitive
-* 🚫 The control is not fully accessible when using a screen reader
+* ✅ The control exposes an explicit programmatic label (`Authors`) and usage instructions
+* ✅ Add/remove/reorder actions emit live status messages (for example `Added guest author...`, `Moved ... to position ...`)
+* ✅ Keyboard reorder is supported (`Space` to pick up/drop, arrow keys to move) when a selected author token has focus
+* ⚠ Keyboard reorder discoverability still depends on users understanding token focus before drag commands
+* ⚠ Full assistive-technology matrix validation (NVDA/VoiceOver) is still in progress
 
 The team are actively investigating either replacing the component used to render the control with a fully accessible one, or fixing the accessibility issues of the current one.
 

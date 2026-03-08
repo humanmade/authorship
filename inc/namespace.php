@@ -130,11 +130,17 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
 		return $caps;
 	}
 
-	if ( empty( $user_id ) || empty( $args[0] ) ) {
+	if ( empty( $user_id ) || ! isset( $args[0] ) || ! is_numeric( $args[0] ) ) {
 		return $caps;
 	}
+	$post_id = (int) $args[0];
+
+	if ( $post_id <= 0 ) {
+		return $caps;
+	}
+
 	$user = get_userdata( $user_id );
-	$post = get_post( $args[0] );
+	$post = get_post( $post_id );
 
 	if ( empty( $user ) || empty( $post ) ) {
 		return $caps;
@@ -238,7 +244,11 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
  * @return bool[] Array of concerned user's capabilities.
  */
 function filter_user_has_cap( array $user_caps, array $required_caps, array $args, WP_User $user ) : array {
-	$cap = $args[0];
+	$cap = isset( $args[0] ) && is_string( $args[0] ) ? $args[0] : '';
+
+	if ( '' === $cap ) {
+		return $user_caps;
+	}
 
 	switch ( $cap ) {
 
@@ -249,7 +259,7 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
 			break;
 
 		case 'attribute_post_type':
-			if ( empty( $args[2] ) ) {
+			if ( empty( $args[2] ) || ! is_string( $args[2] ) ) {
 				$user_caps[ $cap ] = false;
 				break;
 			}
@@ -287,7 +297,10 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
  */
 function action_wp( WP $wp ) : void {
 	if ( is_author() ) {
-		$GLOBALS['authordata'] = get_userdata( get_query_var( 'author' ) );
+		$author_id = get_query_var( 'author' );
+		$author_id = is_numeric( $author_id ) ? (int) $author_id : 0;
+
+		$GLOBALS['authordata'] = get_userdata( $author_id );
 	}
 }
 
@@ -314,6 +327,11 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
 	$data = $result->get_data();
 
 	if ( ! is_array( $data ) || ! isset( $data[ REST_PARAM ] ) ) {
+		return $result;
+	}
+
+	// Avoid embedding-author link lookups that non-admin editors cannot resolve in edit context.
+	if ( 'edit' === $request->get_param( 'context' ) && ! current_user_can( 'list_users' ) ) {
 		return $result;
 	}
 
@@ -378,6 +396,12 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
 
 	// The REST API accepts and coerces a comma-separated string as an array, so
 	// we need to allow for that here.
+	if ( ! is_array( $authors ) && ! is_string( $authors ) ) {
+		return new WP_Error( 'authorship', __( 'The authors payload must be an array or comma-separated string.', 'authorship' ), [
+			'status' => WP_Http::BAD_REQUEST,
+		] );
+	}
+
 	$authors = wp_parse_id_list( $authors );
 
 	/** @var WP_User[] */
@@ -472,8 +496,8 @@ function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_R
 /**
  * Filters extra CURIEs available on REST API responses.
  *
- * @param array[] $additional Additional CURIEs to register with the API.
- * @return array[] Additional CURIEs to register with the API.
+ * @param array<int,array{name:string,href:string,templated:bool}> $additional Additional CURIEs to register with the API.
+ * @return array<int,array{name:string,href:string,templated:bool}> Additional CURIEs to register with the API.
  */
 function filter_rest_response_link_curies( array $additional ) : array {
 	$additional[] = [
@@ -494,7 +518,7 @@ function enqueue_assets() : void {
 
 	if ( ! $post || ! is_post_type_supported( $post->post_type ) ) {
 		return;
-	}
+	}//end if
 
 	enqueue_assets_for_post();
 	preload_author_data( $post );
@@ -507,6 +531,16 @@ function enqueue_assets_for_post() : void {
 	$plugin_dir = plugin_dir_path( __DIR__ );
 	$plugin_url = plugin_dir_url( __DIR__ );
 	$manifest   = $plugin_dir . 'build/asset-manifest.json';
+	$script_relative_path = 'build/main.js';
+	$script_path          = $plugin_dir . $script_relative_path;
+	$style_relative_path  = 'build/style.css';
+	$style_path           = $plugin_dir . $style_relative_path;
+	$asset_file           = $plugin_dir . 'build/main.asset.php';
+
+	if ( ! file_exists( $style_path ) ) {
+		$style_relative_path = 'build/style-style.css';
+		$style_path          = $plugin_dir . $style_relative_path;
+	}
 
 	$script_dependencies = [
 		'lodash',
@@ -544,10 +578,49 @@ function enqueue_assets_for_post() : void {
 		);
 
 		return;
-	}
+	}//end if
 
-	$script_relative_path = 'build/main.js';
-	$script_path          = $plugin_dir . $script_relative_path;
+	if ( file_exists( $asset_file ) && file_exists( $script_path ) ) {
+		$asset_metadata = require $asset_file;
+		$dependencies   = $script_dependencies;
+		$version        = null;
+
+		if ( is_array( $asset_metadata ) ) {
+			if ( isset( $asset_metadata['dependencies'] ) && is_array( $asset_metadata['dependencies'] ) ) {
+				$dependencies = $asset_metadata['dependencies'];
+			}
+
+			if ( isset( $asset_metadata['version'] ) && is_scalar( $asset_metadata['version'] ) ) {
+				$version = (string) $asset_metadata['version'];
+			}
+		}
+
+		wp_enqueue_script(
+			SCRIPT_HANDLE,
+			$plugin_url . $script_relative_path,
+			$dependencies,
+			$version,
+			true
+		);
+
+		if ( file_exists( $style_path ) ) {
+			$style_version = $version;
+
+			if ( null === $style_version ) {
+				$style_file_mtime = filemtime( $style_path );
+				$style_version    = false !== $style_file_mtime ? (string) $style_file_mtime : null;
+			}
+
+			wp_enqueue_style(
+				STYLE_HANDLE,
+				$plugin_url . $style_relative_path,
+				[],
+				$style_version
+			);
+		}
+
+		return;
+	}//end if
 
 	if ( file_exists( $script_path ) ) {
 		$script_version = filemtime( $script_path );
@@ -560,9 +633,6 @@ function enqueue_assets_for_post() : void {
 			true
 		);
 	}
-
-	$style_relative_path = 'build/style.css';
-	$style_path          = $plugin_dir . $style_relative_path;
 
 	if ( file_exists( $style_path ) ) {
 		$style_version = filemtime( $style_path );
@@ -648,7 +718,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 		if ( ! empty( $value ) ) {
 			$stored_values[ $concern ] = $value;
 			$query->set( $concern, $concern_default_value );
-		}
+		}//end if
 	}
 
 	// None of the set query vars concern us? Then we have nothing more to do.
@@ -662,30 +732,54 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	// as WP_Query will handle the validation before constructing its query.
 	if ( ! empty( $stored_values['author'] ) ) {
 		if ( is_string( $stored_values['author'] ) ) {
-			$user_ids = array_map( 'intval', explode( ',', $stored_values['author'] ) );
+			$user_ids = array_map(
+				static function( $id ) : int {
+					return (int) $id;
+				},
+				explode( ',', $stored_values['author'] )
+			);
 		} elseif ( is_numeric( $stored_values['author'] ) ) {
 			$user_ids = [ (int) $stored_values['author'] ];
-		}
+		}//end if
 	} elseif ( ! empty( $stored_values['author_name'] ) ) {
-		$user = get_user_by( 'slug', $stored_values['author_name'] );
+		if ( is_string( $stored_values['author_name'] ) ) {
+			$user = get_user_by( 'slug', $stored_values['author_name'] );
 
-		if ( $user ) {
-			$user_ids = [ $user->ID ];
-		}
+			if ( $user ) {
+				$user_ids = [ $user->ID ];
+			}
+		}//end if
 	} elseif ( ! empty( $stored_values['author__in'] ) ) {
-		$user_ids = array_map( 'intval', $stored_values['author__in'] );
+		if ( is_array( $stored_values['author__in'] ) ) {
+			$user_ids = array_map(
+				static function( $id ) : int {
+					return (int) $id;
+				},
+				$stored_values['author__in']
+			);
+		}
 	} elseif ( ! empty( $stored_values['author__not_in'] ) ) {
-		$user_ids = array_map( function( int $id ) : int {
-			return $id * -1;
-		}, array_map( 'intval', $stored_values['author__not_in'] ) );
-	}
+		if ( is_array( $stored_values['author__not_in'] ) ) {
+			$user_ids = array_map(
+				static function( int $id ) : int {
+					return $id * -1;
+				},
+				array_map(
+					static function( $id ) : int {
+						return (int) $id;
+					},
+					$stored_values['author__not_in']
+				)
+			);
+		}
+	}//end if
 
 	$tax_query = $query->get( 'tax_query' );
 
 	// Record the value of an existing tax query, if there is one.
 	$stored_values['tax_query'] = $tax_query;
 
-	if ( empty( $tax_query ) ) {
+	if ( ! is_array( $tax_query ) ) {
 		$tax_query = [];
 	}
 

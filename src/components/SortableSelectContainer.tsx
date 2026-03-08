@@ -1,23 +1,50 @@
+import { DndContext, DragEndEvent, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import React, { ReactElement } from 'react';
-import AsyncCreatableSelect, { Props as AsyncCreatableSelectProps } from 'react-select/async-creatable';
-import { SortableContainer } from 'react-sortable-hoc';
+import { components as selectComponents } from 'react-select';
+import type { GroupBase, MultiValueRemoveProps } from 'react-select';
+import AsyncCreatableSelect, { AsyncCreatableProps } from 'react-select/async-creatable';
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
-import { Option } from '../types';
+import { Option, SortedOption } from '../types';
 
 import SortableMultiValueElement from './SortableMultiValueElement';
 
+const { MultiValueRemove } = selectComponents;
+
+const MultiValueRemoveElement = ( props: MultiValueRemoveProps<Option> ): ReactElement => (
+	<MultiValueRemove
+		{ ...props }
+		innerProps={ {
+			...( props.innerProps || {} ),
+			'aria-label': sprintf(
+				/* translators: %s: selected author label. */
+				__( 'Remove author %s', 'authorship' ),
+				props.data.label
+			),
+		} }
+	/>
+);
+
 const components = {
 	MultiValue: SortableMultiValueElement,
+	MultiValueRemove: MultiValueRemoveElement,
 };
 
 const isValidNewOption = ( value: string ) => value.length >= 2;
 
 const placeholder = __( 'Select authors…', 'authorship' );
+const ariaLabel = __( 'Authors', 'authorship' );
+const helpTextID = 'authorship-select-help';
+const helpText = __( 'Use the authors field to assign one or more authors. Use drag and drop or keyboard reordering to change author order.', 'authorship' );
 
 export const className = 'authorship-select-container';
 export const classNamePrefix = 'authorship-select';
+
+interface SortableSelectProps extends AsyncCreatableProps<Option, true, GroupBase<Option>> {
+	onSortEnd: ( option: SortedOption ) => void;
+}
 
 /**
  * Overrides the default option display with our custom one.
@@ -39,24 +66,134 @@ const formatOptionLabel = ( option: Option ): ReactElement => (
 /**
  * Returns the base author selector control.
  *
- * @param {AsyncCreatableSelectProps} props Component props.
+ * @param {SortableSelectProps} props Component props.
  * @returns {ReactElement} An element.
  */
-const Select = ( props: AsyncCreatableSelectProps<Option, true> ): ReactElement => (
-	<AsyncCreatableSelect
-		cacheOptions
-		className={ className }
-		classNamePrefix={ classNamePrefix }
-		components={ components }
-		formatOptionLabel={ formatOptionLabel }
-		isClearable={ false }
-		isMulti
-		isValidNewOption={ isValidNewOption }
-		placeholder={ placeholder }
-		{ ...props }
-	/>
-);
+const Select = ( props: SortableSelectProps ): ReactElement => {
+	const { onSortEnd, value, ...selectProps } = props;
+	const selectedOptions = Array.isArray( value ) ? value : [];
+	const selectedIDs = selectedOptions.map( option => option.value );
+	const sensors = useSensors(
+		useSensor( PointerSensor, {
+			activationConstraint: {
+				distance: 4,
+			},
+		} ),
+		useSensor( KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		} )
+	);
+
+	const getOptionLabel = ( id: number | string ): string => {
+		const selected = selectedOptions.find( option => option.value === Number( id ) );
+
+		return selected?.label || __( 'author', 'authorship' );
+	};
+
+	/**
+	 * Emits `onSortEnd` callback payload that matches the legacy shape.
+	 *
+	 * @param {DragEndEvent} event Drag-end event data.
+	 */
+	const handleDragEnd = ( event: DragEndEvent ) => {
+		const { active, over } = event;
+
+		if ( ! over || active.id === over.id ) {
+			return;
+		}
+
+		const oldIndex = selectedIDs.indexOf( Number( active.id ) );
+		const newIndex = selectedIDs.indexOf( Number( over.id ) );
+
+		if ( oldIndex < 0 || newIndex < 0 ) {
+			return;
+		}
+
+		onSortEnd( {
+			oldIndex,
+			newIndex,
+		} );
+	};
+
+	return (
+		<>
+			<span className="screen-reader-text" id={ helpTextID }>
+				{ helpText }
+			</span>
+			<DndContext
+				accessibility={ {
+					announcements: {
+						onDragStart: ( { active }: { active: { id: number | string } } ) => sprintf(
+							/* translators: %s: selected author label. */
+							__( 'Picked up %s for reordering.', 'authorship' ),
+							getOptionLabel( active.id )
+						),
+						onDragOver: ( { over }: { over: { id: number | string } | null } ) => {
+							if ( ! over ) {
+								return __( 'Author reordering in progress.', 'authorship' );
+							}
+
+							const overIndex = selectedIDs.indexOf( Number( over.id ) );
+
+							if ( overIndex < 0 ) {
+								return __( 'Author reordering in progress.', 'authorship' );
+							}
+
+							return sprintf(
+								/* translators: 1: position number, 2: total selected authors. */
+								__( 'Moving to position %1$d of %2$d.', 'authorship' ),
+								overIndex + 1,
+								selectedIDs.length
+							);
+						},
+						onDragEnd: ( { active, over }: { active: { id: number | string }, over: { id: number | string } | null } ) => {
+							if ( ! over ) {
+								return __( 'Author reordering cancelled.', 'authorship' );
+							}
+
+							const newIndex = selectedIDs.indexOf( Number( over.id ) );
+
+							if ( newIndex < 0 ) {
+								return __( 'Author reordering cancelled.', 'authorship' );
+							}
+
+							return sprintf(
+								/* translators: 1: selected author label, 2: position number, 3: total selected authors. */
+								__( 'Moved %1$s to position %2$d of %3$d.', 'authorship' ),
+								getOptionLabel( active.id ),
+								newIndex + 1,
+								selectedIDs.length
+							);
+						},
+						onDragCancel: () => __( 'Author reordering cancelled.', 'authorship' ),
+					},
+				} }
+				collisionDetection={ closestCenter }
+				sensors={ sensors }
+				onDragEnd={ handleDragEnd }
+			>
+				<SortableContext items={ selectedIDs } strategy={ verticalListSortingStrategy }>
+					<AsyncCreatableSelect
+						aria-describedby={ helpTextID }
+						aria-label={ ariaLabel }
+						cacheOptions
+						className={ className }
+						classNamePrefix={ classNamePrefix }
+						components={ components }
+						formatOptionLabel={ formatOptionLabel }
+						isClearable={ false }
+						isMulti
+						isValidNewOption={ isValidNewOption }
+						placeholder={ placeholder }
+						value={ selectedOptions }
+						{ ...selectProps }
+					/>
+				</SortableContext>
+			</DndContext>
+		</>
+	);
+};
 
 export { Select };
 
-export default SortableContainer( Select );
+export default Select;
