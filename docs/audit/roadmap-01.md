@@ -30,12 +30,13 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
 - Phase 04 planning started on 2026-03-08:
   - `04-01` planned at `.planning/phases/04-test-depth-and-ratcheting-authorship/04-01-PLAN.md`
   - `04-Build-01` and `04-Build-02` plans created and queued for multisite/test-depth and ratchet work
-  - `04-Build-03` through `04-Build-06` plans created and queued for full-review blocker remediation:
+  - `04-Build-03` through `04-Build-07` plans created and queued for blocker remediation:
     - deterministic `wp-authors` batching
     - stale PPA linked-user hardening
     - implicit author-query post-type semantics
     - author-query callback lifecycle cleanup
-  - Phase 04 execution priority is `04-Build-03` through `04-Build-06`, then `04-Build-01` and `04-Build-02`
+    - user-deletion authorship sync verification and coverage hardening
+  - Phase 04 execution priority is `04-Build-03` through `04-Build-07`, then `04-Build-01` and `04-Build-02`
 - Strict fork-first upstream policy centralized at `docs/fork-first-policy.md`.
 - Upstream PR hygiene completed on 2026-03-08: superseded HM PRs `#160`, `#161`, and `#167`-`#172` closed; maintained open packaging set is `#162`-`#165`.
 
@@ -83,5 +84,5 @@ Residual risk notes:
 
 ## Next step
 - Keep Phase 04 execution paused; start `04-Build-03` first after explicit go-ahead.
-- Keep `04-Build-01` and `04-Build-02` queued behind the blocker-remediation lane.
+- Blocker-remediation lane is `04-Build-03` through `04-Build-07`; keep `04-Build-01` and `04-Build-02` queued behind it.
 - Keep NVDA transcript capture in backlog as optional `UI-06` evidence work (non-blocking).

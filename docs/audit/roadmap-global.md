@@ -279,7 +279,8 @@ Clear the active correctness blockers found in the full-project review, then con
 - `04-Build-04` plan queued for stale PPA linked-user handling.
 - `04-Build-05` plan queued for implicit author-query post-type semantics.
 - `04-Build-06` plan queued for author-query callback lifecycle cleanup.
-- Execution priority inside Phase 04 is `04-Build-03` through `04-Build-06`, then `04-Build-01` and `04-Build-02`.
+- `04-Build-07` plan queued for user-deletion authorship sync verification and coverage hardening.
+- Execution priority inside Phase 04 is `04-Build-03` through `04-Build-07` (blocker remediation), then `04-Build-01` and `04-Build-02` (quality ratchet).
 - Execution is intentionally not started yet.
 
 ---
@@ -356,10 +357,10 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
 - Phase 03 status: complete fork-locally through Build-12; VoiceOver pass recorded and NVDA transcript capture moved to backlog.
-- Phase 04 status: planning started; Build-01 through Build-06 plans exist, execution not started. Blocker-remediation priority is Build-03 through Build-06.
+- Phase 04 status: planning started; Build-01 through Build-07 plans exist, execution not started. Blocker-remediation priority is Build-03 through Build-07.
 
 ## What happens next
 
 1. Keep open upstream PRs as optional adoption paths and post concise fork-status updates when execution state shifts.
-2. Keep `04-Build-03` through `04-Build-06` at the head of the planning-only queue until explicit start instruction for Phase 04 execution; return to `04-Build-01` and `04-Build-02` after the blocker lane is complete.
+2. Keep `04-Build-03` through `04-Build-07` at the head of the planning-only queue until explicit start instruction for Phase 04 execution; return to `04-Build-01` and `04-Build-02` after the blocker lane is complete.
 3. Leave NVDA transcript capture as optional backlog evidence work (`UI-06`) and do not treat it as phase gating.
