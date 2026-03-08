@@ -11,3 +11,4 @@
 
 /tests/.env
 /.phpunit.result.cache
+/.playwright-cli/
