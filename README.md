@@ -58,7 +58,7 @@ Fork development history is tracked in `CHANGELOG.md`.
 
 ## Current Status
 
-**Alpha** upstream product status. The fork is in active modernization/hardening delivery:
+**Alpha** upstream product status. The fork has completed Phase 03 modernization/hardening and is currently in Phase 04 planning (execution not started):
 
 * Phase 01 and Phase 02 are complete fork-locally.
 * Phase 03 Build-12 execution is complete fork-locally: VoiceOver add/remove/reorder pass is recorded; NVDA transcript capture remains a residual follow-up item (not a delivery gate).
