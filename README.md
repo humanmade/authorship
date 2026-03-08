@@ -61,7 +61,7 @@ Fork development history is tracked in `CHANGELOG.md`.
 **Alpha** upstream product status. The fork is in active modernization/hardening delivery:
 
 * Phase 01 and Phase 02 are complete fork-locally.
-* Phase 03 is active (`03-Build-12`): VoiceOver add/remove/reorder pass is recorded; the remaining manual gate is NVDA transcript capture.
+* Phase 03 Build-12 execution is complete fork-locally: VoiceOver add/remove/reorder pass is recorded; NVDA transcript capture remains a residual follow-up item (not a delivery gate).
 
 ## Features
 

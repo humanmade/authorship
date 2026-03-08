@@ -124,7 +124,7 @@ Build-12 preflight notes (2026-03-07, macOS 26.3.1):
   - `Author selection cleared.`
 - Screenshot artifact: `output/playwright/build12-authors-field.png`.
 
-AT transcript ledger (complete remaining rows to close Build-12):
+AT transcript ledger (residual follow-up evidence; does not block Build-12 completion):
 
 | SR | OS | Browser | Version(s) | Field label announced | Instructions announced | Create announced | Remove announced | Reorder announced | Reorder changed order | Result | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|

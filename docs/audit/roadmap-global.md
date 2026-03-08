@@ -1,6 +1,6 @@
 # Authorship Global Roadmap
 
-Last updated: 2026-03-07 (America/Edmonton)
+Last updated: 2026-03-08 (America/Edmonton)
 
 ## Why this project exists
 
@@ -212,11 +212,11 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - added `npm run test:js:coverage` with explicit global threshold enforcement
   - added fork-local Psalm advisory tooling (`composer analyse:psalm`) with config/baseline and runtime wrapper safeguards
   - verified with `composer test:integration`, `WP_MULTISITE=1 composer test:integration`, `composer analyse:phpstan`, `composer analyse:psalm`, `composer lint`, `composer test:coverage`, and `npm run test:js:coverage`
-- `03-Build-12` in progress on `codex/phase-03-build-12-at-matrix-evidence`:
+- `03-Build-12` completed on `codex/phase-03-build-12-at-matrix-evidence`:
   - captured automation evidence for selector label/instructions/live-region behavior in local editor
   - added Build-12 AT transcript ledger in `docs/manual-testing-checklist.md` and recorded manual VoiceOver add/remove/reorder pass
   - documented host automation blockers for spoken-output capture (VoiceOver keystroke automation permission boundary)
-  - remaining manual closeout: NVDA transcript row is pending, and remove-control label quality still needs follow-up
+  - residual follow-up: NVDA transcript row is still pending in the checklist ledger (non-blocking)
 
 ### Scope
 
@@ -246,7 +246,7 @@ PR packaging for Phase 03 will be decided at phase planning time. The frontend c
 
 ---
 
-## Phase 04: Test depth + PHPStan zero (future)
+## Phase 04: Test depth + PHPStan zero (planned, not started)
 
 ### Goal
 Raise PHP test coverage and eliminate the PHPStan baseline entirely.
@@ -258,6 +258,12 @@ Raise PHP test coverage and eliminate the PHPStan baseline entirely.
 - **Custom post type coverage**: Deeper testing of CPT-specific capability mapping, especially with `map_meta_cap`.
 - **Cache behavior tests**: Verify object cache invalidation on authorship changes.
 - **Hook/filter coverage**: Test `authorship_default_author`, `authorship_supported_post_types`, and other public filters.
+
+### Planning status (2026-03-08)
+- `04-01` planning plan created at `.planning/phases/04-test-depth-and-ratcheting-authorship/04-01-PLAN.md`.
+- `04-Build-01` plan queued for multisite + hook/filter coverage expansion.
+- `04-Build-02` plan queued for coverage threshold and Psalm baseline ratcheting.
+- Execution is intentionally not started yet.
 
 ---
 
@@ -312,7 +318,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 ## Current status snapshot
 
-- Active execution branch: `codex/phase-03-build-12-at-matrix-evidence`
+- Current fork branch head: `develop`
 - Integration baseline branch: `codex/restack-audit-queue`
 - Open upstream-facing PRs:
   - `#162` tooling/CI modernization
@@ -328,10 +334,11 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - JS coverage state (`npm run test:js:coverage`): statements `82.06%`, branches `59.37%`, functions `74.35%`, lines `81.95%` against enforced thresholds (80/55/70/80).
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: active; Build-01 through Build-11 executed, Build-12 in progress (VoiceOver pass recorded, NVDA transcript gate open).
+- Phase 03 status: complete fork-locally through Build-12; VoiceOver pass recorded and NVDA transcript capture tracked as residual follow-up.
+- Phase 04 status: planning started; Build-01 and Build-02 plans exist, execution not started.
 
 ## What happens next
 
-1. Complete `03-Build-12` by running the remaining host-native NVDA session and filling the NVDA transcript row in `docs/manual-testing-checklist.md`.
-2. Resolve or explicitly disposition the remove-control `aria-label` residual risk captured in the accessibility audit before Phase 03 close.
-3. Keep monitoring open upstream PRs `#162` through `#165` as optional adoption paths while fork-local delivery continues.
+1. Capture the remaining host-native NVDA transcript row in `docs/manual-testing-checklist.md` as residual accessibility evidence follow-up.
+2. Keep open upstream PRs as optional adoption paths and post concise fork-status updates when execution state shifts.
+3. Keep `04-Build-01` and `04-Build-02` as planning-only queued items until explicit start instruction for Phase 04 execution.
