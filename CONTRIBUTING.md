@@ -1,11 +1,25 @@
 # Contributing to Authorship
 
-Code contributions, bug reports, and feedback are very welcome. These should be submitted through [the GitHub repository](https://github.com/humanmade/authorship). Development happens in the `develop` branch, and any pull requests should be made against that branch please.
+Code contributions, bug reports, and feedback are very welcome.
+
+For this fork (`dknauss/authorship`), development happens on fork `develop`, and pull requests should be made against this fork.
+
+Upstream (`humanmade/authorship`) pull requests are optional and created only at explicit packaging checkpoints. See [Fork-First Policy](docs/fork-first-policy.md).
 
 * [Setting up Locally](#setting-up-locally)
+* [Fork Workflow](#fork-workflow)
 * [Building the Assets](#building-the-assets)
 * [Running the Tests](#running-the-tests)
 * [Releasing a New Version](#releasing-a-new-version)
+
+## Fork Workflow
+
+1. Branch from fork `develop`.
+1. Implement and verify changes locally.
+1. Open a PR to fork `develop`.
+1. Merge through PR workflow only.
+
+Do not open one upstream PR per build slice. Upstream PRs are curated packaging submissions only, per `docs/fork-first-policy.md`.
 
 
 ## Setting up Locally
@@ -90,6 +104,8 @@ Lint command behavior notes:
 ## Releasing a New Version
 
 These are the steps to take to release a new version of Authorship (for contributors who have push access to the GitHub repo).
+
+For this fork, release packaging to upstream is optional and not required for fork delivery.
 
 ### Prior to Release
 

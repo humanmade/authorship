@@ -19,6 +19,14 @@ At this stage, the work is focused on making the plugin safer to operate and eas
 4. Keep upstream PRs as optional value, not a dependency.
 5. Offer upstream contributions at natural phase boundaries in minimal, well-scoped PRs.
 
+### Strict fork-first upstream policy (effective 2026-03-08)
+- Canonical reference: `docs/fork-first-policy.md`
+- Fork `develop` is the delivery source of truth.
+- Upstream HM PRs are optional and opened only at explicit packaging checkpoints.
+- Do not open one HM PR per incremental build slice.
+- Keep open HM PRs bounded to the current packaging set unless explicit go-ahead expands scope.
+- Close superseded HM PRs promptly to avoid review-surface sprawl.
+
 ---
 
 ## History to date
@@ -72,7 +80,7 @@ Phase 02 is done when all of the following fork-local outcomes are true:
 4. `02-Build-13` is executed: upstream PRs are prepared and submitted (see [Upstream PR strategy](#upstream-pr-strategy) below).
 5. This roadmap and `roadmap-01.md` are updated to mark Phase 02 complete.
 
-Phase 02 closes on PR *submission*, not on upstream response. Existing PRs (#160, #161) may be closed or superseded as housekeeping if there is no active review signal, but this is not a completion gate.
+Phase 02 closes on PR *submission*, not on upstream response. Legacy superseded PRs were closed during strict fork-first hygiene on 2026-03-08; upstream response remains non-gating.
 
 After these five items, Phase 02 is closed and Phase 03 begins.
 
@@ -216,7 +224,7 @@ Replace the deprecated and accessibility-impaired frontend stack with current Wo
   - captured automation evidence for selector label/instructions/live-region behavior in local editor
   - added Build-12 AT transcript ledger in `docs/manual-testing-checklist.md` and recorded manual VoiceOver add/remove/reorder pass
   - documented host automation blockers for spoken-output capture (VoiceOver keystroke automation permission boundary)
-  - residual follow-up: NVDA transcript row is still pending in the checklist ledger (non-blocking)
+  - backlog follow-up: NVDA transcript row remains optional evidence work in the checklist ledger (non-blocking)
 
 ### Scope
 
@@ -288,7 +296,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 8 | Remove `lodash` dependency | WP core direction |
 | 9 | Add JS unit tests | Zero JS test coverage today |
 | 10 | Move `PluginPostStatusInfo` to `@wordpress/editor` | Site editor forward-compat |
-| 11 | AT matrix validation + role-path hardening | Complete NVDA outcome capture (VoiceOver already recorded) and track remaining selector accessibility follow-up |
+| 11 | AT matrix validation + role-path hardening | Keep optional NVDA transcript capture in backlog (VoiceOver already recorded) and track selector accessibility follow-up |
 
 ### P2 — Important, next after P1 (Phase 04)
 
@@ -313,6 +321,7 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 | 23 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
 | 24 | Site builder implementation guidance | README aspirational item |
 | 25 | REST API embedding depth tests | Embedded author data structure |
+| 26 | NVDA transcript evidence capture | Optional Windows-host spoken-output capture for `UI-06`; backlogged and non-blocking |
 
 ---
 
@@ -326,19 +335,18 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
   - `#164` CLI migration improvements
   - `#165` editor asset fix
   - Umbrella issue: `#166`
-- Legacy upstream-facing PRs:
-  - `#160` previous integration PR (superseded in packaging, pending housekeeping decision)
-  - `#161` previous focused Build-04 PR (superseded in packaging, pending housekeeping decision)
+- Upstream hygiene state:
+  - superseded HM PRs `#160`, `#161`, and `#167`-`#172` were closed on 2026-03-08 to enforce strict fork-first scope discipline
 - Quality state: `composer test:integration`, `WP_MULTISITE=1 composer test:integration`, `composer analyse:phpstan`, `composer analyse:psalm`, `composer lint`, `composer test:coverage`, and `npm run test:js:coverage` are all green.
 - PHPUnit coverage state: 163 tests in integration run and statement coverage `65.51%` (`625/954`) with threshold ratcheted to `63%`.
 - JS coverage state (`npm run test:js:coverage`): statements `82.06%`, branches `59.37%`, functions `74.35%`, lines `81.95%` against enforced thresholds (80/55/70/80).
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
-- Phase 03 status: complete fork-locally through Build-12; VoiceOver pass recorded and NVDA transcript capture tracked as residual follow-up.
+- Phase 03 status: complete fork-locally through Build-12; VoiceOver pass recorded and NVDA transcript capture moved to backlog.
 - Phase 04 status: planning started; Build-01 and Build-02 plans exist, execution not started.
 
 ## What happens next
 
-1. Capture the remaining host-native NVDA transcript row in `docs/manual-testing-checklist.md` as residual accessibility evidence follow-up.
-2. Keep open upstream PRs as optional adoption paths and post concise fork-status updates when execution state shifts.
-3. Keep `04-Build-01` and `04-Build-02` as planning-only queued items until explicit start instruction for Phase 04 execution.
+1. Keep open upstream PRs as optional adoption paths and post concise fork-status updates when execution state shifts.
+2. Keep `04-Build-01` and `04-Build-02` as planning-only queued items until explicit start instruction for Phase 04 execution.
+3. Leave NVDA transcript capture as optional backlog evidence work (`UI-06`) and do not treat it as phase gating.

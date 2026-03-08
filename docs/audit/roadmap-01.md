@@ -26,10 +26,12 @@ See also: [Global Roadmap](roadmap-global.md) for project-wide purpose, history,
   - `03-Build-09` executed on `codex/phase-03-build-09-runtime-a11y-validation` (runtime validation + `onDragOver` regression fix + README accessibility statement alignment)
   - `03-Build-10` executed on `codex/phase-03-build-10-at-matrix-hardening` (non-admin edit-context request-path hardening + regression test coverage + NVDA/VoiceOver matrix protocol checklist)
   - `03-Build-11` executed on `codex/phase-03-build-11-coverage-psalm-advisory` (admin PHPUnit coverage expansion + JS coverage threshold gate + Psalm advisory tooling)
-  - `03-Build-12` completed on `codex/phase-03-build-12-at-matrix-evidence` (automation evidence captured; manual VoiceOver pass recorded for add/remove/reorder; NVDA transcript row pending as non-blocking follow-up)
+  - `03-Build-12` completed on `codex/phase-03-build-12-at-matrix-evidence` (automation evidence captured; manual VoiceOver pass recorded for add/remove/reorder; optional NVDA transcript capture moved to backlog)
 - Phase 04 planning started on 2026-03-08:
   - `04-01` planned at `.planning/phases/04-test-depth-and-ratcheting-authorship/04-01-PLAN.md`
   - `04-Build-01` and `04-Build-02` plans created and queued (planning-only; no execution started)
+- Strict fork-first upstream policy centralized at `docs/fork-first-policy.md`.
+- Upstream PR hygiene completed on 2026-03-08: superseded HM PRs `#160`, `#161`, and `#167`-`#172` closed; maintained open packaging set is `#162`-`#165`.
 
 ## What Phase 01 established
 - Root standards configuration already exists and is not missing.
@@ -74,5 +76,5 @@ Residual risk notes:
 - Coverage ratchet is intentionally conservative at 63% pending Phase 04 incremental raises.
 
 ## Next step
-- Capture the remaining host-native NVDA transcript row in `docs/manual-testing-checklist.md` as residual evidence follow-up.
 - Keep Phase 04 execution paused; start `04-Build-01` only after explicit go-ahead.
+- Keep NVDA transcript capture in backlog as optional `UI-06` evidence work (non-blocking).

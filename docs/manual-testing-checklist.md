@@ -124,7 +124,7 @@ Build-12 preflight notes (2026-03-07, macOS 26.3.1):
   - `Author selection cleared.`
 - Screenshot artifact: `output/playwright/build12-authors-field.png`.
 
-AT transcript ledger (residual follow-up evidence; does not block Build-12 completion):
+AT transcript ledger (backlog evidence; does not block Build-12 completion):
 
 | SR | OS | Browser | Version(s) | Field label announced | Instructions announced | Create announced | Remove announced | Reorder announced | Reorder changed order | Result | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -132,7 +132,7 @@ AT transcript ledger (residual follow-up evidence; does not block Build-12 compl
 | VoiceOver | macOS | Safari or Chrome | Not captured | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Pass | Manual operator report on 2026-03-07: "VoiceOver is good for add/remove/reorder." Detailed spoken transcript strings were not captured. |
 
 Residual follow-up log:
-- 2026-03-08: NVDA transcript row remains open as non-blocking evidence follow-up; this environment cannot run NVDA because it requires a Windows host.
+- 2026-03-08: NVDA transcript row moved to backlog as non-blocking evidence work; this environment cannot run NVDA because it requires a Windows host.
 
 ## REST API tests
 

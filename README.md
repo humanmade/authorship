@@ -18,6 +18,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 ---
 
 - [Fork Status](#fork-status)
+- [Fork-First Policy](#fork-first-policy)
 - [Changelog](#changelog)
 - [Current Status](#current-status)
 - [Features](#features)
@@ -52,6 +53,10 @@ Fork operating model:
   * `docs/audit/roadmap-01.md`
   * `.planning/phases/`
 
+## Fork-First Policy
+
+Canonical policy: `docs/fork-first-policy.md`
+
 ## Changelog
 
 Fork development history is tracked in `CHANGELOG.md`.
@@ -61,7 +66,7 @@ Fork development history is tracked in `CHANGELOG.md`.
 **Alpha** upstream product status. The fork has completed Phase 03 modernization/hardening and is currently in Phase 04 planning (execution not started):
 
 * Phase 01 and Phase 02 are complete fork-locally.
-* Phase 03 Build-12 execution is complete fork-locally: VoiceOver add/remove/reorder pass is recorded; NVDA transcript capture remains a residual follow-up item (not a delivery gate).
+* Phase 03 Build-12 execution is complete fork-locally: VoiceOver add/remove/reorder pass is recorded; optional NVDA transcript capture is now tracked as backlog evidence (not a delivery gate).
 
 ## Features
 
@@ -102,7 +107,7 @@ Recommended workflow in this fork:
 * Branch from `develop`.
 * Keep scope narrow and test-backed.
 * Open pull requests against fork `develop`.
-* Optionally submit minimal upstream PRs at phase boundaries.
+* Follow `docs/fork-first-policy.md` for upstream submission constraints and PR hygiene.
 
 ## Quality Gates
 
@@ -275,7 +280,7 @@ With regard to the author selection control on the post editing screen:
 * ✅ Add/remove/reorder actions emit live status messages (for example `Added guest author...`, `Moved ... to position ...`)
 * ✅ Keyboard reorder is supported (`Space` to pick up/drop, arrow keys to move) when a selected author token has focus
 * ⚠ Keyboard reorder discoverability still depends on users understanding token focus before drag commands
-* ⚠ Full assistive-technology matrix validation (NVDA/VoiceOver) is still in progress
+* ⚠ Additional NVDA spoken-transcript evidence is backlogged (VoiceOver path is already recorded)
 
 The team are actively investigating either replacing the component used to render the control with a fully accessible one, or fixing the accessibility issues of the current one.
 
