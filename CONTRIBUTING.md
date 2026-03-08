@@ -72,6 +72,11 @@ To lint the JS and CSS:
 
 	npm run lint
 
+Lint command behavior notes:
+
+- `npm run lint:css` intentionally targets stylesheet sources (`src/**/*.scss`) rather than all files under `src/`.
+- This avoids Stylelint parsing `.ts`/`.tsx` files during CI while keeping stylesheet lint coverage intact.
+
 ### Coverage notes
 
 - `composer test:coverage` uses `phpdbg` as the coverage driver, so no Xdebug/PCOV extension is required.
