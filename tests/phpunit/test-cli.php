@@ -421,6 +421,68 @@ class TestCLI extends TestCase {
 		$this->assertSame( '0', $event['assoc_args']['batch-pause'] );
 	}
 
+	public function testPpaMigrationReusesExistingUserLoginWhenNicenameDiffers() : void {
+		$factory = self::factory()->post;
+		$author_taxonomy_preexisting = taxonomy_exists( 'author' );
+		$term_id = 0;
+
+		if ( ! $author_taxonomy_preexisting ) {
+			register_taxonomy(
+				'author',
+				'post',
+				[
+					'public'    => false,
+					'query_var' => false,
+					'rewrite'   => false,
+				]
+			);
+		}
+
+		$existing_user = self::factory()->user->create_and_get( [
+			'role'         => 'author',
+			'user_login'   => 'ppa-existing-author',
+			'user_nicename' => 'existing-author-profile',
+			'display_name' => 'Existing Author Login Match',
+			'user_email'   => 'ppa-existing-author@example.org',
+		] );
+
+		try {
+			$post = $factory->create_and_get( [
+				'post_author' => self::$users['editor']->ID,
+			] );
+
+			$term = wp_insert_term( 'PPA Existing Author', 'author', [
+				'slug' => 'ppa-existing-author',
+			] );
+			$this->assertIsArray( $term );
+			$this->assertArrayHasKey( 'term_id', $term );
+
+			$term_id = (int) $term['term_id'];
+			wp_set_object_terms( $post->ID, [ $term_id ], 'author' );
+
+			$command = new CLI\Migrate_Command();
+			$command->ppa( [], [
+				'dry-run' => false,
+				'overwrite-authors' => true,
+				'batch-pause' => '0',
+			] );
+
+			$authorship_authors = \Authorship\get_authors( $post );
+
+			$this->assertCount( 1, $authorship_authors );
+			$this->assertSame( $existing_user->ID, $authorship_authors[0]->ID );
+			$this->assertSame( $existing_user->ID, username_exists( 'ppa-existing-author' ) );
+		} finally {
+			if ( $term_id > 0 && taxonomy_exists( 'author' ) ) {
+				wp_delete_term( $term_id, 'author' );
+			}
+
+			if ( ! $author_taxonomy_preexisting && taxonomy_exists( 'author' ) ) {
+				unregister_taxonomy( 'author' );
+			}
+		}
+	}
+
 	public function testMigratePauseResolutionActionFiresPerProcessedBatch() : void {
 		$factory = self::factory()->post;
 

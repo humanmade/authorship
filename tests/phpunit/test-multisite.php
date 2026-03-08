@@ -11,6 +11,8 @@ namespace Authorship\Tests;
 
 use const Authorship\POSTS_PARAM;
 
+use function Authorship\get_author_ids;
+
 /**
  * @group ms-required
  */
@@ -91,6 +93,39 @@ class TestMultisite extends TestCase {
 		$this->assertSame( self::$super_admin->ID, $authordata->ID );
 
 		restore_current_blog();
+	}
+
+	public function testDeletedNetworkUserUpdatesSubsiteAuthorship() : void {
+		$cross_site_author = self::factory()->user->create_and_get( [
+			'role'         => 'author',
+			'display_name' => 'Network Deleted Author',
+			'user_email'   => 'network-deleted-author@example.org',
+		] );
+
+		switch_to_blog( self::$sub_site->blog_id );
+		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );
+
+		try {
+			$post = self::factory()->post->create_and_get( [
+				'post_author' => self::$users['admin']->ID,
+				POSTS_PARAM   => [
+					$cross_site_author->ID,
+					self::$users['admin']->ID,
+				],
+			] );
+		} finally {
+			restore_current_blog();
+		}
+
+		wpmu_delete_user( $cross_site_author->ID );
+
+		switch_to_blog( self::$sub_site->blog_id );
+
+		try {
+			$this->assertSame( [ self::$users['admin']->ID ], get_author_ids( $post ) );
+		} finally {
+			restore_current_blog();
+		}
 	}
 
 }

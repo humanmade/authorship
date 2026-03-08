@@ -32,6 +32,7 @@ const REST_PARAM = 'authorship';
 const REST_REL_LINK_ID = 'https://authorship.hmn.md/action-assign-authorship';
 const SCRIPT_HANDLE = 'authorship-js';
 const STYLE_HANDLE = 'authorship-css';
+const TAXONOMY = 'authorship';
 
 /**
  * Bootstraps the main actions and filters.
@@ -47,6 +48,7 @@ function bootstrap() : void {
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
+	add_action( 'deleted_user', __NAMESPACE__ . '\\action_deleted_user', 10, 3 );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -309,6 +311,151 @@ function action_wp( WP $wp ) : void {
  */
 function register_roles_and_caps() : void {
 	add_role( GUEST_ROLE, __( 'Guest Author', 'authorship' ), [] );
+}
+
+/**
+ * Synchronizes authorship data after a user is deleted.
+ *
+ * This updates attributed-author lists across all relevant sites, replacing the
+ * deleted author with the reassigned user when provided, or removing the author
+ * entirely otherwise.
+ *
+ * @param int     $deleted_user_id Deleted user ID.
+ * @param mixed   $reassign        User ID to reassign content to, if provided.
+ * @param WP_User $_user           Deleted user object.
+ */
+function action_deleted_user( int $deleted_user_id, $reassign, WP_User $_user ) : void {
+	$replacement_user_id = is_numeric( $reassign ) ? (int) $reassign : 0;
+
+	if ( $replacement_user_id > 0 && ! get_userdata( $replacement_user_id ) ) {
+		$replacement_user_id = 0;
+	}
+
+	if ( $replacement_user_id === $deleted_user_id ) {
+		$replacement_user_id = 0;
+	}
+
+	$site_ids = [ get_current_blog_id() ];
+
+	if ( is_multisite() ) {
+		$network_site_ids = get_sites( [
+			'fields' => 'ids',
+			'number' => 0,
+		] );
+
+		if ( is_array( $network_site_ids ) ) {
+			$site_ids = array_map( 'intval', $network_site_ids );
+		}
+	}
+
+	foreach ( $site_ids as $site_id ) {
+		if ( is_multisite() ) {
+			switch_to_blog( $site_id );
+		}
+
+		sync_deleted_user_authorship_for_current_site( $deleted_user_id, $replacement_user_id );
+
+		if ( is_multisite() ) {
+			restore_current_blog();
+		}
+	}
+}
+
+/**
+ * Synchronizes deleted-user authorship state for the current site.
+ *
+ * @param int $deleted_user_id Deleted user ID.
+ * @param int $replacement_user_id Replacement user ID, if any.
+ */
+function sync_deleted_user_authorship_for_current_site( int $deleted_user_id, int $replacement_user_id ) : void {
+	if ( ! taxonomy_exists( TAXONOMY ) ) {
+		return;
+	}
+
+	$post_types = get_supported_post_types();
+
+	if ( empty( $post_types ) ) {
+		return;
+	}
+
+	$post_ids = get_posts( [
+		'fields'             => 'ids',
+		'nopaging'           => true,
+		'post_status'        => 'any',
+		'post_type'          => $post_types,
+		'suppress_filters'   => false,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'tax_query'          => [
+			[
+				'taxonomy' => TAXONOMY,
+				'field'    => 'slug',
+				'terms'    => [ (string) $deleted_user_id ],
+			],
+		],
+	] );
+
+	foreach ( $post_ids as $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( ! ( $post instanceof WP_Post ) ) {
+			continue;
+		}
+
+		$author_terms = wp_get_post_terms( $post->ID, TAXONOMY );
+
+		if ( is_wp_error( $author_terms ) ) {
+			continue;
+		}
+
+		$author_ids = array_map(
+			static function( \WP_Term $term ) : int {
+				return (int) $term->slug;
+			},
+			$author_terms
+		);
+
+		if ( ! in_array( $deleted_user_id, $author_ids, true ) ) {
+			continue;
+		}
+
+		$updated_author_ids = [];
+
+		foreach ( $author_ids as $author_id ) {
+			if ( $author_id === $deleted_user_id ) {
+				$author_id = $replacement_user_id;
+			}
+
+			if ( $author_id <= 0 || in_array( $author_id, $updated_author_ids, true ) ) {
+				continue;
+			}
+
+			$updated_author_ids[] = $author_id;
+		}
+
+		if ( empty( $updated_author_ids ) ) {
+			wp_set_post_terms( $post->ID, [], TAXONOMY );
+			continue;
+		}
+
+		$terms = wp_set_post_terms( $post->ID, array_map( 'strval', $updated_author_ids ), TAXONOMY );
+
+		if ( is_wp_error( $terms ) ) {
+			continue;
+		}
+	}//end foreach
+
+	$term = get_term_by( 'slug', (string) $deleted_user_id, TAXONOMY );
+
+	if ( ! ( $term instanceof \WP_Term ) ) {
+		return;
+	}
+
+	$term = get_term( $term->term_id, TAXONOMY );
+
+	if ( $term instanceof \WP_Term && 0 === $term->count ) {
+		wp_delete_term( $term->term_id, TAXONOMY );
+	}
 }
 
 /**
@@ -689,17 +836,30 @@ function preload_author_data( WP_Post $post ) : void {
  */
 function action_pre_get_posts( WP_Query $query ) : void {
 	$post_type = $query->get( 'post_type' );
+	$supported_post_types = get_supported_post_types();
 
 	if ( empty( $post_type ) ) {
-		// @TODO this needs more work so it matches the behaviour of the internals of `WP_Query`.
 		$post_type = 'post';
 	}
 
-	if ( array_diff( (array) $post_type, get_supported_post_types() ) ) {
-		// If _any_ of the requested post types don't support `author`, let the default query run.
-		// @TODO I don't think anything can be done about a query for multiple post types where one or
-		// more support `author` and one or more don't.
-		return;
+	if ( 'any' === $post_type ) {
+		$post_type = $supported_post_types;
+		$query->set( 'post_type', $post_type );
+	} else {
+		$requested_post_types = (array) $post_type;
+		$matching_post_types = array_values( array_intersect( $requested_post_types, $supported_post_types ) );
+
+		if ( empty( $matching_post_types ) ) {
+			return;
+		}
+
+		if ( count( $matching_post_types ) !== count( $requested_post_types ) ) {
+			// Mixed supported/unsupported post-type queries cannot preserve both
+			// Authorship taxonomy semantics and core post_author semantics at once,
+			// so narrow author-filtered queries to the supported set explicitly.
+			$post_type = $matching_post_types;
+			$query->set( 'post_type', $post_type );
+		}
 	}
 
 	$stored_values = [];

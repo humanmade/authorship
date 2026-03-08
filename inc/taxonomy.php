@@ -11,8 +11,6 @@ namespace Authorship;
 
 use WP_Term;
 
-const TAXONOMY = 'authorship';
-
 /**
  * Registers the taxonomy that creates a connection between posts and users.
  */

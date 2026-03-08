@@ -255,9 +255,6 @@
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[$avatar]]></code>
     </RiskyTruthyFalsyComparison>
-    <UndefinedConstant>
-      <code><![CDATA[TAXONOMY]]></code>
-    </UndefinedConstant>
     <UndefinedFunction>
       <code><![CDATA[enqueue_asset(
 			$manifest,

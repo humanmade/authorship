@@ -282,6 +282,78 @@ class TestWPQuery extends TestCase {
 		$this->assertSame( [ self::$users['author']->ID ], $query->get( 'author__not_in' ) );
 	}
 
+	public function testQueryForAuthorWithAnyPostTypeReturnsSupportedTypesOnly() : void {
+		$factory = self::factory()->post;
+
+		register_post_type( 'testing', [
+			'public' => true,
+		] );
+		remove_post_type_support( 'testing', 'author' );
+
+		$yes_post = $factory->create_and_get( [
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$yes_page = $factory->create_and_get( [
+			'post_type'   => 'page',
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$factory->create_and_get( [
+			'post_type'   => 'testing',
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		$query = new WP_Query();
+		$posts = $query->query( [
+			'post_type' => 'any',
+			'author'    => self::$users['editor']->ID,
+			'fields'    => 'ids',
+			'orderby'   => 'ID',
+			'order'     => 'ASC',
+		] );
+
+		$this->assertSame( [ $yes_post->ID, $yes_page->ID ], $posts );
+	}
+
+	public function testQueryForAuthorWithMixedPostTypesNarrowsToSupportedTypes() : void {
+		$factory = self::factory()->post;
+
+		register_post_type( 'testing', [
+			'public' => true,
+		] );
+		remove_post_type_support( 'testing', 'author' );
+
+		$yes_post = $factory->create_and_get( [
+			'post_author' => self::$users['admin']->ID,
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$factory->create_and_get( [
+			'post_type'   => 'testing',
+			'post_author' => self::$users['editor']->ID,
+		] );
+
+		$query = new WP_Query();
+		$posts = $query->query( [
+			'post_type' => [ 'post', 'testing' ],
+			'author'    => self::$users['editor']->ID,
+			'fields'    => 'ids',
+			'orderby'   => 'ID',
+			'order'     => 'ASC',
+		] );
+
+		$this->assertSame( [ $yes_post->ID ], $posts );
+	}
+
 	public function testSubsequentQueriesAreUnaffected() : void {
 		$factory = self::factory()->post;
 

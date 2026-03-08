@@ -139,6 +139,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 */
 	function filter_rest_user_query( array $prepared_args, \WP_REST_Request $request ) : array {
 		unset( $prepared_args['has_published_posts'] );
+		$prepared_args['blog_id'] = 0;
 
 		return $prepared_args;
 	}

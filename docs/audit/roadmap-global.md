@@ -254,15 +254,19 @@ PR packaging for Phase 03 will be decided at phase planning time. The frontend c
 
 ---
 
-## Phase 04: Test depth + PHPStan zero (planned, not started)
+## Phase 04: Correctness blockers + test depth (planned, not started)
 
 ### Goal
-Raise PHP test coverage and eliminate the PHPStan baseline entirely.
+Clear the active correctness blockers found in the full-project review, then continue with deeper PHP test coverage and conservative quality-signal ratcheting.
 
 ### Scope
+- **CLI migration correctness**: Fix write-mode `wp-authors` batching so migrations do not skip posts after earlier batches mutate the candidate set.
+- **PPA migration hardening**: Validate stale PublishPress linked-user metadata before reuse and fall back safely.
+- **Author-query semantics**: Fix omitted-`post_type` author queries so supported content is not collapsed to `post` only.
+- **Query callback lifecycle**: Stop leaking `posts_pre_query` callbacks across the request while preserving restored query vars.
 - **Multisite test expansion**: Cross-site author queries, super admin capabilities on subsites, author archives on subsites. Currently only 1 multisite test.
 - **Coverage ratcheting continuation**: Incremental threshold raises toward 80%+.
-- **PHPStan baseline elimination**: Add `@var` annotations and type guards at WordPress API boundaries to resolve remaining mixed-type errors.
+- **Quality-ratchet continuation**: Keep PHPStan/Psalm/coverage thresholds on a conservative ratchet only after blocker remediation is complete.
 - **Custom post type coverage**: Deeper testing of CPT-specific capability mapping, especially with `map_meta_cap`.
 - **Cache behavior tests**: Verify object cache invalidation on authorship changes.
 - **Hook/filter coverage**: Test `authorship_default_author`, `authorship_supported_post_types`, and other public filters.
@@ -271,6 +275,11 @@ Raise PHP test coverage and eliminate the PHPStan baseline entirely.
 - `04-01` planning plan created at `.planning/phases/04-test-depth-and-ratcheting-authorship/04-01-PLAN.md`.
 - `04-Build-01` plan queued for multisite + hook/filter coverage expansion.
 - `04-Build-02` plan queued for coverage threshold and Psalm baseline ratcheting.
+- `04-Build-03` plan queued for deterministic `wp-authors` batching remediation.
+- `04-Build-04` plan queued for stale PPA linked-user handling.
+- `04-Build-05` plan queued for implicit author-query post-type semantics.
+- `04-Build-06` plan queued for author-query callback lifecycle cleanup.
+- Execution priority inside Phase 04 is `04-Build-03` through `04-Build-06`, then `04-Build-01` and `04-Build-02`.
 - Execution is intentionally not started yet.
 
 ---
@@ -302,26 +311,30 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 
 | # | Item | Notes |
 |---|------|-------|
-| 12 | Multisite test expansion | 1 test today, need 5-10 |
-| 13 | Coverage ratcheting toward 80% | Incremental, ongoing |
-| 14 | PHPStan baseline to zero | Type annotations at WP API boundaries |
-| 15 | CPT capability test depth | `map_meta_cap` edge cases |
-| 16 | Cache invalidation tests | Object cache interactions |
-| 17 | Hook/filter contract tests | `authorship_default_author`, etc. |
-| 18 | `post_author` field synchronization | Sync `post_author` with first attributed author on `set_authors()` to close theme/SEO/caching compatibility gap. See `.planning/known-gaps.md` §`post_author` field divergence. |
-| 19 | Schema.org / JSON-LD author markup in HTML | Structured author data in page output for SEO. Competitors (PPA Pro, Molongui) already provide this. Independent of feed/Byline work. |
+| 12 | Deterministic `wp-authors` batching | Full-review blocker. Fix write-mode skip bug before any non-blocking ratchet work. Planned as `04-Build-03`. |
+| 13 | Stale PPA linked-user hardening | Full-review blocker. Validate linked-user term meta before reuse. Planned as `04-Build-04`. |
+| 14 | Implicit author-query post-type semantics | Full-review blocker. Keep supported non-`post` content in omitted-`post_type` author queries. Planned as `04-Build-05`. |
+| 15 | Author-query callback lifecycle cleanup | Full-review blocker. Prevent `posts_pre_query` callback buildup across the request. Planned as `04-Build-06`. |
+| 16 | Multisite test expansion | Existing Phase 04 quality work. Planned as `04-Build-01` after blocker remediation. |
+| 17 | Coverage ratcheting toward 80% | Existing Phase 04 quality work. Planned as `04-Build-02` after blocker remediation. |
+| 18 | Quality-ratchet continuation | Keep conservative coverage/Psalm tightening only after the blocker queue is green. |
+| 19 | CPT capability test depth | `map_meta_cap` edge cases |
+| 20 | Cache invalidation tests | Object cache interactions |
+| 21 | Hook/filter contract tests | `authorship_default_author`, etc. |
+| 22 | `post_author` field synchronization | Sync `post_author` with first attributed author on `set_authors()` to close theme/SEO/caching compatibility gap. See `.planning/known-gaps.md` §`post_author` field divergence. |
+| 23 | Schema.org / JSON-LD author markup in HTML | Structured author data in page output for SEO. Competitors (PPA Pro, Molongui) already provide this. Independent of feed/Byline work. |
 
 ### P3 — Product features (future, no phase assigned)
 
 | # | Item | Notes |
 |---|------|-------|
-| 20 | Classic editor support | README marks incomplete |
-| 21 | Atom feed support | README marks incomplete |
-| 22 | `init_taxonomy` "Mine" count performance | `get_term_by` on every `init`; cache or lazy-load |
-| 23 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
-| 24 | Site builder implementation guidance | README aspirational item |
-| 25 | REST API embedding depth tests | Embedded author data structure |
-| 26 | NVDA transcript evidence capture | Optional Windows-host spoken-output capture for `UI-06`; backlogged and non-blocking |
+| 24 | Classic editor support | README marks incomplete |
+| 25 | Atom feed support | README marks incomplete |
+| 26 | `init_taxonomy` "Mine" count performance | `get_term_by` on every `init`; cache or lazy-load |
+| 27 | Quick edit author hide cleanup | `include => [0]` hack is fragile |
+| 28 | Site builder implementation guidance | README aspirational item |
+| 29 | REST API embedding depth tests | Embedded author data structure |
+| 30 | NVDA transcript evidence capture | Optional Windows-host spoken-output capture for `UI-06`; backlogged and non-blocking |
 
 ---
 
@@ -343,10 +356,10 @@ Items are ordered by impact and urgency. Phase assignments indicate when each it
 - PHPStan state: baseline contains zero ignored errors.
 - Phase 02 status: completion criteria met on 2026-03-07 (fork-local).
 - Phase 03 status: complete fork-locally through Build-12; VoiceOver pass recorded and NVDA transcript capture moved to backlog.
-- Phase 04 status: planning started; Build-01 and Build-02 plans exist, execution not started.
+- Phase 04 status: planning started; Build-01 through Build-06 plans exist, execution not started. Blocker-remediation priority is Build-03 through Build-06.
 
 ## What happens next
 
 1. Keep open upstream PRs as optional adoption paths and post concise fork-status updates when execution state shifts.
-2. Keep `04-Build-01` and `04-Build-02` as planning-only queued items until explicit start instruction for Phase 04 execution.
+2. Keep `04-Build-03` through `04-Build-06` at the head of the planning-only queue until explicit start instruction for Phase 04 execution; return to `04-Build-01` and `04-Build-02` after the blocker lane is complete.
 3. Leave NVDA transcript capture as optional backlog evidence work (`UI-06`) and do not treat it as phase gating.
