@@ -18,6 +18,7 @@ Authorship is currently geared toward developers who are implementing custom sol
 ---
 
 - [Fork Status](#fork-status)
+- [Changelog](#changelog)
 - [Current Status](#current-status)
 - [Features](#features)
 - [Installation](#installation)
@@ -50,6 +51,10 @@ Fork operating model:
   * `docs/audit/roadmap-global.md`
   * `docs/audit/roadmap-01.md`
   * `.planning/phases/`
+
+## Changelog
+
+Fork development history is tracked in `CHANGELOG.md`.
 
 ## Current Status
 
