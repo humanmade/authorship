@@ -2,7 +2,7 @@
 
 Stable tag: 0.2.17  
 Requires at least: 5.4  
-Tested up to: 6.2  
+Tested up to: 6.6  
 Requires PHP: 7.2  
 License: GPL v3 or later  
 Contributors: johnbillion, humanmade  
@@ -17,9 +17,12 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ---
 
+- [Fork Status](#fork-status)
 - [Current Status](#current-status)
 - [Features](#features)
 - [Installation](#installation)
+- [Fork Development Workflow](#fork-development-workflow)
+- [Quality Gates](#quality-gates)
 - [Design Decisions](#design-decisions)
 - [Template Functions](#template-functions)
 - [REST API](#rest-api)
@@ -34,9 +37,26 @@ Authorship is currently geared toward developers who are implementing custom sol
 
 ---
 
+## Fork Status
+
+This repository (`dknauss/authorship`) is an active fork of [humanmade/authorship](https://github.com/humanmade/authorship).
+
+Fork operating model:
+
+* Default branch is `develop` (branch protection enabled).
+* Delivery is fork-first: phase completion is based on fork-local outcomes, not upstream merge timing.
+* Upstream pull requests are optional adoption paths, not delivery gates.
+* Planning and execution status are tracked in:
+  * `docs/audit/roadmap-global.md`
+  * `docs/audit/roadmap-01.md`
+  * `.planning/phases/`
+
 ## Current Status
 
-**Alpha**. Generally very functional but several features are still in development.
+**Alpha** upstream product status. The fork is in active modernization/hardening delivery:
+
+* Phase 01 and Phase 02 are complete fork-locally.
+* Phase 03 is active (`03-Build-12`): VoiceOver add/remove/reorder pass is recorded; the remaining manual gate is NVDA transcript capture.
 
 ## Features
 
@@ -61,11 +81,41 @@ _Features without a checkmark are still work in progress._
 ### For development use
 
 * Clone this repo into your plugins directory
-* Ensure you have Composer v2 and Node v16 installed
+* Ensure you have Composer v2 and Node v20 installed
 * Install the dependencies:
   `composer install && npm install`
+* If you run integration tests, set credentials in `tests/.env` (copy `tests/.env.dist` first if needed)
 * Start the dev server:
   `npm run start`
+
+## Fork Development Workflow
+
+The fork develops on `develop` and uses short-lived branch slices (for example `codex/phase-03-build-*`) for phased execution and review.
+
+Recommended workflow in this fork:
+
+* Branch from `develop`.
+* Keep scope narrow and test-backed.
+* Open pull requests against fork `develop`.
+* Optionally submit minimal upstream PRs at phase boundaries.
+
+## Quality Gates
+
+Fork-local quality gates currently used before handoff:
+
+* `composer test:integration`
+* `WP_MULTISITE=1 composer test:integration`
+* `composer analyse:phpstan`
+* `composer analyse:psalm`
+* `composer lint`
+* `npm run lint:js`
+* `npm run test:js -- --ci`
+* `npm run build`
+
+Coverage gates used in build slices that change thresholds or coverage policy:
+
+* `composer test:coverage`
+* `npm run test:js:coverage`
 
 ## Design Decisions
 
@@ -92,7 +142,7 @@ Authorship provides:
 
 ### UI design decisions
 
-We'd love it if you activated Authorship and then forgot that its features are provided by a plugin. The UI provides convenient functionality without looking out of place, both in the block editor and the classic editor.
+We'd love it if you activated Authorship and then forgot that its features are provided by a plugin. The UI provides convenient functionality without looking out of place in the block editor.
 
 ### User design decisions
 
@@ -261,11 +311,17 @@ The following custom user capabilities are used by Authorship. These can be gran
 
 ## Contributing
 
-Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md) for more details.
+Code contributions, feedback, and feature suggestions are very welcome.
+
+For this fork, open issues/PRs in `dknauss/authorship` and follow [CONTRIBUTING.md](CONTRIBUTING.md) from this repository.
+
+If a change is intended for upstream, open the fork PR first and then prepare a separately scoped upstream PR against `humanmade/authorship` `develop`.
 
 ## Team
 
-Authorship is developed and maintained by [Human Made](https://humanmade.com) and [Altis](https://www.altis-dxp.com). Its initial development was funded by [Siemens](https://www.siemens.com).
+Authorship was originally developed and maintained by [Human Made](https://humanmade.com) and [Altis](https://www.altis-dxp.com). Its initial development was funded by [Siemens](https://www.siemens.com).
+
+This fork is maintained by Dan Knauss for fork-first hardening and modernization work.
 
 <p align="center">
 	<a href="https://humanmade.com"><img src="assets/images/hm-logo.png" width="207" height="86" alt="Human Made"></a>
