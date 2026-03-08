@@ -128,8 +128,11 @@ AT transcript ledger (residual follow-up evidence; does not block Build-12 compl
 
 | SR | OS | Browser | Version(s) | Field label announced | Instructions announced | Create announced | Remove announced | Reorder announced | Reorder changed order | Result | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| NVDA | Windows |  |  |  |  |  |  |  |  | Pending | Manual host run required |
+| NVDA | Windows |  |  |  |  |  |  |  |  | Pending | Residual follow-up as of 2026-03-08; Windows host run still required to capture spoken transcript evidence. |
 | VoiceOver | macOS | Safari or Chrome | Not captured | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Yes (reported) | Pass | Manual operator report on 2026-03-07: "VoiceOver is good for add/remove/reorder." Detailed spoken transcript strings were not captured. |
+
+Residual follow-up log:
+- 2026-03-08: NVDA transcript row remains open as non-blocking evidence follow-up; this environment cannot run NVDA because it requires a Windows host.
 
 ## REST API tests
 
