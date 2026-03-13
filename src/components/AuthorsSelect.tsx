@@ -101,8 +101,6 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 				isCancelled = true;
 			};
 		}
-
-		hasInitializedSelection.current = true;
 	}, [
 		currentAuthorIDs,
 		onError,
