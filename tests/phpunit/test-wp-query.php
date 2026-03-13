@@ -336,4 +336,51 @@ class TestWPQuery extends TestCase {
 			$query2->get( 'author' )
 		);
 	}
+
+	public function testAuthorFilteredQueriesDoNotAccumulatePostsPreQueryCallbacks() : void {
+		$factory = self::factory()->post;
+
+		$factory->create_and_get( [
+			POSTS_PARAM => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$before = $this->countHookCallbacks( 'posts_pre_query' );
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$query = new WP_Query();
+			$query->query( [
+				'post_type' => 'post',
+				'author'    => self::$users['editor']->ID,
+				'fields'    => 'ids',
+			] );
+		}
+
+		$after = $this->countHookCallbacks( 'posts_pre_query' );
+
+		$this->assertSame( $before, $after );
+	}
+
+	/**
+	 * Count total callbacks registered for a hook across all priorities.
+	 *
+	 * @param string $hook Hook name.
+	 * @return int
+	 */
+	private function countHookCallbacks( string $hook ) : int {
+		global $wp_filter;
+
+		if ( ! isset( $wp_filter[ $hook ] ) || ! $wp_filter[ $hook ] instanceof \WP_Hook ) {
+			return 0;
+		}
+
+		$count = 0;
+
+		foreach ( $wp_filter[ $hook ]->callbacks as $callbacks ) {
+			$count += count( $callbacks );
+		}
+
+		return $count;
+	}
 }

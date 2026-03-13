@@ -665,26 +665,38 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
 	 * @param WP_Query       $query The WP_Query instance.
 	 */
-	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_ids ) : ?array {
+	$restore_query_vars = static function( ?array $posts, WP_Query $filtered_query ) use ( &$restore_query_vars, &$stored_values, $user_ids, $query ) : ?array {
+		if ( $filtered_query !== $query ) {
+			return $posts;
+		}
+
+		remove_filter( 'posts_pre_query', $restore_query_vars, 999 );
+
 		if ( empty( $stored_values ) ) {
 			return $posts;
 		}
 
 		// Reset the query vars to their original values.
 		foreach ( $stored_values as $concern => $value ) {
-			$query->set( $concern, $value );
+			$filtered_query->set( $concern, $value );
 		}
 
 		// Specifically set `author` when `author_name` is in use as WP_Query also sets `author` internally.
-		if ( ! empty( $stored_values['author_name'] ) ) {
-			$query->set( 'author', $user_ids[0] );
+		if (
+			array_key_exists( 'author_name', $stored_values )
+			&& is_string( $stored_values['author_name'] )
+			&& '' !== $stored_values['author_name']
+		) {
+			$filtered_query->set( 'author', $user_ids[0] );
 		}
 
 		// Clear the recorded values so subsequent queries are not affected.
 		$stored_values = [];
 
 		return $posts;
-	}, 999, 2 );
+	};
+
+	add_filter( 'posts_pre_query', $restore_query_vars, 999, 2 );
 }
 
 /**
