@@ -145,7 +145,8 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			const options = [ ...selected, createOption( user ) ];
 
 			setSelected( options );
-			onUpdate( options.map( ( { value } ) => value ) );
+			// eslint-disable-next-line @typescript-eslint/no-shadow
+			onUpdate( options.map( option => option.value ) );
 		} ).catch( ( error: WP_REST_API_Error ) => {
 			onError( error.message );
 		} );
@@ -159,7 +160,8 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	const onSortEnd = ( option: SortedOption ) => {
 		const value: Option[] = arrayMove( selected, option.oldIndex, option.newIndex );
 		setSelected( value );
-		onUpdate( value.map( ( { value } ) => value ) );
+		// eslint-disable-next-line @typescript-eslint/no-shadow
+		onUpdate( value.map( option => option.value ) );
 	};
 
 	return (
