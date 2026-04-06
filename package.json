@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "concurrently -n CSS,JS -c cyan.bold,yellow.bold \"npm run lint:css\" \"npm run lint:js\"",
     "lint:css": "stylelint src/",
-    "lint:js": "eslint --ext .js,.jsx,.ts,.tsx src/",
+    "lint:js": "wp-scripts lint-js --ext .js,.jsx,.ts,.tsx src/",
     "env:cli": "npx @wordpress/env run cli",
     "env:destroy": "npx @wordpress/env destroy",
     "env:start": "npx @wordpress/env start",
@@ -29,6 +29,7 @@
     "react-select": "5.10.2"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.24",
     "@wordpress/api-fetch": "^7.43.0",
     "@wordpress/compose": "^7.43.0",
     "@wordpress/data": "^10.43.0",
@@ -39,6 +40,9 @@
     "@wordpress/url": "^4.43.0",
     "classnames": "^2.2",
     "concurrently": "^5.3.0",
-    "version-bump-prompt": "^6.1.0"
+    "lodash": "^4.18.1",
+    "react": "^18.3.1",
+    "version-bump-prompt": "^6.1.0",
+    "wp-types": "^4.69.0"
   }
 }
