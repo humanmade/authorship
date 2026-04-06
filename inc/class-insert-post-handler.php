@@ -33,7 +33,7 @@ class InsertPostHandler {
 	 *                                     to wp_insert_post().
 	 * @return mixed[] An array of slashed, sanitized, and processed post data.
 	 */
-	function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_postarr ) : array {
+	public function filter_wp_insert_post_data( array $data, array $postarr, $unsanitized_postarr ) : array {
 		// Make sure the unsanitized post array is actually an array. Core sometimes passes it as a WP_Post object.
 		$this->postarr = (array) $unsanitized_postarr;
 
@@ -47,7 +47,7 @@ class InsertPostHandler {
 	 * @param WP_Post $post    Post object.
 	 * @param bool    $update  Whether this is an existing post being updated.
 	 */
-	function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
+	public function action_wp_insert_post( int $post_ID, WP_Post $post, bool $update ) : void {
 		$unsanitized_postarr = $this->postarr;
 
 		$this->postarr = [];

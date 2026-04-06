@@ -135,7 +135,7 @@ class Users_Controller extends WP_REST_Users_Controller {
 	 * @param \WP_REST_Request $request       The current request.
 	 * @return mixed[] Array of arguments for WP_User_Query.
 	 */
-	function filter_rest_user_query( array $prepared_args, \WP_REST_Request $request ) : array {
+	public function filter_rest_user_query( array $prepared_args, \WP_REST_Request $request ) : array {
 		unset( $prepared_args['has_published_posts'] );
 
 		return $prepared_args;
