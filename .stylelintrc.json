@@ -1,11 +1,15 @@
 {
-  "extends": "@humanmade/stylelint-config",
+  "extends": "@wordpress/stylelint-config/scss-stylistic",
   "rules": {
-    "declaration-property-unit-blacklist": null,
+    "@stylistic/max-line-length": null,
     "max-nesting-depth": null,
+    "rule-empty-line-before": null,
     "selector-class-pattern": null
   },
   "ignoreFiles": [
+    "**/*.json",
+    "**/*.ts",
+    "**/*.tsx",
     "build/**",
     "lib/**",
     "node_modules/**",
