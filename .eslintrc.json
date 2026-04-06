@@ -34,7 +34,6 @@
   },
   "ignorePatterns": [
     "build/**",
-    "lib/**",
     "node_modules/**",
     "tests/wordpress/**",
     "vendor/**"
