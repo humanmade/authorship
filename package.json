@@ -13,8 +13,8 @@
     "env:destroy": "npx @wordpress/env destroy",
     "env:start": "npx @wordpress/env start",
     "env:stop": "npx @wordpress/env stop",
-    "start": "webpack serve --config=.config/webpack.config.dev.js",
-    "build": "webpack --config=.config/webpack.config.prod.js",
+    "start": "wp-scripts start --hot",
+    "build": "wp-scripts build",
     "bump:patch": "bump patch --commit 'The v%s release' package.json package-lock.json README.md plugin.php",
     "bump:minor": "bump minor --commit 'The v%s release' package.json package-lock.json README.md plugin.php",
     "bump:major": "bump major --commit 'The v%s release' package.json package-lock.json README.md plugin.php"
