@@ -24,7 +24,7 @@ class TestTemplate extends TestCase {
 	 * @dataProvider dataAuthorsYes
 	 * @dataProvider dataAuthorsNo
 	 */
-	public function testUserIsAuthor( bool $expected, callable $user, ?callable $post_author, callable ...$authorship ) : void {
+	public function testUserIsAuthor( bool $expected, callable $user, ?callable $post_author, callable ...$authorship ): void {
 		$factory = self::factory()->post;
 
 		if ( is_callable( $post_author ) ) {
@@ -39,7 +39,7 @@ class TestTemplate extends TestCase {
 		$post_authorship = array_map( 'call_user_func', $authorship );
 
 		/** @var int[] */
-		$post_authorship = array_map( function( WP_User $user ) : int {
+		$post_authorship = array_map( function ( WP_User $user ): int {
 			return $user->ID;
 		}, $post_authorship );
 
@@ -60,7 +60,7 @@ class TestTemplate extends TestCase {
 	/**
 	 * @dataProvider dataAuthorsYes
 	 */
-	public function testAuthorIDs( bool $is_author, callable $user, ?callable $post_author, callable ...$authorship ) : void {
+	public function testAuthorIDs( bool $is_author, callable $user, ?callable $post_author, callable ...$authorship ): void {
 		$factory = self::factory()->post;
 
 		if ( is_callable( $post_author ) ) {
@@ -72,7 +72,7 @@ class TestTemplate extends TestCase {
 		$post_authorship = array_map( 'call_user_func', $authorship );
 
 		/** @var int[] */
-		$post_authorship = array_map( function( WP_User $user ) : int {
+		$post_authorship = array_map( function ( WP_User $user ): int {
 			return $user->ID;
 		}, $post_authorship );
 
@@ -93,7 +93,7 @@ class TestTemplate extends TestCase {
 		$this->assertSame( $expected, get_author_ids( $post ) );
 	}
 
-	public function testAuthorNames() : void {
+	public function testAuthorNames(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, Author, and Admin.
@@ -115,7 +115,7 @@ class TestTemplate extends TestCase {
 		$this->assertSame( $expected, get_author_names( $post ) );
 	}
 
-	public function testAuthorNamesInSentence() : void {
+	public function testAuthorNamesInSentence(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, Author, and Admin.
@@ -137,7 +137,7 @@ class TestTemplate extends TestCase {
 		$this->assertSame( $expected, get_author_names_sentence( $post ) );
 	}
 
-	public function testAuthorNamesInList() : void {
+	public function testAuthorNamesInList(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, Author, and Admin.
@@ -173,56 +173,56 @@ HTML;
 	/**
 	 * @return mixed[]
 	 */
-	public function dataAuthorsYes() : array {
+	public function dataAuthorsYes(): array {
 		return [
 			// Checking Admin, owned by Editor, attributed to Admin:
 			[
 				true,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['admin'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['admin'];
 				},
 			],
 			// Checking Author, owned by nobody, attributed to Author:
 			[
 				true,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['author'];
 				},
 				null,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['author'];
 				},
 			],
 			// Checking Editor, owned by nobody, attributed to Admin, Editor, and Author:
 			[
 				true,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
 				null,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['admin'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['author'];
 				},
 			],
 			// Checking Editor, owned by Editor, attributed to nobody (inherits Editor):
 			[
 				true,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
 			],
@@ -232,25 +232,25 @@ HTML;
 	/**
 	 * @return mixed[]
 	 */
-	public function dataAuthorsNo() : array {
+	public function dataAuthorsNo(): array {
 		return [
 			// Checking Editor, owned by Editor, attributed to Admin:
 			[
 				false,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['admin'];
 				},
 			],
 			// Checking Author, owned by nobody, attributed to nobody:
 			[
 				false,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['author'];
 				},
 				null,
@@ -258,10 +258,10 @@ HTML;
 			// Checking Editor, owned by Admin, attributed to nobody:
 			[
 				false,
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['editor'];
 				},
-				function() : WP_User {
+				function (): WP_User {
 					return self::$users['admin'];
 				},
 			],

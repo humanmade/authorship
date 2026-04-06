@@ -24,7 +24,7 @@ const COLUMN_NAME = 'authorship';
 /**
  * Bootstraps the main actions and filters.
  */
-function bootstrap() : void {
+function bootstrap(): void {
 	// Actions.
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
 	add_action( 'user_profile_update_errors', __NAMESPACE__ . '\\remove_required_fields_errors', 10, 3 );
@@ -38,7 +38,7 @@ function bootstrap() : void {
  * @param stdClass $user   User object (passed by reference).
  * @return void
  */
-function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass $user ) : void {
+function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass $user ): void {
 	if ( $user->role !== GUEST_ROLE ) {
 		return;
 	}
@@ -55,7 +55,7 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 /**
  * Fires as an admin screen or script is being initialized.
  */
-function init_admin_cols() : void {
+function init_admin_cols(): void {
 	foreach ( get_supported_post_types() as $post_type ) {
 		add_filter( "manage_{$post_type}_posts_columns", __NAMESPACE__ . '\\filter_post_columns' );
 		add_action( "manage_{$post_type}_posts_custom_column", __NAMESPACE__ . '\\action_author_column', 10, 2 );
@@ -68,7 +68,7 @@ function init_admin_cols() : void {
  * @param string $column_name The name of the column to display.
  * @param int    $post_id     The current post ID.
  */
-function action_author_column( string $column_name, int $post_id ) : void {
+function action_author_column( string $column_name, int $post_id ): void {
 	if ( COLUMN_NAME !== $column_name ) {
 		return;
 	}
@@ -105,7 +105,7 @@ function action_author_column( string $column_name, int $post_id ) : void {
  * @param string[] $post_columns An associative array of column headings.
  * @return string[] An associative array of column headings.
  */
-function filter_post_columns( array $post_columns ) : array {
+function filter_post_columns( array $post_columns ): array {
 	$new_columns = [];
 
 	foreach ( $post_columns as $key => $value ) {

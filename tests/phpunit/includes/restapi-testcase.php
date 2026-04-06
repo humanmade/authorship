@@ -16,20 +16,20 @@ use WP_REST_Response;
  * REST API test class for the plugin.
  */
 abstract class RESTAPITestCase extends TestCase {
-	public function setUp() : void {
+	public function setUp(): void {
 		parent::setUp();
 
 		rest_get_server();
 	}
 
-	public function tearDown() : void {
+	public function tearDown(): void {
 		parent::tearDown();
 
 		global $wp_rest_server;
 		$wp_rest_server = null;
 	}
 
-	protected static function get_message( WP_REST_REsponse $response ) : string {
+	protected static function get_message( WP_REST_REsponse $response ): string {
 		if ( $response->is_error() ) {
 			/** @var \WP_Error $error */
 			$error = $response->as_error();
@@ -51,7 +51,7 @@ abstract class RESTAPITestCase extends TestCase {
 		return '';
 	}
 
-	protected static function rest_do_request( WP_REST_Request $request ) : WP_REST_Response {
+	protected static function rest_do_request( WP_REST_Request $request ): WP_REST_Response {
 		$response = rest_do_request( $request );
 
 		return $response;
