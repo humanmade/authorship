@@ -157,7 +157,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 	const onSortEnd = ( option: SortedOption ) => {
 		const value: Option[] = arrayMove( selected, option.oldIndex, option.newIndex );
 		setSelected( value );
-		onUpdate( value.map( option => option.value ) );
+		onUpdate( value.map( ( { value } ) => value ) );
 	};
 
 	return (
