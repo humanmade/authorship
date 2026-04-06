@@ -502,16 +502,16 @@ function enqueue_assets() : void {
  * Enqueues the JS and CSS assets for the author selection control.
  */
 function enqueue_assets_for_post() : void {
-	$editor_script = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
-	if ( empty( $editor_script ) ) {
+	$editor_asset = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+	if ( empty( $editor_asset ) ) {
 		trigger_error( 'Asset file missing, rebuild plugin asset bundles', E_USER_WARNING );
 		return;
 	}
 	wp_enqueue_script(
 		SCRIPT_HANDLE,
 		plugins_url( 'build/index.js', __DIR__ ),
-		$editor_script['dependencies'],
-		$editor_script['version'],
+		$editor_asset['dependencies'],
+		$editor_asset['version'],
 		[
 			'defer' => true,
 			'in_footer' => true
