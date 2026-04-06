@@ -25,6 +25,9 @@
 
 		<!-- This sniff does not respect references in comments and documentation -->
 		<exclude name="PSR2R.Namespaces.UnusedUseStatement.UnusedUse"/>
+
+		<!-- See https://github.com/WordPress/WordPress-Coding-Standards/issues/2374 -->
+		<exclude name="HM.Security.EscapeOutput.ExceptionNotEscaped"/>
 	</rule>
 
 	<rule ref="Squiz.Commenting">
