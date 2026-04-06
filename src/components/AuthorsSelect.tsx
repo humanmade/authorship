@@ -63,6 +63,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			{
 				include: currentAuthorIDs,
 				orderby: 'include',
+				// eslint-disable-next-line camelcase
 				post_type: postType,
 			}
 		);
@@ -87,6 +88,7 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			'/authorship/v1/users/',
 			{
 				search,
+				// eslint-disable-next-line camelcase
 				post_type: postType,
 			}
 		);
