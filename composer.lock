@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "62cbbe60f560435cdcd03d65b5448679",
+    "content-hash": "68d91deefc8a20d323047629a9a0cd7f",
     "packages": [
         {
             "name": "composer/installers",
@@ -151,40 +151,6 @@
                 }
             ],
             "time": "2024-06-24T20:46:46+00:00"
-        },
-        {
-            "name": "humanmade/asset-loader",
-            "version": "v0.6.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/humanmade/asset-loader.git",
-                "reference": "1cc2bdcae19b2c6a4900df3cf827ab573ed0beac"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/humanmade/asset-loader/zipball/1cc2bdcae19b2c6a4900df3cf827ab573ed0beac",
-                "reference": "1cc2bdcae19b2c6a4900df3cf827ab573ed0beac",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "require-dev": {
-                "10up/wp_mock": "^0.4.2",
-                "humanmade/coding-standards": "^1.1.0",
-                "phpunit/phpunit": "^7.5"
-            },
-            "type": "wordpress-plugin",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "description": "Utilities to seamlessly consume Webpack-bundled assets in WordPress themes & plugins.",
-            "support": {
-                "issues": "https://github.com/humanmade/asset-loader/issues",
-                "source": "https://github.com/humanmade/asset-loader/tree/v0.6.4"
-            },
-            "time": "2023-12-05T15:10:30+00:00"
         }
     ],
     "packages-dev": [
@@ -4274,13 +4240,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "7.4"
     },

@@ -22,8 +22,6 @@ use WP_REST_Response;
 use WP_REST_Server;
 use WP_User;
 
-use function Asset_Loader\enqueue_asset;
-
 const GUEST_ROLE = 'guest-author';
 const POSTS_PARAM = 'authorship';
 const REST_CURIE_TEMPLATE = 'https://authorship.hmn.md/{rel}';
@@ -504,33 +502,32 @@ function enqueue_assets() : void {
  * Enqueues the JS and CSS assets for the author selection control.
  */
 function enqueue_assets_for_post() : void {
-	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
-
-	enqueue_asset(
-		$manifest,
-		'main.js',
+	$editor_script = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+	if ( empty( $editor_script ) ) {
+		trigger_error( 'Asset file missing, rebuild plugin asset bundles', E_USER_WARNING );
+		return;
+	}
+	wp_enqueue_script(
+		SCRIPT_HANDLE,
+		plugins_url( 'build/index.js', __DIR__ ),
+		$editor_script['dependencies'],
+		$editor_script['version'],
 		[
-			'handle'       => SCRIPT_HANDLE,
-			// @TODO check:
-			'dependencies' => [
-				'react',
-				'lodash',
-				'wp-block-editor',
-				'wp-blocks',
-				'wp-components',
-				'wp-element',
-				'wp-i18n',
-				'wp-polyfill',
-			],
+			'defer' => true,
+			'in_footer' => true
 		]
 	);
 
-	enqueue_asset(
-		$manifest,
-		'style.css',
-		[
-			'handle' => STYLE_HANDLE,
-		]
+	$css_path = plugin_dir_path( __DIR__ ) . 'build/style-index.css';
+	$css_version = is_readable( $css_path )
+		? ( hash_file( 'crc32', $css_path ) ?: filemtime( $css_path ) )
+		: false;
+
+	wp_enqueue_style(
+		STYLE_HANDLE,
+		plugins_url( 'build/style-index.css', __DIR__ ),
+		[],
+		$css_version
 	);
 }
 
