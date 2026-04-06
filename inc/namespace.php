@@ -514,6 +514,7 @@ function enqueue_assets_for_post() : void {
 			// @TODO check:
 			'dependencies' => [
 				'react',
+				'lodash',
 				'wp-block-editor',
 				'wp-blocks',
 				'wp-components',
