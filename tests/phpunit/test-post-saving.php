@@ -9,10 +9,10 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
+use function Authorship\get_authors;
+
 use const Authorship\POSTS_PARAM;
 use const Authorship\TAXONOMY;
-
-use function Authorship\get_authors;
 
 class TestPostSaving extends TestCase {
 	public function testPostAuthorshipDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor(): void {

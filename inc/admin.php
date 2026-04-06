@@ -14,10 +14,10 @@ use WP_Error;
 use WP_User;
 use stdClass;
 
-use const Authorship\GUEST_ROLE;
-
 use function Authorship\get_authors;
 use function Authorship\get_supported_post_types;
+
+use const Authorship\GUEST_ROLE;
 
 const COLUMN_NAME = 'authorship';
 

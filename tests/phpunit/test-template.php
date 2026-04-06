@@ -9,7 +9,7 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
-use const Authorship\POSTS_PARAM;
+use WP_User;
 
 use function Authorship\get_author_ids;
 use function Authorship\get_author_names;
@@ -17,7 +17,7 @@ use function Authorship\get_author_names_list;
 use function Authorship\get_author_names_sentence;
 use function Authorship\user_is_author;
 
-use WP_User;
+use const Authorship\POSTS_PARAM;
 
 class TestTemplate extends TestCase {
 	/**
