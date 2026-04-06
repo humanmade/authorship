@@ -23,6 +23,7 @@ const MultiValueElement = ( props: MultiValueProps<Option> ): ReactElement => {
 	};
 
 	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			{...attributes}
 			{...listeners}
