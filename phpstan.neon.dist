@@ -20,7 +20,6 @@ parameters:
     - tests/phpunit/includes/restapi-testcase.php
   scanDirectories:
     - inc
-    - lib
     - vendor/wp-phpunit/wp-phpunit/includes
     - vendor/wp-cli/wp-cli
   ignoreErrors:
