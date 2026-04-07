@@ -381,7 +381,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 */
 	private function reset_local_object_cache(): void {
 		/**
-		 * @var WP_Object_Cache
+		 * @var ?WP_Object_Cache
 		 */
 		global $wp_object_cache;
 
