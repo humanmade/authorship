@@ -534,16 +534,11 @@ function enqueue_assets_for_post(): void {
 		]
 	);
 
-	$css_path = plugin_dir_path( __DIR__ ) . 'build/style-index.css';
-	$css_version = is_readable( $css_path )
-		? ( hash_file( 'crc32', $css_path ) ?: filemtime( $css_path ) )
-		: false;
-
 	wp_enqueue_style(
 		STYLE_HANDLE,
-		plugins_url( 'build/style-index.css', __DIR__ ),
+		plugins_url( 'build/index.css', __DIR__ ),
 		[],
-		$css_version
+		$editor_asset['version']
 	);
 }
 
