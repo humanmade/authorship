@@ -15,11 +15,10 @@ declare( strict_types=1 );
 namespace Authorship\Tests;
 
 use Authorship\Users_Controller;
-
-use const Authorship\GUEST_ROLE;
-
 use WP_Http;
 use WP_REST_Request;
+
+use const Authorship\GUEST_ROLE;
 
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
@@ -27,7 +26,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 */
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
 
-	public function testGuestAuthorCanBeCreatedWithJustAName() : void {
+	public function testGuestAuthorCanBeCreatedWithJustAName(): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'POST', self::$route );
@@ -46,7 +45,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 *
 	 * @param string $param
 	 */
-	public function testFieldCannotBeSpecifiedWhenCreatingGuestAuthor( string $param ) : void {
+	public function testFieldCannotBeSpecifiedWhenCreatingGuestAuthor( string $param ): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'POST', self::$route );
@@ -59,7 +58,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status(), $message );
 	}
 
-	public function testUserOutputFieldsAreRestrictedWhenListingUsers() : void {
+	public function testUserOutputFieldsAreRestrictedWhenListingUsers(): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -82,7 +81,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertEqualSets( $expected, array_keys( $data[0] ) );
 	}
 
-	public function testAllUsersAreListedWhenListingUsers() : void {
+	public function testAllUsersAreListedWhenListingUsers(): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -101,7 +100,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 *
 	 * @param string $param
 	 */
-	public function testUsersCannotBeFilteredByParameter( string $param ) : void {
+	public function testUsersCannotBeFilteredByParameter( string $param ): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -113,7 +112,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
-	public function testContextCannotBeSetToEditWhenListingUsers() : void {
+	public function testContextCannotBeSetToEditWhenListingUsers(): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -125,7 +124,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status(), $message );
 	}
 
-	public function testPostTypeIsRequiredWhenListingUsers() : void {
+	public function testPostTypeIsRequiredWhenListingUsers(): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -142,7 +141,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$this->assertSame( [ 'post_type' ], $data['params'] );
 	}
 
-	public function testEndpointRequiresAuthentication() : void {
+	public function testEndpointRequiresAuthentication(): void {
 		$request = new WP_REST_Request( 'GET', self::$route );
 		$request->set_param( 'search', 'testing' );
 		$request->set_param( 'post_type', 'post' );
@@ -158,7 +157,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 *
 	 * @param string $orderby
 	 */
-	public function testAllowedOrderByParameters( string $orderby ) : void {
+	public function testAllowedOrderByParameters( string $orderby ): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -176,7 +175,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 *
 	 * @param string $orderby
 	 */
-	public function testDisallowedOrderByParameters( string $orderby ) : void {
+	public function testDisallowedOrderByParameters( string $orderby ): void {
 		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -203,7 +202,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 * @param string $role
 	 * @param bool   $expected
 	 */
-	public function testUserRolesThatCanListAuthors( string $role, bool $expected ) : void {
+	public function testUserRolesThatCanListAuthors( string $role, bool $expected ): void {
 		wp_set_current_user( self::$users[ $role ]->ID );
 
 		$request = new WP_REST_Request( 'GET', self::$route );
@@ -225,7 +224,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 * @param string $role
 	 * @param bool   $expected
 	 */
-	public function testUserRolesThatCanCreateGuestAuthors( string $role, bool $expected ) : void {
+	public function testUserRolesThatCanCreateGuestAuthors( string $role, bool $expected ): void {
 		wp_set_current_user( self::$users[ $role ]->ID );
 
 		$request = new WP_REST_Request( 'POST', self::$route );
@@ -247,7 +246,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	 * @param string $role
 	 * @param bool   $expected
 	 */
-	public function testGuestAuthorEmailIsAllowed( string $role, bool $expected ) : void {
+	public function testGuestAuthorEmailIsAllowed( string $role, bool $expected ): void {
 		wp_set_current_user( self::$users[ $role ]->ID );
 
 		$request = new WP_REST_Request( 'POST', self::$route );
@@ -267,7 +266,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataAllowedOrderby() : array {
+	public function dataAllowedOrderby(): array {
 		return [
 			[
 				'id',
@@ -281,7 +280,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataDisallowedOrderby() : array {
+	public function dataDisallowedOrderby(): array {
 		return [
 			[
 				'registered_date',
@@ -304,7 +303,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataDisallowedFilters() : array {
+	public function dataDisallowedFilters(): array {
 		return [
 			[
 				'roles',
@@ -324,7 +323,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataDisallowedFields() : array {
+	public function dataDisallowedFields(): array {
 		return [
 			[
 				'password',
@@ -338,7 +337,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataRolesThatCanCreateGuestAuthors() : array {
+	public function dataRolesThatCanCreateGuestAuthors(): array {
 		return [
 			[
 				'admin',
@@ -366,7 +365,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataRolesThatCanAttributeAuthors() : array {
+	public function dataRolesThatCanAttributeAuthors(): array {
 		return [
 			[
 				'admin',
@@ -394,7 +393,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataRolesThatCanManageUsers() : array {
+	public function dataRolesThatCanManageUsers(): array {
 		return [
 			[
 				'admin',

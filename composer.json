@@ -10,18 +10,23 @@
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "0.7.0",
     "ergebnis/composer-normalize": "^2",
-    "humanmade/coding-standards": "1.1.1",
+    "humanmade/coding-standards": "dev-upgrade-wpcs",
     "php-stubs/wordpress-stubs": "^5.5",
     "phpcompatibility/phpcompatibility-wp": "2.1.0",
     "phpstan/phpstan": "0.12.57",
     "phpunit/phpunit": "^9.5.20",
     "roots/wordpress": "~6.6.0",
-    "squizlabs/php_codesniffer": "3.5.8",
     "szepeviktor/phpstan-wordpress": "0.7.1",
     "vlucas/phpdotenv": "^3",
     "wp-cli/db-command": "^2",
     "wp-phpunit/wp-phpunit": "~6.6.0",
     "yoast/phpunit-polyfills": "^1.0"
+  },
+  "repositories": {
+    "humanmade/coding-standards": {
+      "type": "git",
+      "url": "https://github.com/humanmade/coding-standards"
+    }
   },
   "config": {
     "allow-plugins": {

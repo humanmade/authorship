@@ -9,13 +9,13 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
+use function Authorship\get_authors;
+
 use const Authorship\POSTS_PARAM;
 use const Authorship\TAXONOMY;
 
-use function Authorship\get_authors;
-
 class TestPostSaving extends TestCase {
-	public function testPostAuthorshipDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor() : void {
+	public function testPostAuthorshipDoesNotGetSavedOnPostTypeThatDoesNotSupportAuthor(): void {
 		$factory = self::factory()->post;
 
 		register_post_type( 'testing', [
@@ -37,7 +37,7 @@ class TestPostSaving extends TestCase {
 		$this->assertCount( 0, $authors );
 	}
 
-	public function testPostAuthorshipIsRetainedWhenUpdatingPostWithNoAuthorshipParameter() : void {
+	public function testPostAuthorshipIsRetainedWhenUpdatingPostWithNoAuthorshipParameter(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -59,7 +59,7 @@ class TestPostSaving extends TestCase {
 		$this->assertSame( [ self::$users['editor']->ID ], $author_ids );
 	}
 
-	public function testPostAuthorshipIsRetainedWhenUpdatingPostWithPostAuthorParameter() : void {
+	public function testPostAuthorshipIsRetainedWhenUpdatingPostWithPostAuthorParameter(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -81,7 +81,7 @@ class TestPostSaving extends TestCase {
 		$this->assertSame( [ self::$users['editor']->ID ], $author_ids );
 	}
 
-	public function testPostAuthorshipIsSetToAuthorWhenCreatingPost() : void {
+	public function testPostAuthorshipIsSetToAuthorWhenCreatingPost(): void {
 		/** @var int */
 		$post_id = wp_insert_post( [
 			'post_title'  => 'Testing',
@@ -96,7 +96,7 @@ class TestPostSaving extends TestCase {
 		$this->assertSame( [ self::$users['author']->ID ], $author_ids );
 	}
 
-	public function testPostAuthorshipIsSetToAuthorWhenUpdatingPostWithNoExistingAuthorship() : void {
+	public function testPostAuthorshipIsSetToAuthorWhenUpdatingPostWithNoExistingAuthorship(): void {
 		$factory = self::factory()->post;
 
 		// Owned by Author.
@@ -115,7 +115,7 @@ class TestPostSaving extends TestCase {
 		$this->assertSame( [ self::$users['author']->ID ], $author_ids );
 	}
 
-	public function testPostAuthorshipIsSetToEmptyWhenUpdatingPostWithNoExistingAuthorshipAndFiltered() : void {
+	public function testPostAuthorshipIsSetToEmptyWhenUpdatingPostWithNoExistingAuthorshipAndFiltered(): void {
 		$factory = self::factory()->post;
 
 		add_filter( 'authorship_default_author', '__return_empty_array' );
@@ -138,7 +138,7 @@ class TestPostSaving extends TestCase {
 		remove_filter( 'authorship_default_author', '__return_empty_array' );
 	}
 
-	public function testMultiplePostInsertionDoesNotCompoundActions() : void {
+	public function testMultiplePostInsertionDoesNotCompoundActions(): void {
 		global $wp_filter;
 
 		$before = count( $wp_filter['wp_insert_post']->callbacks );

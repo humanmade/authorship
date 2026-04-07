@@ -91,5 +91,4 @@ class TestMultisite extends TestCase {
 
 		restore_current_blog();
 	}
-
 }

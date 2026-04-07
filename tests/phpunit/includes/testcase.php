@@ -48,7 +48,7 @@ abstract class TestCase extends \WP_UnitTestCase {
 		}
 	}
 
-	public function setUp() : void {
+	public function setUp(): void {
 		parent::setUp();
 
 		$this->set_permalink_structure( '/%year%/%monthnum%/%day%/%postname%/' );

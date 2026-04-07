@@ -34,7 +34,7 @@ const STYLE_HANDLE = 'authorship-css';
 /**
  * Bootstraps the main actions and filters.
  */
-function bootstrap() : void {
+function bootstrap(): void {
 	$insert_post_handler = new InsertPostHandler();
 
 	// Actions.
@@ -63,7 +63,7 @@ function bootstrap() : void {
  *
  * @return string[] List of post types to support.
  */
-function get_supported_post_types() : array {
+function get_supported_post_types(): array {
 	$post_types = get_post_types_by_support( 'author' );
 
 	/**
@@ -80,7 +80,7 @@ function get_supported_post_types() : array {
  * @param string $post_type Post type to check.
  * @return boolean
  */
-function is_post_type_supported( string $post_type ) : bool {
+function is_post_type_supported( string $post_type ): bool {
 	return in_array( $post_type, get_supported_post_types(), true );
 }
 
@@ -90,7 +90,7 @@ function is_post_type_supported( string $post_type ) : bool {
  * @param string|null $display_name The author's display name.
  * @return string|null The author's display name.
  */
-function filter_the_author_for_rss( ?string $display_name ) : ?string {
+function filter_the_author_for_rss( ?string $display_name ): ?string {
 	if ( ! is_feed( 'rss2' ) ) {
 		return $display_name;
 	}
@@ -113,7 +113,7 @@ function filter_the_author_for_rss( ?string $display_name ) : ?string {
  * @param mixed[]  $args    The context for the cap, typically with the object ID as the first element.
  * @return string[] Array of the user's capabilities.
  */
-function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id, array $args ) : array {
+function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id, array $args ): array {
 	$concerns = [
 		'delete_post',
 		'delete_page',
@@ -235,7 +235,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
  * @param WP_User  $user          Concerned user object.
  * @return bool[] Array of concerned user's capabilities.
  */
-function filter_user_has_cap( array $user_caps, array $required_caps, array $args, WP_User $user ) : array {
+function filter_user_has_cap( array $user_caps, array $required_caps, array $args, WP_User $user ): array {
 	$cap = $args[0];
 
 	switch ( $cap ) {
@@ -283,7 +283,7 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
  *
  * @param WP $wp Current WordPress environment instance.
  */
-function action_wp( WP $wp ) : void {
+function action_wp( WP $wp ): void {
 	if ( is_author() ) {
 		$GLOBALS['authordata'] = get_userdata( get_query_var( 'author' ) );
 	}
@@ -292,7 +292,7 @@ function action_wp( WP $wp ) : void {
 /**
  * Fires after WordPress has finished loading but before any headers are sent.
  */
-function register_roles_and_caps() : void {
+function register_roles_and_caps(): void {
 	add_role( GUEST_ROLE, __( 'Guest Author', 'authorship' ), [] );
 }
 
@@ -337,12 +337,12 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
  *
  * @param WP_REST_Server $server Server object.
  */
-function register_rest_api_fields( WP_REST_Server $server ) : void {
+function register_rest_api_fields( WP_REST_Server $server ): void {
 	$post_types = get_supported_post_types();
 
 	array_walk( $post_types, __NAMESPACE__ . '\\register_rest_api_field' );
 
-	$users_controller = new Users_Controller;
+	$users_controller = new Users_Controller();
 	$users_controller->register_routes();
 }
 
@@ -355,7 +355,7 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
  * @param string          $post_type The post type name.
  * @return WP_Error|null Null if the validation passes, `WP_Error` instance otherwise.
  */
-function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ) :? WP_Error {
+function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ): ?WP_Error {
 	$schema_validation = rest_validate_request_arg( $authors, $request, $param );
 
 	if ( is_wp_error( $schema_validation ) ) {
@@ -400,24 +400,24 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
  *
  * @param string $post_type The post type name.
  */
-function register_rest_api_field( string $post_type ) : void {
-	$validate_callback = function( $authors, WP_REST_Request $request, string $param ) use ( $post_type ) :? WP_Error {
+function register_rest_api_field( string $post_type ): void {
+	$validate_callback = function ( $authors, WP_REST_Request $request, string $param ) use ( $post_type ): ?WP_Error {
 		return validate_authors( $authors, $request, $param, $post_type );
 	};
 
 	register_rest_field( $post_type, REST_PARAM, [
-		'get_callback' => function( array $post ) : array {
+		'get_callback' => function ( array $post ): array {
 			$post = get_post( $post['id'] );
 
 			if ( ! $post ) {
 				return [];
 			}
 
-			return array_map( function( WP_User $user ) : int {
+			return array_map( function ( WP_User $user ): int {
 				return $user->ID;
 			}, get_authors( $post ) );
 		},
-		'update_callback' => function( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
+		'update_callback' => function ( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ): ?WP_Error {
 			try {
 				set_authors( $post, wp_parse_id_list( $value ) );
 			} catch ( Exception $e ) {
@@ -456,7 +456,7 @@ function register_rest_api_field( string $post_type ) : void {
  * @param WP_REST_Request  $request  Request object.
  * @return WP_REST_Response The response object.
  */
-function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : WP_REST_Response {
+function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ): WP_REST_Response {
 	$links = $response->get_links();
 
 	if ( isset( $links['https://api.w.org/action-assign-author'] ) ) {
@@ -473,7 +473,7 @@ function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_R
  * @param array[] $additional Additional CURIEs to register with the API.
  * @return array[] Additional CURIEs to register with the API.
  */
-function filter_rest_response_link_curies( array $additional ) : array {
+function filter_rest_response_link_curies( array $additional ): array {
 	$additional[] = [
 		'name'      => REST_PARAM,
 		'href'      => REST_CURIE_TEMPLATE,
@@ -486,7 +486,7 @@ function filter_rest_response_link_curies( array $additional ) : array {
 /**
  * Fires after block assets have been enqueued for the editing interface.
  */
-function enqueue_assets() : void {
+function enqueue_assets(): void {
 	/** @var WP_Post|null */
 	$post = get_post();
 
@@ -501,7 +501,7 @@ function enqueue_assets() : void {
 /**
  * Enqueues the JS and CSS assets for the author selection control.
  */
-function enqueue_assets_for_post() : void {
+function enqueue_assets_for_post(): void {
 	$editor_asset = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
 	if ( empty( $editor_asset ) ) {
 		trigger_error( 'Asset file missing, rebuild plugin asset bundles', E_USER_WARNING );
@@ -517,7 +517,7 @@ function enqueue_assets_for_post() : void {
 			$runtime_asset['dependencies'],
 			$runtime_asset['version'],
 			[
-				'in_footer' => true
+				'in_footer' => true,
 			]
 		);
 		$editor_asset['dependencies'][] = 'authorship-hmr-runtime';
@@ -530,7 +530,7 @@ function enqueue_assets_for_post() : void {
 		$editor_asset['version'],
 		[
 			'defer' => true,
-			'in_footer' => true
+			'in_footer' => true,
 		]
 	);
 
@@ -552,7 +552,7 @@ function enqueue_assets_for_post() : void {
  *
  * @param WP_Post $post The post being edited.
  */
-function preload_author_data( WP_Post $post ) : void {
+function preload_author_data( WP_Post $post ): void {
 	$authors = get_authors( $post );
 
 	if ( empty( $authors ) ) {
@@ -561,7 +561,7 @@ function preload_author_data( WP_Post $post ) : void {
 		];
 	}
 
-	$authors = array_map( function( WP_User $user ) {
+	$authors = array_map( function ( WP_User $user ) {
 		$avatar = get_avatar_url( $user->ID );
 
 		return [
@@ -588,7 +588,7 @@ function preload_author_data( WP_Post $post ) : void {
  *
  * @param WP_Query $query The WP_Query instance.
  */
-function action_pre_get_posts( WP_Query $query ) : void {
+function action_pre_get_posts( WP_Query $query ): void {
 	$post_type = $query->get( 'post_type' );
 
 	if ( empty( $post_type ) ) {
@@ -646,7 +646,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	} elseif ( ! empty( $stored_values['author__in'] ) ) {
 		$user_ids = array_map( 'intval', $stored_values['author__in'] );
 	} elseif ( ! empty( $stored_values['author__not_in'] ) ) {
-		$user_ids = array_map( function( int $id ) : int {
+		$user_ids = array_map( function ( int $id ): int {
 			return $id * -1;
 		}, array_map( 'intval', $stored_values['author__not_in'] ) );
 	}
@@ -679,7 +679,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
 	 * @param WP_Query       $query The WP_Query instance.
 	 */
-	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_ids ) : ?array {
+	add_filter( 'posts_pre_query', function ( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_ids ): ?array {
 		if ( empty( $stored_values ) ) {
 			return $posts;
 		}
@@ -708,7 +708,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
  * @param int      $comment_id Comment ID.
  * @return string[] List of email addresses to notify for comment moderation.
  */
-function filter_comment_moderation_recipients( array $emails, int $comment_id ) : array {
+function filter_comment_moderation_recipients( array $emails, int $comment_id ): array {
 	/** @var \WP_Comment */
 	$comment = get_comment( $comment_id );
 	$post_id = (int) $comment->comment_post_ID;
@@ -725,11 +725,11 @@ function filter_comment_moderation_recipients( array $emails, int $comment_id ) 
 
 	$authors = get_authors( $post );
 
-	$moderators = array_filter( $authors, function( WP_User $user ) use ( $comment ) : bool {
+	$moderators = array_filter( $authors, function ( WP_User $user ) use ( $comment ): bool {
 		return user_can( $user->ID, 'edit_comment', $comment->comment_ID );
 	} );
 
-	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
+	$additional_emails = array_filter( array_map( function ( WP_User $user ): string {
 		return $user->user_email;
 	}, $moderators ) );
 
@@ -743,7 +743,7 @@ function filter_comment_moderation_recipients( array $emails, int $comment_id ) 
  * @param int      $comment_id The comment ID.
  * @return string[] An array of email addresses to receive a comment notification.
  */
-function filter_comment_notification_recipients( array $emails, int $comment_id ) : array {
+function filter_comment_notification_recipients( array $emails, int $comment_id ): array {
 	/** @var \WP_Comment */
 	$comment = get_comment( $comment_id );
 	$post_id = (int) $comment->comment_post_ID;
@@ -761,7 +761,7 @@ function filter_comment_notification_recipients( array $emails, int $comment_id 
 	$authors = get_authors( $post );
 
 	/** @var string[] */
-	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
+	$additional_emails = array_filter( array_map( function ( WP_User $user ): string {
 		return $user->user_email;
 	}, $authors ) );
 
@@ -777,7 +777,7 @@ function filter_comment_notification_recipients( array $emails, int $comment_id 
  * @param array<string, mixed> $options Options.
  * @return array<string, mixed> Filtered options.
  */
-function hide_quickedit_authors( array $options ) : array {
+function hide_quickedit_authors( array $options ): array {
 	$options['hide_if_only_one_author'] = true;
 	$options['include'] = [ 0 ];
 	return $options;
