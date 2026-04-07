@@ -397,9 +397,7 @@ class Migrate_Command extends WP_CLI_Command {
 			$wp_object_cache->memcache_debug = [];
 		}
 
-		if ( isset( $wp_object_cache->cache ) ) {
-			$wp_object_cache->cache = [];
-		}
+		$wp_object_cache->cache = [];
 
 		if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
 			// important!
