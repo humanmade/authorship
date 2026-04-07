@@ -20,7 +20,7 @@
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns": "off",
 
-    "camelcase": [ "error", { "allow": [ "^WP_REST_API_" ] } ],
+    "camelcase": [ "error", { "allow": [ "^WP_REST_API_", "post_type" ] } ],
     "no-unused-vars": "off",
     "no-use-before-define": "off",
     "prettier/prettier": "off"
