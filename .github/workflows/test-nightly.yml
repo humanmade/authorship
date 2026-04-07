@@ -43,7 +43,7 @@ jobs:
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.composer-cache-dir.outputs.DIR }}
         key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}

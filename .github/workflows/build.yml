@@ -32,7 +32,7 @@ jobs:
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.composer-cache-dir.outputs.DIR }}
         key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
@@ -49,7 +49,7 @@ jobs:
 
     - name: Cache JS Dependencies
       id: npm-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.npm-cache-dir.outputs.DIR }}
         key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.NODE_VERSION }}-${{ steps.npm-cache-dir.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
