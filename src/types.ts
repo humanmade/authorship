@@ -22,6 +22,10 @@ export interface SortedOption {
 	 * The new index position.
 	 */
 	newIndex: number;
+	/**
+	 * The option value.
+	 */
+	value: number;
 }
 
 export interface authorshipDataFromWP {

@@ -61,7 +61,7 @@ _Features without a checkmark are still work in progress._
 ### For development use
 
 * Clone this repo into your plugins directory
-* Ensure you have Composer v2 and Node v16 installed
+* Ensure you have Composer v2 and Node v24 installed
 * Install the dependencies:
   `composer install && npm install`
 * Start the dev server:

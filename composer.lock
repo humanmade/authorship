@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac27ef853c1982af09cae5ac6f0d19e0",
+    "content-hash": "5aeae14e84670349cc6fa7d474c982d0",
     "packages": [
         {
             "name": "composer/installers",
@@ -151,40 +151,6 @@
                 }
             ],
             "time": "2024-06-24T20:46:46+00:00"
-        },
-        {
-            "name": "humanmade/asset-loader",
-            "version": "v0.6.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/humanmade/asset-loader.git",
-                "reference": "1cc2bdcae19b2c6a4900df3cf827ab573ed0beac"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/humanmade/asset-loader/zipball/1cc2bdcae19b2c6a4900df3cf827ab573ed0beac",
-                "reference": "1cc2bdcae19b2c6a4900df3cf827ab573ed0beac",
-                "shasum": ""
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "require-dev": {
-                "10up/wp_mock": "^0.4.2",
-                "humanmade/coding-standards": "^1.1.0",
-                "phpunit/phpunit": "^7.5"
-            },
-            "type": "wordpress-plugin",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "description": "Utilities to seamlessly consume Webpack-bundled assets in WordPress themes & plugins.",
-            "support": {
-                "issues": "https://github.com/humanmade/asset-loader/issues",
-                "source": "https://github.com/humanmade/asset-loader/tree/v0.6.4"
-            },
-            "time": "2023-12-05T15:10:30+00:00"
         }
     ],
     "packages-dev": [
@@ -847,7 +813,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/humanmade/coding-standards",
-                "reference": "a13a172c6d3b73c7388322d57eecc8d7a50a56b1"
+                "reference": "4f4efa86e9e4b9b3174decb47ecd0bdfddb51b2b"
             },
             "require": {
                 "automattic/vipwpcs": "~3.0.0",
@@ -871,7 +837,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Human Made Coding Standards",
-            "time": "2025-09-19T19:48:05+00:00"
+            "time": "2026-04-06T19:35:35+00:00"
         },
         {
             "name": "justinrainbow/json-schema",

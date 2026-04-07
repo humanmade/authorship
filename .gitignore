@@ -1,7 +1,6 @@
 # Directories:
 
 /build/
-/lib/
 /node_modules/
 /tests/cache/
 /tests/wordpress/

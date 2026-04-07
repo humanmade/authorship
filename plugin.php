@@ -35,11 +35,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Only load asset-loader if it's not loaded already.
-if ( ! defined( 'Asset_Loader\\LOADED' ) ) {
-	require_once __DIR__ . '/lib/asset-loader/asset-loader.php';
-}
-
 require_once __DIR__ . '/inc/namespace.php';
 require_once __DIR__ . '/inc/taxonomy.php';
 require_once __DIR__ . '/inc/class-users-controller.php';

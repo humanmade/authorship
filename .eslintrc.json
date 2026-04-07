@@ -1,11 +1,6 @@
 {
-  "parser": "@typescript-eslint/parser",
   "extends": [
-    "@humanmade",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "plugins": [
-    "@typescript-eslint"
+    "plugin:@wordpress/eslint-plugin/recommended"
   ],
   "rules": {
     "@typescript-eslint/no-unused-vars": [ "warn", {
@@ -14,22 +9,31 @@
       "ignoreRestSiblings": true
     } ],
     "@typescript-eslint/no-use-before-define": [ "error" ],
+
     "jsdoc/require-jsdoc": [ "error", {
       "require": {
         "FunctionDeclaration": true
       }
     } ],
-
-    // Superseded by TypeScript.
+    "jsdoc/check-tag-names": "warn",
     "jsdoc/require-param": "off",
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns": "off",
+
+    "camelcase": [ "error", { "allow": [ "^WP_REST_API_", "post_type" ] } ],
     "no-unused-vars": "off",
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "prettier/prettier": "off"
+  },
+  "settings": {
+    "jsdoc": {
+      "tagNamePreference": {
+        "return": "returns"
+      }
+    }
   },
   "ignorePatterns": [
     "build/**",
-    "lib/**",
     "node_modules/**",
     "tests/wordpress/**",
     "vendor/**"
