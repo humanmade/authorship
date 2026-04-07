@@ -22,6 +22,5 @@ parameters:
     - vendor/wp-cli/wp-cli/php/class-wp-cli-command.php
   scanDirectories:
     - inc
-    - lib
     - vendor/wp-phpunit/wp-phpunit/includes
 

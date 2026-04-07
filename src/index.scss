@@ -18,6 +18,7 @@
 
 		&__value-container {
 			padding: 0;
+			width: 100%;
 		}
 
 		&__multi-value {
@@ -59,30 +60,26 @@
 		}
 
 		&__input {
-			width: 100%;
+			/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+			background: #fff !important;
+			/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+			border: 1px solid #757575 !important;
+			/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+			border-radius: 2px !important;
+			/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+			box-sizing: border-box !important;
+			margin: 0;
+			/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+			padding: 6px 8px !important;
+			line-height: normal;
+			/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
+			width: 100% !important;
 
-			input[type="text"] {
+			&:focus {
 				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				background: #fff !important;
+				border: 1px solid var(--wp-admin-theme-color, #0073aa) !important;
 				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				border: 1px solid #757575 !important;
-				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				border-radius: 2px !important;
-				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				box-sizing: border-box !important;
-				margin: 0;
-				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				padding: 6px 8px !important;
-				line-height: normal;
-				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				width: 100% !important;
-			}
-
-			input[type="text"]:focus {
-				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				border: 1px solid var( --wp-admin-theme-color, #0073aa ) !important;
-				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
-				box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #0073aa ) !important;
+				box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color, #0073aa) !important;
 				/* stylelint-disable-next-line declaration-no-important -- Need to override inline style */
 				outline: 2px solid transparent !important;
 			}

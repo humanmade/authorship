@@ -22,8 +22,6 @@ use WP_REST_Response;
 use WP_REST_Server;
 use WP_User;
 
-use function Asset_Loader\enqueue_asset;
-
 const GUEST_ROLE = 'guest-author';
 const POSTS_PARAM = 'authorship';
 const REST_CURIE_TEMPLATE = 'https://authorship.hmn.md/{rel}';
@@ -504,32 +502,43 @@ function enqueue_assets(): void {
  * Enqueues the JS and CSS assets for the author selection control.
  */
 function enqueue_assets_for_post(): void {
-	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
+	$editor_asset = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+	if ( empty( $editor_asset ) ) {
+		trigger_error( 'Asset file missing, rebuild plugin asset bundles', E_USER_WARNING );
+		return;
+	}
 
-	enqueue_asset(
-		$manifest,
-		'main.js',
+	// Hot-reloading support.
+	$runtime_asset = include plugin_dir_path( __DIR__ ) . 'build/runtime.asset.php';
+	if ( ! empty( $runtime_asset ) && in_array( 'wp-react-refresh-runtime', $editor_asset['dependencies'] ?? [], true ) ) {
+		wp_register_script(
+			'authorship-hmr-runtime',
+			plugins_url( 'build/runtime.js', __DIR__ ),
+			$runtime_asset['dependencies'],
+			$runtime_asset['version'],
+			[
+				'in_footer' => true,
+			]
+		);
+		$editor_asset['dependencies'][] = 'authorship-hmr-runtime';
+	}
+
+	wp_enqueue_script(
+		SCRIPT_HANDLE,
+		plugins_url( 'build/index.js', __DIR__ ),
+		$editor_asset['dependencies'],
+		$editor_asset['version'],
 		[
-			'handle'       => SCRIPT_HANDLE,
-			// @TODO check:
-			'dependencies' => [
-				'react',
-				'wp-block-editor',
-				'wp-blocks',
-				'wp-components',
-				'wp-element',
-				'wp-i18n',
-				'wp-polyfill',
-			],
+			'defer' => true,
+			'in_footer' => true,
 		]
 	);
 
-	enqueue_asset(
-		$manifest,
-		'style.css',
-		[
-			'handle' => STYLE_HANDLE,
-		]
+	wp_enqueue_style(
+		STYLE_HANDLE,
+		plugins_url( 'build/index.css', __DIR__ ),
+		[],
+		$editor_asset['version']
 	);
 }
 
