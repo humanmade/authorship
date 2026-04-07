@@ -4,7 +4,7 @@
   "license": "GPL-3.0-or-later",
   "type": "wordpress-plugin",
   "require": {
-    "php": ">=7.2",
+    "php": ">=8.2",
     "composer/installers": "^1.0 || ^2.0",
     "humanmade/asset-loader": "^0.5.0 || ^0.6.1"
   },
@@ -16,7 +16,7 @@
     "phpcompatibility/phpcompatibility-wp": "2.1.0",
     "phpstan/phpstan": "0.12.57",
     "phpunit/phpunit": "^9.5.20",
-    "roots/wordpress": "~6.6.0",
+    "roots/wordpress": "~6.9.0",
     "szepeviktor/phpstan-wordpress": "0.7.1",
     "vlucas/phpdotenv": "^3",
     "wp-cli/db-command": "^2",
@@ -37,7 +37,7 @@
       "roots/wordpress-core-installer": true
     },
     "platform": {
-      "php": "7.4"
+      "php": "8.2"
     },
     "preferred-install": "dist",
     "sort-packages": true
