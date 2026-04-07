@@ -65,7 +65,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string> $args CLI arguments
 	 * @param array<string> $assoc_args CLI arguments
 	 */
-	public function wp_authors( $args, $assoc_args ) : void {
+	public function wp_authors( $args, $assoc_args ): void {
 		$posts_per_page = 100;
 		$paged = 1;
 		$count = 0;
@@ -128,7 +128,7 @@ class Migrate_Command extends WP_CLI_Command {
 					\Authorship\set_authors( $post, [ intval( $post->post_author ) ] );
 				}
 
-				$count++;
+				++$count;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
@@ -138,7 +138,7 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
 			sleep( 2 );
 
-			$paged++;
+			++$paged;
 		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
@@ -188,7 +188,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string> $args CLI arguments
 	 * @param array<string> $assoc_args CLI arguments
 	 */
-	function ppa( $args, $assoc_args ) : void {
+	public function ppa( $args, $assoc_args ): void {
 		if ( ! taxonomy_exists( 'author' ) ) {
 			// register the `author` taxonomy so that we can query for PPA author terms.
 			register_taxonomy( 'author', 'post' );
@@ -288,7 +288,7 @@ class Migrate_Command extends WP_CLI_Command {
 					\Authorship\set_authors( $post, $new_authors );
 				}
 
-				$count++;
+				++$count;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
@@ -298,7 +298,7 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
 			sleep( 2 );
 
-			$paged++;
+			++$paged;
 		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
@@ -317,7 +317,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 *
 	 * @return integer a user ID for this term, or -1 if not resolvable
 	 */
-	private function get_ppa_user_id( WP_Term $ppa_author, bool $create_users = false ) : int {
+	private function get_ppa_user_id( WP_Term $ppa_author, bool $create_users = false ): int {
 		/**
 		 * We need to get the user for Authorship so check if a
 		 * user is already mapped in PPA.
@@ -379,7 +379,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 *
 	 * @see https://github.com/Automattic/vip-go-mu-plugins/blob/master/vip-helpers/vip-caching.php#L733-L747
 	 */
-	private function reset_local_object_cache() : void {
+	private function reset_local_object_cache(): void {
 		/**
 		 * @var WP_Object_Cache
 		 */

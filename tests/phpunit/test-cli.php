@@ -21,7 +21,7 @@ class TestCLI extends TestCase {
 		CLI\bootstrap();
 	}
 
-	public function testMigratePostTypePost() : void {
+	public function testMigratePostTypePost(): void {
 		$factory = self::factory()->post;
 
 		// Post. Owned by editor, attributed to nobody.
@@ -36,7 +36,7 @@ class TestCLI extends TestCase {
 		$authorship_authors = \Authorship\get_authors( $post1 );
 		$this->assertCount( 0, $authorship_authors );
 
-		$command = new CLI\Migrate_Command;
+		$command = new CLI\Migrate_Command();
 		$command->wp_authors( [], [
 			'dry-run' => false,
 			'post-type' => 'post', // Note, have to set default values manually.
@@ -48,7 +48,7 @@ class TestCLI extends TestCase {
 		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
 
-	public function testMigratePostTypePage() : void {
+	public function testMigratePostTypePage(): void {
 		$factory = self::factory()->post;
 
 		// Page. Owned by editor, attributed to nobody.

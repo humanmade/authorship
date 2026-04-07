@@ -10,7 +10,7 @@ declare( strict_types=1 );
 namespace Authorship;
 
 $_plugin_dir = getcwd();
-$_env_dir    = dirname( dirname( __DIR__ ) );
+$_env_dir    = dirname( __DIR__, 2 );
 
 require_once $_plugin_dir . '/vendor/autoload.php';
 
@@ -23,7 +23,7 @@ $_tests_dir = getenv( 'WP_PHPUNIT__DIR' );
 
 require_once $_tests_dir . '/includes/functions.php';
 
-tests_add_filter( 'muplugins_loaded', function() use ( $_plugin_dir ) : void {
+tests_add_filter( 'muplugins_loaded', function () use ( $_plugin_dir ): void {
 	require_once $_plugin_dir . '/plugin.php';
 } );
 
