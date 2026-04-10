@@ -27,7 +27,7 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	protected static $route = '/' . Users_Controller::_NAMESPACE . '/' . Users_Controller::BASE;
 
 	public function testGuestAuthorCanBeCreatedWithJustAName(): void {
-		wp_set_current_user( self::$users['admin']->ID );
+		wp_set_current_user( self::$users['editor']->ID );
 
 		$request = new WP_REST_Request( 'POST', self::$route );
 		$request->set_param( 'name', 'Firsty Lasty' );
