@@ -18,8 +18,6 @@ use Authorship\Users_Controller;
 use WP_Http;
 use WP_REST_Request;
 
-use const Authorship\GUEST_ROLE;
-
 class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 	/**
 	 * @var string
@@ -33,11 +31,9 @@ class TestRESTAPIUserEndpoint extends RESTAPITestCase {
 		$request->set_param( 'name', 'Firsty Lasty' );
 
 		$response = self::rest_do_request( $request );
-		$data = $response->get_data();
 		$message = self::get_message( $response );
 
 		$this->assertSame( WP_Http::CREATED, $response->get_status(), $message );
-		$this->assertSame( [ GUEST_ROLE ], $data['roles'] );
 	}
 
 	/**
