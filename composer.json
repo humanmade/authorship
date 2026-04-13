@@ -4,22 +4,22 @@
   "license": "GPL-3.0-or-later",
   "type": "wordpress-plugin",
   "require": {
-    "php": ">=7.2",
+    "php": ">=8.2",
     "composer/installers": "^1.0 || ^2.0"
   },
   "require-dev": {
     "dealerdirect/phpcodesniffer-composer-installer": "0.7.0",
     "ergebnis/composer-normalize": "^2",
     "humanmade/coding-standards": "dev-upgrade-wpcs",
-    "php-stubs/wordpress-stubs": "^5.5",
+    "php-stubs/wordpress-stubs": "^6.9",
     "phpcompatibility/phpcompatibility-wp": "2.1.0",
-    "phpstan/phpstan": "0.12.57",
+    "phpstan/phpstan": "^2",
     "phpunit/phpunit": "^9.5.20",
-    "roots/wordpress": "~6.6.0",
-    "szepeviktor/phpstan-wordpress": "0.7.1",
+    "roots/wordpress": "~6.9.0",
+    "szepeviktor/phpstan-wordpress": "^2",
     "vlucas/phpdotenv": "^3",
     "wp-cli/db-command": "^2",
-    "wp-phpunit/wp-phpunit": "~6.6.0",
+    "wp-phpunit/wp-phpunit": "~6.9.0",
     "yoast/phpunit-polyfills": "^1.0"
   },
   "repositories": {
@@ -36,7 +36,7 @@
       "roots/wordpress-core-installer": true
     },
     "platform": {
-      "php": "7.4"
+      "php": "8.2"
     },
     "preferred-install": "dist",
     "sort-packages": true
@@ -58,7 +58,7 @@
       "phpcs -p --cache=tests/cache/phpcs ."
     ],
     "test:phpstan": [
-      "phpstan analyze"
+      "phpstan analyze --memory-limit=1G"
     ],
     "test:ut": [
       "wp db reset --yes --path=tests/wordpress #",

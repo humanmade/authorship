@@ -9,3 +9,4 @@
 # Files:
 
 /tests/.env
+.phpunit.result.cache

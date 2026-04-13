@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Install PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
       with:
-        php-version: '7.4'
+        php-version: '8.2'
         coverage: none
 
     - name: Debugging
@@ -35,20 +35,20 @@ jobs:
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: ${{ steps.composer-cache-dir.outputs.DIR }}
-        key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
+        key: ${{ runner.os }}-composer-8.2-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
       run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
     - name: PHPCS cache
-      uses: actions/cache@v4
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: tests/cache
-        key: ${{ runner.os }}-phpcs-7.4-${{ hashFiles('plugin.php') }}
+        key: ${{ runner.os }}-phpcs-8.2-${{ hashFiles('plugin.php') }}
 
     - name: Run the tests
       run: |

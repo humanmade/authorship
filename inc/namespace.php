@@ -470,8 +470,8 @@ function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_R
 /**
  * Filters extra CURIEs available on REST API responses.
  *
- * @param array[] $additional Additional CURIEs to register with the API.
- * @return array[] Additional CURIEs to register with the API.
+ * @param array<int, array<string, mixed>> $additional Additional CURIEs to register with the API.
+ * @return array<int, array<string, mixed>> Additional CURIEs to register with the API.
  */
 function filter_rest_response_link_curies( array $additional ): array {
 	$additional[] = [
