@@ -1,11 +1,11 @@
 # Authorship
 
-Stable tag: 0.2.17  
-Requires at least: 5.4
-Tested up to: 6.9
+Stable tag: 0.3.0  
+Requires at least: 5.4  
+Tested up to: 6.9  
 Requires PHP: 8.2  
 License: GPL v3 or later  
-Contributors: johnbillion, humanmade  
+Contributors: johnbillion, humanmade
 
 A modern approach to author attribution in WordPress.
 
@@ -261,7 +261,7 @@ The following custom user capabilities are used by Authorship. These can be gran
 
 ## Contributing
 
-Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md) for more details.
+Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ## Team
 
