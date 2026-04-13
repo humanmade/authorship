@@ -261,7 +261,7 @@ The following custom user capabilities are used by Authorship. These can be gran
 
 ## Contributing
 
-Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md) for more details.
+Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ## Team
 
