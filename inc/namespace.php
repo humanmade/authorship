@@ -509,18 +509,23 @@ function enqueue_assets_for_post(): void {
 	}
 
 	// Hot-reloading support.
-	$runtime_asset = include plugin_dir_path( __DIR__ ) . 'build/runtime.asset.php';
-	if ( ! empty( $runtime_asset ) && in_array( 'wp-react-refresh-runtime', $editor_asset['dependencies'] ?? [], true ) ) {
-		wp_register_script(
-			'authorship-hmr-runtime',
-			plugins_url( 'build/runtime.js', __DIR__ ),
-			$runtime_asset['dependencies'],
-			$runtime_asset['version'],
-			[
-				'in_footer' => true,
-			]
-		);
-		$editor_asset['dependencies'][] = 'authorship-hmr-runtime';
+	if ( in_array( 'wp-react-refresh-runtime', $editor_asset['dependencies'] ?? [], true ) ) {
+		$runtime_asset_file = plugin_dir_path( __DIR__ ) . 'build/runtime.asset.php';
+		if ( is_readable( $runtime_asset_file ) ) {
+			$runtime_asset = include $runtime_asset_file;
+			if ( ! empty( $runtime_asset ) ) {
+				wp_register_script(
+					'authorship-hmr-runtime',
+					plugins_url( 'build/runtime.js', __DIR__ ),
+					$runtime_asset['dependencies'],
+					$runtime_asset['version'],
+					[
+						'in_footer' => true,
+					]
+				);
+				$editor_asset['dependencies'][] = 'authorship-hmr-runtime';
+			}
+		}
 	}
 
 	wp_enqueue_script(
