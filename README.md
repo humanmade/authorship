@@ -1,6 +1,6 @@
 # Authorship
 
-Stable tag: 0.3.0  
+Stable tag: 0.3.1  
 Requires at least: 5.4  
 Tested up to: 6.9  
 Requires PHP: 8.2  
