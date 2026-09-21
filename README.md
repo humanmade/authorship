@@ -214,6 +214,7 @@ Great care has been taken to ensure Authorship makes no changes to the user capa
 * Grant users who are attributed to a post the ability to edit that post if their capabilities allow it
 * Grant users the ability to create and assign guest authors to a post
 * Allow this behaviour to be changed at a granular level with custom capabilities
+* Prevent guest authors from logging in, using application passwords, or resetting their password, and log users out when they become a guest author
 
 ### Assigning Attribution
 

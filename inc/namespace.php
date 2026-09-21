@@ -20,6 +20,7 @@ use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Session_Tokens;
 use WP_User;
 
 const GUEST_ROLE = 'guest-author';
@@ -45,6 +46,7 @@ function bootstrap(): void {
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
+	add_action( 'set_user_role', __NAMESPACE__ . '\\action_set_user_role', 10, 2 );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -56,6 +58,9 @@ function bootstrap(): void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
+	add_filter( 'wp_authenticate_user', __NAMESPACE__ . '\\filter_wp_authenticate_user' );
+	add_filter( 'wp_is_application_passwords_available_for_user', __NAMESPACE__ . '\\filter_application_passwords_available_for_user', 10, 2 );
+	add_filter( 'allow_password_reset', __NAMESPACE__ . '\\filter_allow_password_reset', 10, 2 );
 }
 
 /**
@@ -294,6 +299,60 @@ function action_wp( WP $wp ): void {
  */
 function register_roles_and_caps(): void {
 	add_role( GUEST_ROLE, __( 'Guest Author', 'authorship' ), [] );
+}
+
+/**
+ * Prevents guest authors from logging in.
+ *
+ * @param WP_User|WP_Error $user The user being authenticated, or an error.
+ * @return WP_User|WP_Error The user, or an error if they are a guest author.
+ */
+function filter_wp_authenticate_user( $user ) {
+	if ( $user instanceof WP_User && in_array( GUEST_ROLE, $user->roles, true ) ) {
+		return new WP_Error( 'authorship_guest_author_login', __( 'Guest authors cannot log in.', 'authorship' ) );
+	}
+
+	return $user;
+}
+
+/**
+ * Prevents guest authors from using application passwords.
+ *
+ * @param bool    $available Whether application passwords are available to the user.
+ * @param WP_User $user      The user.
+ * @return bool Whether application passwords are available to the user.
+ */
+function filter_application_passwords_available_for_user( bool $available, WP_User $user ): bool {
+	return $available && ! in_array( GUEST_ROLE, $user->roles, true );
+}
+
+/**
+ * Prevents guest authors from resetting their password.
+ *
+ * @param bool|WP_Error $allow   Whether the user can reset their password, or an error.
+ * @param int           $user_id The user ID.
+ * @return bool|WP_Error Whether the user can reset their password, or an error.
+ */
+function filter_allow_password_reset( $allow, int $user_id ) {
+	$user = get_userdata( $user_id );
+
+	if ( $user && in_array( GUEST_ROLE, $user->roles, true ) ) {
+		return false;
+	}
+
+	return $allow;
+}
+
+/**
+ * Logs a user out everywhere when they become a guest author.
+ *
+ * @param int    $user_id The user ID.
+ * @param string $role    The new role.
+ */
+function action_set_user_role( int $user_id, string $role ): void {
+	if ( GUEST_ROLE === $role ) {
+		WP_Session_Tokens::get_instance( $user_id )->destroy_all();
+	}
 }
 
 /**
