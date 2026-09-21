@@ -35,4 +35,15 @@ class TestAuthentication extends TestCase {
 		$this->assertFalse( wp_is_application_passwords_available_for_user( self::$users[ GUEST_ROLE ] ) );
 		$this->assertTrue( wp_is_application_passwords_available_for_user( self::$users['subscriber'] ) );
 	}
+
+	public function testGuestAuthorCannotResetPassword(): void {
+		$result = get_password_reset_key( self::$users[ GUEST_ROLE ] );
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'no_password_reset', $result->get_error_code() );
+	}
+
+	public function testOtherUserCanResetPassword(): void {
+		$this->assertIsString( get_password_reset_key( self::$users['subscriber'] ) );
+	}
 }

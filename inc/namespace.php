@@ -58,6 +58,7 @@ function bootstrap(): void {
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
 	add_filter( 'wp_authenticate_user', __NAMESPACE__ . '\\filter_wp_authenticate_user' );
 	add_filter( 'wp_is_application_passwords_available_for_user', __NAMESPACE__ . '\\filter_application_passwords_available_for_user', 10, 2 );
+	add_filter( 'allow_password_reset', __NAMESPACE__ . '\\filter_allow_password_reset', 10, 2 );
 }
 
 /**
@@ -321,6 +322,23 @@ function filter_wp_authenticate_user( $user ) {
  */
 function filter_application_passwords_available_for_user( bool $available, WP_User $user ): bool {
 	return $available && ! in_array( GUEST_ROLE, $user->roles, true );
+}
+
+/**
+ * Prevents guest authors from resetting their password.
+ *
+ * @param bool|WP_Error $allow   Whether the user can reset their password, or an error.
+ * @param int           $user_id The user ID.
+ * @return bool|WP_Error Whether the user can reset their password, or an error.
+ */
+function filter_allow_password_reset( $allow, int $user_id ) {
+	$user = get_userdata( $user_id );
+
+	if ( $user && in_array( GUEST_ROLE, $user->roles, true ) ) {
+		return false;
+	}
+
+	return $allow;
 }
 
 /**
