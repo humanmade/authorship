@@ -28,4 +28,11 @@ class TestAuthentication extends TestCase {
 
 		$this->assertInstanceOf( \WP_User::class, wp_authenticate( $user->user_login, 'password' ) );
 	}
+
+	public function testApplicationPasswordsAreOnlyUnavailableToGuestAuthors(): void {
+		add_filter( 'wp_is_application_passwords_available', '__return_true' );
+
+		$this->assertFalse( wp_is_application_passwords_available_for_user( self::$users[ GUEST_ROLE ] ) );
+		$this->assertTrue( wp_is_application_passwords_available_for_user( self::$users['subscriber'] ) );
+	}
 }

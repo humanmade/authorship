@@ -57,6 +57,7 @@ function bootstrap(): void {
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
 	add_filter( 'wp_authenticate_user', __NAMESPACE__ . '\\filter_wp_authenticate_user' );
+	add_filter( 'wp_is_application_passwords_available_for_user', __NAMESPACE__ . '\\filter_application_passwords_available_for_user', 10, 2 );
 }
 
 /**
@@ -309,6 +310,17 @@ function filter_wp_authenticate_user( $user ) {
 	}
 
 	return $user;
+}
+
+/**
+ * Prevents guest authors from using application passwords.
+ *
+ * @param bool    $available Whether application passwords are available to the user.
+ * @param WP_User $user      The user.
+ * @return bool Whether application passwords are available to the user.
+ */
+function filter_application_passwords_available_for_user( bool $available, WP_User $user ): bool {
+	return $available && ! in_array( GUEST_ROLE, $user->roles, true );
 }
 
 /**
