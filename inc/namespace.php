@@ -20,6 +20,7 @@ use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Session_Tokens;
 use WP_User;
 
 const GUEST_ROLE = 'guest-author';
@@ -45,6 +46,7 @@ function bootstrap(): void {
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
+	add_action( 'set_user_role', __NAMESPACE__ . '\\action_set_user_role', 10, 2 );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -339,6 +341,18 @@ function filter_allow_password_reset( $allow, int $user_id ) {
 	}
 
 	return $allow;
+}
+
+/**
+ * Logs a user out everywhere when they become a guest author.
+ *
+ * @param int    $user_id The user ID.
+ * @param string $role    The new role.
+ */
+function action_set_user_role( int $user_id, string $role ): void {
+	if ( GUEST_ROLE === $role ) {
+		WP_Session_Tokens::get_instance( $user_id )->destroy_all();
+	}
 }
 
 /**

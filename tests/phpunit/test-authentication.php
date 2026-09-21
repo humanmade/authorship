@@ -46,4 +46,16 @@ class TestAuthentication extends TestCase {
 	public function testOtherUserCanResetPassword(): void {
 		$this->assertIsString( get_password_reset_key( self::$users['subscriber'] ) );
 	}
+
+	public function testUserIsLoggedOutWhenTheyBecomeGuestAuthor(): void {
+		$user     = self::factory()->user->create_and_get( [ 'role' => 'editor' ] );
+		$sessions = \WP_Session_Tokens::get_instance( $user->ID );
+		$sessions->create( time() + HOUR_IN_SECONDS );
+
+		$user->set_role( 'author' );
+		$this->assertCount( 1, $sessions->get_all() );
+
+		$user->set_role( GUEST_ROLE );
+		$this->assertCount( 0, $sessions->get_all() );
+	}
 }
