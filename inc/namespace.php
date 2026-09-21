@@ -56,6 +56,7 @@ function bootstrap(): void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
+	add_filter( 'wp_authenticate_user', __NAMESPACE__ . '\\filter_wp_authenticate_user' );
 }
 
 /**
@@ -294,6 +295,20 @@ function action_wp( WP $wp ): void {
  */
 function register_roles_and_caps(): void {
 	add_role( GUEST_ROLE, __( 'Guest Author', 'authorship' ), [] );
+}
+
+/**
+ * Prevents guest authors from logging in.
+ *
+ * @param WP_User|WP_Error $user The user being authenticated, or an error.
+ * @return WP_User|WP_Error The user, or an error if they are a guest author.
+ */
+function filter_wp_authenticate_user( $user ) {
+	if ( $user instanceof WP_User && in_array( GUEST_ROLE, $user->roles, true ) ) {
+		return new WP_Error( 'authorship_guest_author_login', __( 'Guest authors cannot log in.', 'authorship' ) );
+	}
+
+	return $user;
 }
 
 /**
