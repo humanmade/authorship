@@ -57,9 +57,7 @@ function bootstrap(): void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
-	add_filter( 'render_block_core/post-author-name', __NAMESPACE__ . '\\render_authorship_post_author_name', 10, 3 );
-	add_filter( 'register_block_type_args', __NAMESPACE__ . '\\wrap_post_author_biography_render_callback', 10, 2 );
-	add_filter( 'render_block_core/avatar', __NAMESPACE__ . '\\render_authorship_avatar', 10, 3 );
+	add_filter( 'register_block_type_args', __NAMESPACE__ . '\\wrap_author_block_render_callbacks', 10, 2 );
 }
 
 /**
@@ -119,6 +117,9 @@ function replace_single_wrapper_content( string $block_content, string $inner_ht
 /**
  * Replaces the native post author's name with every attributed author.
  *
+ * Core returns an empty string when the native `post_author` is invalid,
+ * regardless of Authorship data, so rebuild the wrapper in that case.
+ *
  * @param string   $block_content Rendered block markup.
  * @param array{attrs: array<string, mixed>} $block Parsed block, including its attributes.
  * @param WP_Block $instance      The block instance.
@@ -154,32 +155,57 @@ function render_authorship_post_author_name( string $block_content, array $block
 		$authors
 	);
 
-	return replace_single_wrapper_content( $block_content, wp_sprintf( '%l', $names ) );
+	$inner = wp_sprintf( '%l', $names );
+
+	if ( '' !== $block_content ) {
+		return replace_single_wrapper_content( $block_content, $inner );
+	}
+
+	$classes = [];
+
+	if ( ! empty( $block['attrs']['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $block['attrs']['textAlign'];
+	}
+
+	if ( isset( $block['attrs']['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( [ 'class' => implode( ' ', $classes ) ] );
+
+	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $inner );
 }
 
 /**
- * Wraps core's post author biography render callback.
+ * Wraps core author block render callbacks.
  *
- * The fallback biography can need `get_block_wrapper_attributes()` where core
- * produced no wrapper. `WP_Block::render()` resets the block supports state to
- * the parent block before render filters run, so the callback must be wrapped
- * while the state still belongs to the biography block.
+ * A fallback can need `get_block_wrapper_attributes()` where core produced no
+ * wrapper. `WP_Block::render()` resets `WP_Block_Supports::$block_to_render`
+ * to the parent block before render filters run, so the callbacks must be
+ * wrapped while the state still belongs to the rendered author block.
  *
  * @param array<string, mixed> $args Registered block type args.
  * @param string               $name Block type name.
  * @return array<string, mixed> Filtered args.
  */
-function wrap_post_author_biography_render_callback( array $args, string $name ): array {
-	if ( 'core/post-author-biography' !== $name || empty( $args['render_callback'] ) ) {
+function wrap_author_block_render_callbacks( array $args, string $name ): array {
+	$filters = [
+		'core/post-author-name'      => __NAMESPACE__ . '\\render_authorship_post_author_name',
+		'core/avatar'                => __NAMESPACE__ . '\\render_authorship_avatar',
+		'core/post-author-biography' => __NAMESPACE__ . '\\render_authorship_post_author_biography',
+	];
+
+	if ( ! isset( $filters[ $name ] ) || empty( $args['render_callback'] ) ) {
 		return $args;
 	}
 
 	$original = $args['render_callback'];
+	$filter   = $filters[ $name ];
 
-	$args['render_callback'] = function ( $attributes, $content, $block ) use ( $original ) {
+	$args['render_callback'] = function ( $attributes, $content, $block ) use ( $original, $filter ) {
 		$block_content = (string) call_user_func( $original, $attributes, $content, $block );
 
-		return render_authorship_post_author_biography( $block_content, [ 'attrs' => $attributes ], $block );
+		return $filter( $block_content, [ 'attrs' => $attributes ], $block );
 	};
 
 	return $args;
@@ -229,6 +255,9 @@ function render_authorship_post_author_biography( string $block_content, array $
 
 /**
  * Replaces core's native post author avatar with one avatar per attributed author.
+ *
+ * Core returns an empty string when the native `post_author` is invalid,
+ * regardless of Authorship data, so rebuild the wrapper in that case.
  *
  * @param string   $block_content Rendered block markup.
  * @param array{attrs: array<string, mixed>} $block Parsed block, including its attributes.
@@ -297,7 +326,13 @@ function render_authorship_avatar( string $block_content, array $block, WP_Block
 		$authors
 	);
 
-	return replace_single_wrapper_content( $block_content, implode( '', $avatars ) );
+	$inner = implode( '', $avatars );
+
+	if ( '' !== $block_content ) {
+		return replace_single_wrapper_content( $block_content, $inner );
+	}
+
+	return sprintf( '<div %1$s>%2$s</div>', get_block_wrapper_attributes(), $inner );
 }
 
 /**
