@@ -13,12 +13,10 @@ use WP_Block;
 use WP_Post;
 use WP_User;
 
-use function Authorship\get_post_authors;
-
 use const Authorship\POSTS_PARAM;
 
 class TestCoreAuthorBlocks extends TestCase {
-	public function testPostAuthorsFallsBackToNativePostAuthor(): void {
+	public function testPostAuthorNameFallsBackToNativePostAuthor(): void {
 		add_filter( 'authorship_default_author', '__return_empty_array' );
 
 		$post = self::factory()->post->create_and_get( [
@@ -27,7 +25,12 @@ class TestCoreAuthorBlocks extends TestCase {
 
 		remove_filter( 'authorship_default_author', '__return_empty_array' );
 
-		$this->assertSame( [ self::$users['editor']->ID ], wp_list_pluck( get_post_authors( $post ), 'ID' ) );
+		$output = $this->render_block( 'core/post-author-name', [
+			'isLink' => true,
+		], $post );
+
+		$this->assertStringContainsString( self::$users['editor']->display_name, $output );
+		$this->assertStringContainsString( get_author_posts_url( self::$users['editor']->ID ), $output );
 	}
 
 	public function testPostAuthorNameUsesAttributedAuthorArchiveUrl(): void {

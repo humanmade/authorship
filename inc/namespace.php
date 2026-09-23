@@ -63,10 +63,11 @@ function bootstrap(): void {
 }
 
 /**
- * Returns the authors to display in a core author block.
+ * Returns the authors to display in a core author block: every attributed
+ * author, or the post's native author if nobody has been attributed.
  *
  * @param WP_Block $instance The block instance.
- * @return WP_User[] Authorship's authors, in order, or an empty array when there is nothing to display.
+ * @return WP_User[] Authors, in order, or an empty array when there is nothing to display.
  */
 function get_authors_for_block( WP_Block $instance ): array {
 	$post_id = $instance->context['postId'] ?? get_the_ID();
@@ -81,7 +82,15 @@ function get_authors_for_block( WP_Block $instance ): array {
 		return [];
 	}
 
-	return get_post_authors( $post );
+	$authors = get_authors( $post );
+
+	if ( ! empty( $authors ) ) {
+		return $authors;
+	}
+
+	$native_author = get_userdata( (int) $post->post_author );
+
+	return $native_author ? [ $native_author ] : [];
 }
 
 /**
