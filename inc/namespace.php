@@ -63,35 +63,25 @@ function bootstrap(): void {
 }
 
 /**
- * Returns the authors that should replace a core block's native author, or null when core is correct.
+ * Returns the authors to display in a core author block.
  *
  * @param WP_Block $instance The block instance.
- * @return WP_User[]|null Authorship's authors, in order, or null.
+ * @return WP_User[] Authorship's authors, in order, or an empty array when there is nothing to display.
  */
-function authors_replacing_native( WP_Block $instance ): ?array {
+function get_authors_for_block( WP_Block $instance ): array {
 	$post_id = $instance->context['postId'] ?? get_the_ID();
 
 	if ( ! $post_id || ! post_type_supports( get_post_type( $post_id ), 'author' ) ) {
-		return null;
+		return [];
 	}
 
 	$post = get_post( $post_id );
 
 	if ( ! $post ) {
-		return null;
+		return [];
 	}
 
-	$authors = get_post_authors( $post );
-
-	if ( empty( $authors ) ) {
-		return null;
-	}
-
-	if ( 1 === count( $authors ) && (int) $authors[0]->ID === (int) $post->post_author ) {
-		return null;
-	}
-
-	return $authors;
+	return get_post_authors( $post );
 }
 
 /**
@@ -126,9 +116,9 @@ function replace_single_wrapper_content( string $block_content, string $inner_ht
  * @return string Filtered block markup.
  */
 function render_authorship_post_author_name( string $block_content, array $block, WP_Block $instance ): string {
-	$authors = authors_replacing_native( $instance );
+	$authors = get_authors_for_block( $instance );
 
-	if ( null === $authors ) {
+	if ( empty( $authors ) ) {
 		return $block_content;
 	}
 
@@ -195,9 +185,9 @@ function wrap_post_author_biography_render_callback( array $args, string $name )
  * @return string Filtered block markup.
  */
 function render_authorship_post_author_biography( string $block_content, array $block, WP_Block $instance ): string {
-	$authors = authors_replacing_native( $instance );
+	$authors = get_authors_for_block( $instance );
 
-	if ( null === $authors ) {
+	if ( empty( $authors ) ) {
 		return $block_content;
 	}
 
@@ -241,9 +231,9 @@ function render_authorship_avatar( string $block_content, array $block, WP_Block
 		return $block_content;
 	}
 
-	$authors = authors_replacing_native( $instance );
+	$authors = get_authors_for_block( $instance );
 
-	if ( null === $authors ) {
+	if ( empty( $authors ) ) {
 		return $block_content;
 	}
 
