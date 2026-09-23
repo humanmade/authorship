@@ -12,6 +12,7 @@ namespace Authorship;
 use Exception;
 use stdClass;
 use WP;
+use WP_Block;
 use WP_Error;
 use WP_Http;
 use WP_HTTP_Response;
@@ -56,6 +57,282 @@ function bootstrap(): void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
+	add_filter( 'register_block_type_args', __NAMESPACE__ . '\\wrap_author_block_render_callbacks', 10, 2 );
+}
+
+/**
+ * Returns the authors to display in a core author block: every attributed
+ * author, or the post's native author if nobody has been attributed.
+ *
+ * @param WP_Block $instance The block instance.
+ * @return WP_User[] Authors, in order, or an empty array when there is nothing to display.
+ */
+function get_authors_for_block( WP_Block $instance ): array {
+	$post_id = $instance->context['postId'] ?? get_the_ID();
+
+	if ( ! $post_id || ! post_type_supports( get_post_type( $post_id ), 'author' ) ) {
+		return [];
+	}
+
+	$post = get_post( $post_id );
+
+	if ( ! $post ) {
+		return [];
+	}
+
+	$authors = get_authors( $post );
+
+	if ( ! empty( $authors ) ) {
+		return $authors;
+	}
+
+	$native_author = get_userdata( (int) $post->post_author );
+
+	return $native_author ? [ $native_author ] : [];
+}
+
+/**
+ * Replaces a single-wrapper block's inner content.
+ *
+ * Core's post author name, avatar and biography blocks each render one div
+ * wrapper. Reusing that wrapper preserves the attributes core computed for
+ * this block instance.
+ *
+ * @param string $block_content Rendered block markup.
+ * @param string $inner_html    Replacement content.
+ * @return string The block with its content replaced, or the original unchanged when it is not the expected shape.
+ */
+function replace_single_wrapper_content( string $block_content, string $inner_html ): string {
+	$replaced = preg_replace_callback(
+		'/^(<div\\b[^>]*>).*(<\\/div>)$/s',
+		static fn( array $matches ): string => $matches[1] . $inner_html . $matches[2],
+		$block_content,
+		1,
+		$count
+	);
+
+	return $count ? $replaced : $block_content;
+}
+
+/**
+ * Replaces the native post author's name with every attributed author.
+ *
+ * Core returns an empty string when the native `post_author` is invalid,
+ * regardless of Authorship data, so rebuild the wrapper in that case.
+ *
+ * @param string   $block_content Rendered block markup.
+ * @param array{attrs: array<string, mixed>} $block Parsed block, including its attributes.
+ * @param WP_Block $instance      The block instance.
+ * @return string Filtered block markup.
+ */
+function render_authorship_post_author_name( string $block_content, array $block, WP_Block $instance ): string {
+	$authors = get_authors_for_block( $instance );
+
+	if ( empty( $authors ) ) {
+		return $block_content;
+	}
+
+	$is_link     = ! empty( $block['attrs']['isLink'] );
+	$link_target = $block['attrs']['linkTarget'] ?? '_self';
+
+	$names = array_map(
+		static function ( WP_User $author ) use ( $is_link, $link_target ): string {
+			$name = esc_html( $author->display_name );
+
+			if ( ! $is_link ) {
+				return $name;
+			}
+
+			// Build each link instead of changing the rendered native name. A display
+			// name can appear in its author's nicename-based archive URL.
+			return sprintf(
+				'<a href="%1$s" target="%2$s" class="wp-block-post-author-name__link">%3$s</a>',
+				esc_url( get_author_posts_url( $author->ID ) ),
+				esc_attr( $link_target ),
+				$name
+			);
+		},
+		$authors
+	);
+
+	$inner = wp_sprintf( '%l', $names );
+
+	if ( '' !== $block_content ) {
+		return replace_single_wrapper_content( $block_content, $inner );
+	}
+
+	$classes = [];
+
+	if ( ! empty( $block['attrs']['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $block['attrs']['textAlign'];
+	}
+
+	if ( isset( $block['attrs']['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( [ 'class' => implode( ' ', $classes ) ] );
+
+	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $inner );
+}
+
+/**
+ * Wraps core author block render callbacks.
+ *
+ * A fallback can need `get_block_wrapper_attributes()` where core produced no
+ * wrapper. `WP_Block::render()` resets `WP_Block_Supports::$block_to_render`
+ * to the parent block before render filters run, so the callbacks must be
+ * wrapped while the state still belongs to the rendered author block.
+ *
+ * @param array<string, mixed> $args Registered block type args.
+ * @param string               $name Block type name.
+ * @return array<string, mixed> Filtered args.
+ */
+function wrap_author_block_render_callbacks( array $args, string $name ): array {
+	$filters = [
+		'core/post-author-name'      => __NAMESPACE__ . '\\render_authorship_post_author_name',
+		'core/avatar'                => __NAMESPACE__ . '\\render_authorship_avatar',
+		'core/post-author-biography' => __NAMESPACE__ . '\\render_authorship_post_author_biography',
+	];
+
+	if ( ! isset( $filters[ $name ] ) || empty( $args['render_callback'] ) ) {
+		return $args;
+	}
+
+	$original = $args['render_callback'];
+	$filter   = $filters[ $name ];
+
+	$args['render_callback'] = function ( $attributes, $content, $block ) use ( $original, $filter ) {
+		$block_content = (string) call_user_func( $original, $attributes, $content, $block );
+
+		return $filter( $block_content, [ 'attrs' => $attributes ], $block );
+	};
+
+	return $args;
+}
+
+/**
+ * Replaces the native post author's biography with one paragraph per attributed author.
+ *
+ * @param string   $block_content Rendered block markup.
+ * @param array{attrs: array<string, mixed>} $block Parsed block, including its attributes.
+ * @param WP_Block $instance      The block instance.
+ * @return string Filtered block markup.
+ */
+function render_authorship_post_author_biography( string $block_content, array $block, WP_Block $instance ): string {
+	$authors = get_authors_for_block( $instance );
+
+	if ( empty( $authors ) ) {
+		return $block_content;
+	}
+
+	$biographies = array_filter(
+		array_map(
+			static fn( WP_User $author ): string => get_the_author_meta( 'description', $author->ID ),
+			$authors
+		)
+	);
+
+	// Match core's rule: no wrapper when no attributed author has a biography.
+	if ( empty( $biographies ) ) {
+		return '';
+	}
+
+	$inner = implode(
+		'',
+		array_map( static fn( string $biography ): string => '<p>' . $biography . '</p>', $biographies )
+	);
+
+	if ( '' !== $block_content ) {
+		return replace_single_wrapper_content( $block_content, $inner );
+	}
+
+	$align_class_name   = empty( $block['attrs']['textAlign'] ) ? '' : "has-text-align-{$block['attrs']['textAlign']}";
+	$wrapper_attributes = get_block_wrapper_attributes( [ 'class' => $align_class_name ] );
+
+	return sprintf( '<div %1$s>', $wrapper_attributes ) . $inner . '</div>';
+}
+
+/**
+ * Replaces core's native post author avatar with one avatar per attributed author.
+ *
+ * Core returns an empty string when the native `post_author` is invalid,
+ * regardless of Authorship data, so rebuild the wrapper in that case.
+ *
+ * @param string   $block_content Rendered block markup.
+ * @param array{attrs: array<string, mixed>} $block Parsed block, including its attributes.
+ * @param WP_Block $instance      The block instance.
+ * @return string Filtered block markup.
+ */
+function render_authorship_avatar( string $block_content, array $block, WP_Block $instance ): string {
+	if ( isset( $instance->context['commentId'] ) ) {
+		return $block_content;
+	}
+
+	$authors = get_authors_for_block( $instance );
+
+	if ( empty( $authors ) ) {
+		return $block_content;
+	}
+
+	$size        = $block['attrs']['size'] ?? 96;
+	$is_link     = ! empty( $block['attrs']['isLink'] );
+	$link_target = $block['attrs']['linkTarget'] ?? '_self';
+
+	$border = function_exists( 'get_block_core_avatar_border_attributes' )
+		? get_block_core_avatar_border_attributes( $block['attrs'] )
+		: [];
+
+	$image_class = trim( 'wp-block-avatar__image ' . ( $border['class'] ?? '' ) );
+	$image_extra = empty( $border['style'] ) ? '' : sprintf( ' style="%s"', esc_attr( $border['style'] ) );
+
+	$avatars = array_map(
+		static function ( WP_User $author ) use ( $size, $is_link, $link_target, $image_class, $image_extra ): string {
+			$avatar = get_avatar(
+				$author->ID,
+				$size,
+				'',
+				/* translators: %s: the attributed author's display name. */
+				sprintf( __( '%s Avatar', 'authorship' ), $author->display_name ),
+				[
+					'class'      => $image_class,
+					'extra_attr' => $image_extra,
+				]
+			);
+
+			if ( ! $is_link ) {
+				return $avatar;
+			}
+
+			$label = '';
+			if ( '_blank' === $link_target ) {
+				$label = sprintf(
+					' aria-label="%s"',
+					esc_attr(
+						/* translators: %s: the attributed author's display name. */
+						sprintf( __( '(%s author archive, opens in a new tab)', 'authorship' ), $author->display_name )
+					)
+				);
+			}
+
+			return sprintf(
+				'<a href="%1$s" target="%2$s"%3$s class="wp-block-avatar__link">%4$s</a>',
+				esc_url( get_author_posts_url( $author->ID ) ),
+				esc_attr( $link_target ),
+				$label,
+				$avatar
+			);
+		},
+		$authors
+	);
+
+	$inner = implode( '', $avatars );
+
+	if ( '' !== $block_content ) {
+		return replace_single_wrapper_content( $block_content, $inner );
+	}
+
+	return sprintf( '<div %1$s>%2$s</div>', get_block_wrapper_attributes(), $inner );
 }
 
 /**
