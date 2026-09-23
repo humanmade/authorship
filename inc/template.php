@@ -63,6 +63,24 @@ function get_authors( WP_Post $post ): array {
 }
 
 /**
+ * Returns every attributed author, falling back to the native post author.
+ *
+ * @param WP_Post $post The post object.
+ * @return WP_User[] Array of user objects.
+ */
+function get_post_authors( WP_Post $post ): array {
+	$authors = get_authors( $post );
+
+	if ( ! empty( $authors ) ) {
+		return $authors;
+	}
+
+	$native_author = get_userdata( (int) $post->post_author );
+
+	return $native_author ? [ $native_author ] : [];
+}
+
+/**
  * Returns a comma-separated list of the names of the attributed author(s) of the given post.
  *
  * Example:
