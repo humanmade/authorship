@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Authorship;
 
 use Exception;
+use WP_Error;
 use WP_Post;
 use WP_Term;
 use WP_User;
@@ -167,7 +168,17 @@ function set_authors( WP_Post $post, array $authors ): array {
 		throw new Exception( __( 'One or more user IDs are not valid for this site.', 'authorship' ) );
 	}
 
-	$term_ids = array_map( __NAMESPACE__ . '\\get_author_term_id', $authors );
+	$term_ids = [];
+
+	foreach ( $authors as $author ) {
+		$term_id = get_author_term_id( $author );
+
+		if ( is_wp_error( $term_id ) ) {
+			throw new Exception( $term_id->get_error_message() );
+		}
+
+		$term_ids[] = $term_id;
+	}
 
 	$terms = wp_set_post_terms( $post->ID, $term_ids, TAXONOMY );
 
@@ -186,10 +197,9 @@ function set_authors( WP_Post $post, array $authors ): array {
  * display name is that user ID.
  *
  * @param int $user_id The user ID.
- * @throws Exception If the term cannot be created.
- * @return int The term ID.
+ * @return int|WP_Error The term ID, or an error if the term cannot be created.
  */
-function get_author_term_id( int $user_id ): int {
+function get_author_term_id( int $user_id ) {
 	$slug = (string) $user_id;
 	$term = get_term_by( 'slug', $slug, TAXONOMY );
 
@@ -205,7 +215,7 @@ function get_author_term_id( int $user_id ): int {
 	] );
 
 	if ( is_wp_error( $term ) ) {
-		throw new Exception( $term->get_error_message() );
+		return $term;
 	}
 
 	return (int) $term['term_id'];
