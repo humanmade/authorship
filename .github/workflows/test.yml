@@ -12,13 +12,16 @@ jobs:
   build:
     strategy:
       matrix:
+        wp:
+          - '6.9'
+          - '7.1'
         php:
           - '8.2'
           - '8.3'
           - '8.4'
           - '8.5'
       fail-fast: false
-    name: WP 6.9 / PHP ${{ matrix.php }}
+    name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }}
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout repository
@@ -49,11 +52,16 @@ jobs:
       uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp6.9
+        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp${{ matrix.wp }}
 
     - name: Install PHP Dependencies
       run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction --ignore-platform-reqs
+
+    - name: Install WordPress ${{ matrix.wp }}
+      if: matrix.wp != '6.9'
+      run: |
+        composer require --dev --update-with-all-dependencies --prefer-dist --no-progress --no-interaction --ignore-platform-reqs roots/wordpress="~${{ matrix.wp }}.0" roots/wordpress-no-content="~${{ matrix.wp }}.0" wp-phpunit/wp-phpunit="~${{ matrix.wp }}.0"
 
     - name: Run the tests
       run: |
