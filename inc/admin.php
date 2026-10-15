@@ -43,25 +43,29 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 		return;
 	}
 
-	$current_error_codes = $errors->get_error_codes();
-	$removed_error_codes = [ 'empty_email' ];
-	if ( $update ) {
-		// Remove those errors on update.
-		array_push( $removed_error_codes, 'nickname' );
-	} else {
-		// Remove those errors on add.
-		array_push( $removed_error_codes, 'pass' );
+	$error_codes_to_remove = [ 'empty_email', 'nickname' ];
+
+	// Core reports an empty email field as invalid too, but a malformed email must still be rejected.
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified before edit_user() runs.
+	$email = isset( $_POST['email'] ) && is_string( $_POST['email'] ) ? sanitize_text_field( wp_unslash( $_POST['email'] ) ) : null;
+	if ( $email === '' ) {
+		$error_codes_to_remove[] = 'invalid_email';
 	}
 
-	// Remove matched errors.
-	$codes = array_intersect( $current_error_codes, $removed_error_codes );
-	foreach ( $codes as $code ) {
+	/*
+	 * Guest authors don't log in, so don't require a password when adding one. The password
+	 * is generated client side, so this only happens when JS is disabled or the field is
+	 * cleared. Other password errors, such as mismatched passwords, are kept.
+	 */
+	if ( ! $update && empty( $user->user_pass ) ) {
+		$error_codes_to_remove[] = 'pass';
+		$user->user_pass = wp_generate_password( 24 );
+	}
+
+	$current_codes = array_intersect( $errors->get_error_codes(), $error_codes_to_remove );
+
+	foreach ( $current_codes as $code ) {
 		$errors->remove( $code );
-	}
-
-	// Provide a random password for the user (JS disabled).
-	if ( empty( $user->user_pass ) && in_array( 'pass', $codes, true ) ) {
-		$user->user_pass = wp_generate_password();
 	}
 }
 
