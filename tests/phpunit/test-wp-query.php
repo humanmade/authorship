@@ -177,7 +177,8 @@ class TestWPQuery extends TestCase {
 				$posts,
 				"Post count for {$test_key} query is incorrect."
 			);
-			$this->assertFalse(
+			// WordPress 7.1+ returns null rather than false for an invalid author.
+			$this->assertEmpty(
 				$query->get_queried_object(),
 				"Queried object for {$test_key} query is incorrect."
 			);
