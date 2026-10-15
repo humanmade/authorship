@@ -47,17 +47,18 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 		return;
 	}
 
-	$error_codes_to_remove = [ 'empty_email', 'nickname' ];
+	$error_codes_to_remove = [ 'nickname' ];
 
 	/*
-	 * Core reports an empty email field as invalid too, but a malformed email must still be
-	 * rejected. The raw value is only compared, so it isn't sanitized: sanitizing would turn
-	 * input such as `<foo>` into an empty string.
+	 * Only skip the email requirement when the field was left empty. Depending on the
+	 * WordPress version, core reports an empty field as `empty_email`, `invalid_email` or both,
+	 * and may sanitize input such as `<foo>` into an empty email, which must still be rejected.
+	 * The raw value is only compared, so it isn't sanitized.
 	 */
 	// phpcs:ignore WordPress.Security.NonceVerification.Missing, HM.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified before edit_user() runs, and the value is only compared.
-	$email = isset( $_POST['email'] ) && is_string( $_POST['email'] ) ? trim( wp_unslash( $_POST['email'] ) ) : null;
-	if ( $email === '' ) {
-		$error_codes_to_remove[] = 'invalid_email';
+	$email = isset( $_POST['email'] ) ? wp_unslash( $_POST['email'] ) : '';
+	if ( is_string( $email ) && trim( $email ) === '' ) {
+		array_push( $error_codes_to_remove, 'empty_email', 'invalid_email' );
 	}
 
 	/*
