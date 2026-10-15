@@ -46,7 +46,7 @@ function bootstrap(): void {
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
-	add_action( 'profile_update', __NAMESPACE__ . '\\update_author_term_name', 10, 3 );
+	add_action( 'profile_update', __NAMESPACE__ . '\\update_author_term_name' );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -91,27 +91,34 @@ function add_term_name( array $data, string $taxonomy, array $args ): array {
 /**
  * Sync author term name with user display name.
  *
- * @param int           $user_id User ID.
- * @param WP_User       $old_user_data Old user data.
- * @param array<string> $userdata User data.
+ * Uses the saved display name rather than the raw user data passed to the hook, which may
+ * be missing the display name or contain unsanitized input.
+ *
+ * @param int $user_id User ID.
  * @return void
  */
-function update_author_term_name( int $user_id, WP_User $old_user_data, array $userdata ): void {
-	// User doesn't exist in authorship taxonomy.
+function update_author_term_name( int $user_id ): void {
 	$term = get_term_by( 'slug', (string) $user_id, TAXONOMY );
+
+	// User doesn't exist in authorship taxonomy.
 	if ( ! $term instanceof WP_Term ) {
 		return;
 	}
 
-	$display_name = $userdata['display_name'] ?? null;
+	$user = get_userdata( $user_id );
 
-	// User display name hasn't changed.
-	if ( $term->name === $display_name ) {
+	if ( ! $user instanceof WP_User || $user->display_name === '' ) {
 		return;
 	}
 
+	// User display name hasn't changed.
+	if ( $term->name === $user->display_name ) {
+		return;
+	}
+
+	// `wp_update_term()` expects slashed data.
 	wp_update_term( $term->term_id, TAXONOMY, [
-		'name' => $userdata['display_name'],
+		'name' => wp_slash( $user->display_name ),
 	] );
 }
 
