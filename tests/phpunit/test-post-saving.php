@@ -121,13 +121,12 @@ class TestPostSaving extends TestCase {
 			'post_title'  => 'Testing',
 			'post_author' => self::$users['author']->ID,
 		], true );
-		/** @var \WP_Post */
-		$post = get_post( $post_id );
 
 		/** @var \WP_Term[] */
-		$author_terms = wp_get_post_terms( $post->ID, TAXONOMY );
+		$author_terms = wp_get_post_terms( $post_id, TAXONOMY );
 
-		$this->assertEquals( self::$users['author']->display_name, $author_terms[0]->name );
+		$this->assertCount( 1, $author_terms );
+		$this->assertSame( self::$users['author']->display_name, $author_terms[0]->name );
 	}
 
 	public function testPostAuthorshipIsSetToEmptyWhenUpdatingPostWithNoExistingAuthorshipAndFiltered(): void {

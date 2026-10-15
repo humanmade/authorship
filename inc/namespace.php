@@ -58,7 +58,7 @@ function bootstrap(): void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
-	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\add_term_name', 10, 3 );
+	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\filter_wp_insert_term_data', 10, 3 );
 }
 
 /**
@@ -70,14 +70,17 @@ function bootstrap(): void {
  *
  * @return array{'name': string, 'slug': string, 'term_group': int}
  */
-function add_term_name( array $data, string $taxonomy, array $args ): array {
+function filter_wp_insert_term_data( array $data, string $taxonomy, array $args ): array {
 	if ( $taxonomy !== TAXONOMY ) {
 		return $data;
 	}
-	$user_id = (int) $data['slug'];
-	if ( $user_id <= 0 ) {
+
+	// Author term slugs are user IDs.
+	if ( ! ctype_digit( $data['slug'] ) ) {
 		return $data;
 	}
+
+	$user_id = (int) $data['slug'];
 
 	$user = get_userdata( $user_id );
 	if ( ! $user instanceof WP_User ) {

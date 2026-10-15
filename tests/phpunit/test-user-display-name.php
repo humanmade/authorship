@@ -73,11 +73,11 @@ class TestUserDisplayName extends TestCase {
 		$author = self::$users['author'];
 
 		// Simulate a term created before names were synced.
-		remove_filter( 'wp_insert_term_data', 'Authorship\\add_term_name' );
+		remove_filter( 'wp_insert_term_data', 'Authorship\\filter_wp_insert_term_data' );
 		wp_insert_term( (string) $author->ID, TAXONOMY, [
 			'slug' => (string) $author->ID,
 		] );
-		add_filter( 'wp_insert_term_data', 'Authorship\\add_term_name', 10, 3 );
+		add_filter( 'wp_insert_term_data', 'Authorship\\filter_wp_insert_term_data', 10, 3 );
 
 		$term = get_term_by( 'slug', (string) $author->ID, TAXONOMY );
 		$this->assertInstanceOf( WP_Term::class, $term );
