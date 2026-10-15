@@ -20,6 +20,7 @@ use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Term;
 use WP_User;
 
 const GUEST_ROLE = 'guest-author';
@@ -45,6 +46,7 @@ function bootstrap(): void {
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
+	add_action( 'profile_update', __NAMESPACE__ . '\\update_author_term_name' );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -56,6 +58,71 @@ function bootstrap(): void {
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
+	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\filter_wp_insert_term_data', 10, 3 );
+}
+
+/**
+ * Set term name to user display name on term creation.
+ *
+ * @param array{'name': string, 'slug': string, 'term_group': int}                        $data Term data.
+ * @param string                                                                          $taxonomy Taxonomy.
+ * @param array{'alias_of': string, 'description': string, 'parent': int, 'slug': string} $args Term args
+ *
+ * @return array{'name': string, 'slug': string, 'term_group': int}
+ */
+function filter_wp_insert_term_data( array $data, string $taxonomy, array $args ): array {
+	if ( $taxonomy !== TAXONOMY ) {
+		return $data;
+	}
+
+	// Author term slugs are user IDs.
+	if ( ! ctype_digit( $data['slug'] ) ) {
+		return $data;
+	}
+
+	$user_id = (int) $data['slug'];
+
+	$user = get_userdata( $user_id );
+	if ( ! $user instanceof WP_User ) {
+		return $data;
+	}
+
+	$data['name'] = $user->display_name;
+	return $data;
+}
+
+/**
+ * Sync author term name with user display name.
+ *
+ * Uses the saved display name rather than the raw user data passed to the hook, which may
+ * be missing the display name or contain unsanitized input.
+ *
+ * @param int $user_id User ID.
+ * @return void
+ */
+function update_author_term_name( int $user_id ): void {
+	$term = get_term_by( 'slug', (string) $user_id, TAXONOMY );
+
+	// User doesn't exist in authorship taxonomy.
+	if ( ! $term instanceof WP_Term ) {
+		return;
+	}
+
+	$user = get_userdata( $user_id );
+
+	if ( ! $user instanceof WP_User || $user->display_name === '' ) {
+		return;
+	}
+
+	// User display name hasn't changed.
+	if ( $term->name === $user->display_name ) {
+		return;
+	}
+
+	// `wp_update_term()` expects slashed data.
+	wp_update_term( $term->term_id, TAXONOMY, [
+		'name' => wp_slash( $user->display_name ),
+	] );
 }
 
 /**

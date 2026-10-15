@@ -115,6 +115,20 @@ class TestPostSaving extends TestCase {
 		$this->assertSame( [ self::$users['author']->ID ], $author_ids );
 	}
 
+	public function testPostAuthorshipTermNameIsSetToAuthorDisplaynameWhenCreatingPost(): void {
+		/** @var int */
+		$post_id = wp_insert_post( [
+			'post_title'  => 'Testing',
+			'post_author' => self::$users['author']->ID,
+		], true );
+
+		/** @var \WP_Term[] */
+		$author_terms = wp_get_post_terms( $post_id, TAXONOMY );
+
+		$this->assertCount( 1, $author_terms );
+		$this->assertSame( self::$users['author']->display_name, $author_terms[0]->name );
+	}
+
 	public function testPostAuthorshipIsSetToEmptyWhenUpdatingPostWithNoExistingAuthorshipAndFiltered(): void {
 		$factory = self::factory()->post;
 
