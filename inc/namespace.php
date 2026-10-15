@@ -57,6 +57,7 @@ function bootstrap(): void {
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
+	add_filter( 'wp_send_new_user_notification_to_user', __NAMESPACE__ . '\\filter_wp_send_new_user_notification_to_user', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
 	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\filter_wp_insert_term_data', 10, 3 );
 }
@@ -848,4 +849,22 @@ function hide_quickedit_authors( array $options ): array {
 	$options['hide_if_only_one_author'] = true;
 	$options['include'] = [ 0 ];
 	return $options;
+}
+
+/**
+ * Prevents the new user notification from being sent to a user without an email address.
+ *
+ * Guest authors can be added without an email address. Bailing early also avoids generating
+ * an unused password reset key.
+ *
+ * @param bool    $send Whether to send the email.
+ * @param WP_User $user The new user.
+ * @return bool Whether to send the email.
+ */
+function filter_wp_send_new_user_notification_to_user( bool $send, WP_User $user ): bool {
+	if ( $user->user_email === '' ) {
+		return false;
+	}
+
+	return $send;
 }

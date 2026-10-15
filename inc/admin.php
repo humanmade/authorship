@@ -33,29 +33,38 @@ function bootstrap(): void {
 /**
  * Removes required fields errors from the user profile update.
  *
+ * Guest authors don't need an email or a password. When a guest author is added without a
+ * password, a random one is assigned.
+ *
  * @param WP_Error $errors WP_Error object (passed by reference).
  * @param bool     $update Whether this is a user update.
  * @param stdClass $user   User object (passed by reference).
  * @return void
  */
 function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass $user ): void {
-	if ( $user->role !== GUEST_ROLE ) {
+	// The role is only set when it's submitted and the current user can change it.
+	if ( ( $user->role ?? '' ) !== GUEST_ROLE ) {
 		return;
 	}
 
 	$error_codes_to_remove = [ 'empty_email', 'nickname' ];
 
-	// Core reports an empty email field as invalid too, but a malformed email must still be rejected.
-	// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified before edit_user() runs.
-	$email = isset( $_POST['email'] ) && is_string( $_POST['email'] ) ? sanitize_text_field( wp_unslash( $_POST['email'] ) ) : null;
+	/*
+	 * Core reports an empty email field as invalid too, but a malformed email must still be
+	 * rejected. The raw value is only compared, so it isn't sanitized: sanitizing would turn
+	 * input such as `<foo>` into an empty string.
+	 */
+	// phpcs:ignore WordPress.Security.NonceVerification.Missing, HM.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified before edit_user() runs, and the value is only compared.
+	$email = isset( $_POST['email'] ) && is_string( $_POST['email'] ) ? trim( wp_unslash( $_POST['email'] ) ) : null;
 	if ( $email === '' ) {
 		$error_codes_to_remove[] = 'invalid_email';
 	}
 
 	/*
-	 * Guest authors don't log in, so don't require a password when adding one. The password
-	 * is generated client side, so this only happens when JS is disabled or the field is
-	 * cleared. Other password errors, such as mismatched passwords, are kept.
+	 * Guest authors don't log in, so don't require a password when adding one. The form
+	 * generates one client side, so this only happens when JS is disabled or the field is
+	 * cleared. A random password is assigned so that no account has an empty password. Other
+	 * password errors, such as mismatched passwords, are kept.
 	 */
 	if ( ! $update && empty( $user->user_pass ) ) {
 		$error_codes_to_remove[] = 'pass';
