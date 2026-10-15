@@ -27,6 +27,7 @@ class TestNewUserNotification extends EmailTestCase {
 
 		// Only the site admin is notified.
 		$this->assertSame( [ get_option( 'admin_email' ) ], $recipients );
+		// Sending to an empty address may fail before being recorded, so this is what guards the filter.
 		$this->assertSame( '', get_userdata( $guest_id )->user_activation_key );
 	}
 

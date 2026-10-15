@@ -26,7 +26,7 @@ class TestAdminUserErrors extends TestCase {
 	public function setUp(): void {
 		parent::setUp();
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Backing up test state.
+		// phpcs:ignore HM.Security.NonceVerification.Missing -- Backing up test state.
 		$this->post_backup = $_POST;
 
 		require_once ABSPATH . 'wp-admin/includes/user.php';
@@ -45,7 +45,7 @@ class TestAdminUserErrors extends TestCase {
 	}
 
 	/**
-	 * @param array<string, string> $data Form data.
+	 * @param array<string, mixed> $data Form data.
 	 * @return int|WP_Error
 	 */
 	private function add_user( array $data ) {
@@ -90,15 +90,27 @@ class TestAdminUserErrors extends TestCase {
 		$this->assertNotEmpty( $user->user_pass );
 	}
 
-	public function testGuestAuthorCanBeUpdatedWithoutEmail(): void {
+	public function testGuestAuthorEmailCanBeCleared(): void {
 		$guest_id = self::factory()->user->create( [
 			'role' => GUEST_ROLE,
-			'user_email' => '',
+			'user_email' => 'guest.cleared@example.org',
 		] );
 
 		$result = $this->update_user( $guest_id, [
 			'role' => GUEST_ROLE,
 		] );
+
+		$this->assertSame( $guest_id, $result );
+		$this->assertSame( '', get_userdata( $guest_id )->user_email );
+	}
+
+	public function testGuestAuthorCanBeUpdatedWithoutEmailWhenRoleIsNotSubmitted(): void {
+		$guest_id = self::factory()->user->create( [
+			'role' => GUEST_ROLE,
+			'user_email' => '',
+		] );
+
+		$result = $this->update_user( $guest_id, [] );
 
 		$this->assertSame( $guest_id, $result );
 	}
@@ -164,11 +176,31 @@ class TestAdminUserErrors extends TestCase {
 	/**
 	 * @return array<string, array{string}>
 	 */
-	public function dataMalformedEmails(): array {
+	public static function dataMalformedEmails(): array {
 		return [
 			'plain text' => [ 'not-an-email' ],
 			'tag' => [ '<foo>' ],
 		];
+	}
+
+	public function testWhitespaceEmailIsTreatedAsEmptyForGuestAuthor(): void {
+		$user_id = $this->add_user( [
+			'role' => GUEST_ROLE,
+			'email' => '   ',
+		] );
+
+		$this->assertIsInt( $user_id );
+		$this->assertSame( '', get_userdata( $user_id )->user_email );
+	}
+
+	public function testNonStringEmailIsRejectedForGuestAuthor(): void {
+		$result = $this->add_user( [
+			'role' => GUEST_ROLE,
+			'email' => [ 'guest@example.org' ],
+		] );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertNotEmpty( array_intersect( [ 'empty_email', 'invalid_email' ], $result->get_error_codes() ) );
 	}
 
 	public function testEmailIsRequiredForOtherRoles(): void {

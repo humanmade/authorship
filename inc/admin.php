@@ -42,8 +42,7 @@ function bootstrap(): void {
  * @return void
  */
 function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass $user ): void {
-	// The role is only set when it's submitted and the current user can change it.
-	if ( ( $user->role ?? '' ) !== GUEST_ROLE ) {
+	if ( ! is_guest_author_submission( $update, $user ) ) {
 		return;
 	}
 
@@ -55,10 +54,13 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 	 * and may sanitize input such as `<foo>` into an empty email, which must still be rejected.
 	 * The raw value is only compared, so it isn't sanitized.
 	 */
-	// phpcs:ignore WordPress.Security.NonceVerification.Missing, HM.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified before edit_user() runs, and the value is only compared.
+	// phpcs:ignore HM.Security.NonceVerification.Missing, HM.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce is verified before edit_user() runs, and the value is only compared.
 	$email = isset( $_POST['email'] ) ? wp_unslash( $_POST['email'] ) : '';
 	if ( is_string( $email ) && trim( $email ) === '' ) {
 		array_push( $error_codes_to_remove, 'empty_email', 'invalid_email' );
+
+		// Core only sets the email when it's valid, so set it explicitly to clear an existing one.
+		$user->user_email = '';
 	}
 
 	/*
@@ -77,6 +79,30 @@ function remove_required_fields_errors( WP_Error $errors, bool $update, stdClass
 	foreach ( $current_codes as $code ) {
 		$errors->remove( $code );
 	}
+}
+
+/**
+ * Determines whether the user being added or updated is a guest author.
+ *
+ * The submitted role is only set when the role field is submitted and the current user can
+ * change it. Otherwise, the role of an existing user is used.
+ *
+ * @param bool     $update Whether this is a user update.
+ * @param stdClass $user   User object.
+ * @return bool Whether the user is a guest author.
+ */
+function is_guest_author_submission( bool $update, stdClass $user ): bool {
+	if ( isset( $user->role ) ) {
+		return $user->role === GUEST_ROLE;
+	}
+
+	if ( ! $update ) {
+		return false;
+	}
+
+	$existing_user = get_userdata( $user->ID );
+
+	return $existing_user instanceof WP_User && in_array( GUEST_ROLE, $existing_user->roles, true );
 }
 
 /**

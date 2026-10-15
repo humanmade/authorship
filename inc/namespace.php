@@ -857,11 +857,11 @@ function hide_quickedit_authors( array $options ): array {
  * Guest authors can be added without an email address. Bailing early also avoids generating
  * an unused password reset key.
  *
- * @param bool    $send Whether to send the email.
+ * @param mixed   $send Whether to send the email. Not type hinted, as other filters may return a non-boolean value.
  * @param WP_User $user The new user.
- * @return bool Whether to send the email.
+ * @return mixed Whether to send the email.
  */
-function filter_wp_send_new_user_notification_to_user( bool $send, WP_User $user ): bool {
+function filter_wp_send_new_user_notification_to_user( $send, WP_User $user ) {
 	if ( $user->user_email === '' ) {
 		return false;
 	}
