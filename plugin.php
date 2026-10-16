@@ -9,12 +9,12 @@
  *
  * Plugin Name:  Authorship
  * Description:  Authorship plugin for WordPress.
- * Version:      0.3.1
+ * Version:      0.4.0
  * Plugin URI:   https://github.com/humanmade/authorship
  * Author:       Human Made, initially funded by Siemens.
  * Author URI:   https://humanmade.com/
  * Text Domain:  authorship
- * Requires PHP: 7.2.0
+ * Requires PHP: 8.2
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
