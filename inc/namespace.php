@@ -602,7 +602,7 @@ function enqueue_assets_for_post(): void {
 		$editor_asset['dependencies'],
 		$editor_asset['version'],
 		[
-			'defer' => true,
+			'strategy' => 'defer',
 			'in_footer' => true,
 		]
 	);
