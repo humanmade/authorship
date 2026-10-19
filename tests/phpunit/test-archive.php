@@ -12,7 +12,7 @@ namespace Authorship\Tests;
 use const Authorship\POSTS_PARAM;
 
 class TestArchive extends TestCase {
-	public function testAuthorArchiveQueryIsCorrect() : void {
+	public function testAuthorArchiveQueryIsCorrect(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -42,7 +42,7 @@ class TestArchive extends TestCase {
 		$this->assertSame( self::$users['editor']->ID, $authordata->ID );
 	}
 
-	public function testAuthorArchiveTitleIsCorrect() : void {
+	public function testAuthorArchiveTitleIsCorrect(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.

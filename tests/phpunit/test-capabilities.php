@@ -23,7 +23,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManageDraftPostTheyAreAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManageDraftPostTheyAreAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'draft';
 
@@ -48,7 +48,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManagePublishedPostTheyAreAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManagePublishedPostTheyAreAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'publish';
 
@@ -73,7 +73,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManageScheduledPostTheyAreAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManageScheduledPostTheyAreAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'future';
 
@@ -100,7 +100,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManagePendingPostTheyAreAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManagePendingPostTheyAreAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'pending';
 
@@ -125,7 +125,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManageTrashedPostTheyAreAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManageTrashedPostTheyAreAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'trash';
 
@@ -151,7 +151,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManagePrivatePostTheyAreAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManagePrivatePostTheyAreAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'private';
 
@@ -176,7 +176,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCanManagePublishedPostTheyAreOwnerOfButNotAttributedTo( string $role, array $caps ) : void {
+	public function testUserCanManagePublishedPostTheyAreOwnerOfButNotAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'publish';
 
@@ -201,7 +201,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCannotManagePublishedPostTheyAreNotAttributedTo( string $role, array $caps ) : void {
+	public function testUserCannotManagePublishedPostTheyAreNotAttributedTo( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$status  = 'publish_not_mine';
 
@@ -223,7 +223,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testUserCannotManageNonExistentPost( string $role, array $caps ) : void {
+	public function testUserCannotManageNonExistentPost( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 		$post_id = 1;
 
@@ -240,7 +240,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testDefaultCustomCapMappingIsCorrect( string $role, array $caps ) : void {
+	public function testDefaultCustomCapMappingIsCorrect( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 
 		$this->assertSame( $caps['create_guest_authors'], user_can( $user_id, 'create_guest_authors' ) );
@@ -253,7 +253,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testGuestAuthorCreationCanBeGranted( string $role, array $caps ) : void {
+	public function testGuestAuthorCreationCanBeGranted( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 
 		self::$users[ $role ]->add_cap( 'create_guest_authors', true );
@@ -267,7 +267,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testGuestAuthorCreationCanBeDenied( string $role, array $caps ) : void {
+	public function testGuestAuthorCreationCanBeDenied( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 
 		self::$users[ $role ]->add_cap( 'create_guest_authors', false );
@@ -281,7 +281,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testGuestPostAttributionCanBeGranted( string $role, array $caps ) : void {
+	public function testGuestPostAttributionCanBeGranted( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 
 		self::$users[ $role ]->add_cap( 'attribute_post_type', true );
@@ -295,7 +295,7 @@ class TestCapabilities extends TestCase {
 	 * @param string $role Role name
 	 * @param mixed[] $caps Caps
 	 */
-	public function testGuestPostAttributionCanBeDenied( string $role, array $caps ) : void {
+	public function testGuestPostAttributionCanBeDenied( string $role, array $caps ): void {
 		$user_id = self::$users[ $role ]->ID;
 
 		self::$users[ $role ]->add_cap( 'attribute_post_type', false );
@@ -306,7 +306,7 @@ class TestCapabilities extends TestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataRolesAndPostCaps() : array {
+	public function dataRolesAndPostCaps(): array {
 		return [
 			[
 				'editor',
@@ -504,7 +504,7 @@ class TestCapabilities extends TestCase {
 	/**
 	 * @return mixed[]
 	 */
-	public function dataRolesAndCustomCaps() : array {
+	public function dataRolesAndCustomCaps(): array {
 		return [
 			[
 				'admin',

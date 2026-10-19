@@ -12,19 +12,23 @@ jobs:
   build:
     strategy:
       matrix:
-        php: ['7.4']
-        include:
-          - php: '8.0'
-            experimental: true
+        wp:
+          - '6.9'
+          - '7.1'
+        php:
+          - '8.2'
+          - '8.3'
+          - '8.4'
+          - '8.5'
       fail-fast: false
-    name: WP 5.9 / PHP ${{ matrix.php }}
-    runs-on: ubuntu-20.04
+    name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }}
+    runs-on: ubuntu-24.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Install PHP
-      uses: shivammathur/setup-php@2.7.0
+      uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
       with:
         php-version: ${{ matrix.php }}
         extensions: mysqli, xmlwriter
@@ -41,18 +45,23 @@ jobs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
         path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp5.9
+        key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('composer.lock') }}-wp${{ matrix.wp }}
 
     - name: Install PHP Dependencies
       run: |
         composer install --prefer-dist --no-progress --no-suggest --no-interaction --ignore-platform-reqs
+
+    - name: Install WordPress ${{ matrix.wp }}
+      if: matrix.wp != '6.9'
+      run: |
+        composer require --dev --update-with-all-dependencies --prefer-dist --no-progress --no-interaction --ignore-platform-reqs roots/wordpress="~${{ matrix.wp }}.0" roots/wordpress-no-content="~${{ matrix.wp }}.0" wp-phpunit/wp-phpunit="~${{ matrix.wp }}.0"
 
     - name: Run the tests
       run: |

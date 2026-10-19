@@ -49,6 +49,12 @@ class Migrate_Command extends WP_CLI_Command {
 	 *   - false
 	 * ---
 	 *
+	 * [--post-type=<post-type>]
+	 * : Post type, or comma separated list of post types.
+	 * ---
+	 * default: post
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp authorship migrate wp-authors --dry-run=true
@@ -59,7 +65,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string> $args CLI arguments
 	 * @param array<string> $assoc_args CLI arguments
 	 */
-	public function wp_authors( $args, $assoc_args ) : void {
+	public function wp_authors( $args, $assoc_args ): void {
 		$posts_per_page = 100;
 		$paged = 1;
 		$count = 0;
@@ -79,6 +85,9 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::warning( 'Overwriting of previous Authorship data is set to true.' );
 		}
 
+		$post_types = explode( ',', $assoc_args['post-type'] );
+		WP_CLI::line( sprintf( 'Updating post types: %s', implode( ', ', $post_types ) ) );
+
 		$tax_query = $overwrite ? [] : [
 			[
 				'taxonomy' => 'authorship',
@@ -93,6 +102,7 @@ class Migrate_Command extends WP_CLI_Command {
 			$posts = get_posts( [
 				'posts_per_page'      => $posts_per_page,
 				'paged'               => $paged,
+				'post_type'           => $post_types,
 				'post_status'         => 'any',
 				'ignore_sticky_posts' => true,
 				'suppress_filters'    => false,
@@ -118,7 +128,7 @@ class Migrate_Command extends WP_CLI_Command {
 					\Authorship\set_authors( $post, [ intval( $post->post_author ) ] );
 				}
 
-				$count++;
+				++$count;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
@@ -128,11 +138,7 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
 			sleep( 2 );
 
-			// A normal run, don't need to paginate due to NOT EXISTS tax query.
-			// But for dry run or when overwriting, need to increment paged.
-			if ( $dry_run || $overwrite ) {
-				$paged++;
-			}
+			++$paged;
 		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
@@ -182,7 +188,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 * @param array<string> $args CLI arguments
 	 * @param array<string> $assoc_args CLI arguments
 	 */
-	function ppa( $args, $assoc_args ) : void {
+	public function ppa( $args, $assoc_args ): void {
 		if ( ! taxonomy_exists( 'author' ) ) {
 			// register the `author` taxonomy so that we can query for PPA author terms.
 			register_taxonomy( 'author', 'post' );
@@ -253,8 +259,8 @@ class Migrate_Command extends WP_CLI_Command {
 				// Usually invalid taxonomy, lets catch and report this.
 				if ( is_wp_error( $ppa_terms ) ) {
 					WP_CLI::error( 'There was an error fetching the PublishPress Author data, is the plugin activated?', false );
-					WP_CLI::error( $ppa_terms );
-					exit;
+					WP_CLI::error( $ppa_terms, false );
+					exit( 1 );
 				}
 
 				/**
@@ -282,7 +288,7 @@ class Migrate_Command extends WP_CLI_Command {
 					\Authorship\set_authors( $post, $new_authors );
 				}
 
-				$count++;
+				++$count;
 			}//end foreach
 
 			// Avoid memory exhaustion issues.
@@ -292,7 +298,7 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
 			sleep( 2 );
 
-			$paged++;
+			++$paged;
 		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
@@ -311,7 +317,7 @@ class Migrate_Command extends WP_CLI_Command {
 	 *
 	 * @return integer a user ID for this term, or -1 if not resolvable
 	 */
-	private function get_ppa_user_id( WP_Term $ppa_author, bool $create_users = false ) : int {
+	private function get_ppa_user_id( WP_Term $ppa_author, bool $create_users = false ): int {
 		/**
 		 * We need to get the user for Authorship so check if a
 		 * user is already mapped in PPA.
@@ -355,9 +361,9 @@ class Migrate_Command extends WP_CLI_Command {
 		// If this fails we want the debug data, so print out the
 		// arguments so we can reproduce later.
 		if ( is_wp_error( $ppa_user_id ) ) {
-			WP_CLI::error( 'Could not create Authorship user with these arguments:' );
-			WP_CLI::error( $ppa_user_id );
-			return -1;
+			WP_CLI::error( 'Could not create Authorship user with these arguments:', false );
+			WP_CLI::error( $ppa_user_id, false );
+			exit( 1 );
 		}
 
 		return $ppa_user_id;
@@ -373,9 +379,9 @@ class Migrate_Command extends WP_CLI_Command {
 	 *
 	 * @see https://github.com/Automattic/vip-go-mu-plugins/blob/master/vip-helpers/vip-caching.php#L733-L747
 	 */
-	private function reset_local_object_cache() : void {
+	private function reset_local_object_cache(): void {
 		/**
-		 * @var WP_Object_Cache
+		 * @var ?WP_Object_Cache
 		 */
 		global $wp_object_cache;
 
@@ -391,9 +397,7 @@ class Migrate_Command extends WP_CLI_Command {
 			$wp_object_cache->memcache_debug = [];
 		}
 
-		if ( isset( $wp_object_cache->cache ) ) {
-			$wp_object_cache->cache = [];
-		}
+		$wp_object_cache->cache = [];
 
 		if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
 			// important!

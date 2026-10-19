@@ -1,11 +1,11 @@
 # Authorship
 
-Stable tag: 0.2.16  
+Stable tag: 0.3.1  
 Requires at least: 5.4  
-Tested up to: 6.2  
-Requires PHP: 7.2  
+Tested up to: 6.9  
+Requires PHP: 8.2  
 License: GPL v3 or later  
-Contributors: johnbillion, humanmade  
+Contributors: johnbillion, humanmade
 
 A modern approach to author attribution in WordPress.
 
@@ -61,9 +61,10 @@ _Features without a checkmark are still work in progress._
 ### For development use
 
 * Clone this repo into your plugins directory
-* Install the dependencies:  
+* Ensure you have Composer v2 and Node v24 installed
+* Install the dependencies:
   `composer install && npm install`
-* Start the dev server:  
+* Start the dev server:
   `npm run start`
 
 ## Design Decisions
@@ -133,7 +134,7 @@ This endpoint allows:
 
 ### `authorship` field
 
-This field is added to the endpoint for all suported post types (by default, ones which that have post type support for `author`), for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of IDs of users attributed to the post.
+This field is added to the endpoint for all supported post types (by default, ones which that have post type support for `author`), for example `wp/v2/posts`. This field is readable and writable and accepts and provides an array of IDs of users attributed to the post.
 
 In addition, user objects are embedded in the `_embedded['wp:authorship']` field in the response if `_embed` is set and the authenticated user can list users.
 
@@ -213,6 +214,7 @@ Great care has been taken to ensure Authorship makes no changes to the user capa
 * Grant users who are attributed to a post the ability to edit that post if their capabilities allow it
 * Grant users the ability to create and assign guest authors to a post
 * Allow this behaviour to be changed at a granular level with custom capabilities
+* Prevent guest authors from logging in, using application passwords, or resetting their password, and log users out when they become a guest author
 
 ### Assigning Attribution
 
@@ -260,7 +262,7 @@ The following custom user capabilities are used by Authorship. These can be gran
 
 ## Contributing
 
-Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md) for more details.
+Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ## Team
 

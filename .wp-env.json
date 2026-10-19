@@ -1,0 +1,11 @@
+{
+	"port": 3001,
+	"testsEnvironment": false,
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_DISPLAY": false,
+		"WP_DEVELOPMENT_MODE": "plugin",
+		"SCRIPT_DEBUG": true
+	},
+	"plugins": [ "." ]
+}

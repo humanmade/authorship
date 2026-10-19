@@ -25,6 +25,9 @@
 
 		<!-- This sniff does not respect references in comments and documentation -->
 		<exclude name="PSR2R.Namespaces.UnusedUseStatement.UnusedUse"/>
+
+		<!-- See https://github.com/WordPress/WordPress-Coding-Standards/issues/2374 -->
+		<exclude name="HM.Security.EscapeOutput.ExceptionNotEscaped"/>
 	</rule>
 
 	<rule ref="Squiz.Commenting">
@@ -34,13 +37,9 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="authorship"/>
-		</properties>
-	</rule>
-
-	<rule ref="WordPress.WP.DeprecatedFunctions">
-		<properties>
-			<property name="minimum_supported_version" value="5.4"/>
+			<property name="text_domain" type="array">
+				<element value="authorship"/>
+			</property>
 		</properties>
 	</rule>
 </ruleset>

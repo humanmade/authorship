@@ -19,7 +19,7 @@ abstract class FeedTestCase extends TestCase {
 	 * @param string $url The URL to visit, eg. `/?feed=rss2`.
 	 * @return mixed[] The feed output as an array.
 	 */
-	public function go_to_feed( string $url ) : array {
+	public function go_to_feed( string $url ): array {
 		$this->go_to( $url );
 
 		ob_start();

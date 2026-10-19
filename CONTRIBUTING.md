@@ -71,13 +71,14 @@ These are the steps to take to release a new version of Authorship (for contribu
 1. If this is a non-patch release, check issues and PRs assigned to the patch or minor milestones that will get skipped. Reassign as necessary.
 1. Ensure you're on the `develop` branch and all the changes for this release have been merged in.
 1. Ensure `README.md` contains an up to date description, "Tested up to" version, FAQs, screenshots, etc.
-1. Run `composer test` and ensure everything passes.
-1. Prepare a changelog for [the Releases page on GitHub](https://github.com/humanmade/authorship/releases).
+    * **Note:** The double spaces at the end of the lines in the plugin header section at the top of README.md must be kept, to ensure line breaks are created.
+3. Run `composer test` and ensure everything passes.
+4. Prepare a changelog for [the Releases page on GitHub](https://github.com/humanmade/authorship/releases).
    - The `git changelog -x` command from [Git Extras](https://github.com/tj/git-extras) is handy for this.
 
 ### For Release
 
-1. Bump and commit the plugin version number using `npm run bump:{INCEMENTOR}`, eg: `npm run bump:patch`, `npm run bump:minor`, or `npm run bump:major`
+1. Bump and commit the plugin version number using `npm run bump:{INCREMENTOR}`, eg: `npm run bump:patch`, `npm run bump:minor`, or `npm run bump:major`
 1. Push to a new release branch, eg: `git checkout -b release-vxxx` and then `git push`
 1. Create a new pull-request from that branch, eg: `hub pull-request`
 1. Wait until (and ensure that) [the build passes](https://github.com/humanmade/authorship/actions)

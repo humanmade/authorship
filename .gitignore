@@ -1,7 +1,6 @@
 # Directories:
 
 /build/
-/lib/
 /node_modules/
 /tests/cache/
 /tests/wordpress/
@@ -10,3 +9,4 @@
 # Files:
 
 /tests/.env
+.phpunit.result.cache

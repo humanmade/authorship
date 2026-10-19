@@ -7,20 +7,21 @@ on:
 jobs:
   wordpress:
     name: Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - name: Setup Node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
       with:
         node-version-file: '.nvmrc'
+        cache: 'npm'
 
     - name: Install PHP
-      uses: shivammathur/setup-php@2.7.0
+      uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
       with:
-        php-version: 7.4
+        php-version: 8.2
         extensions: mysqli, xmlwriter
         coverage: none
         tools: composer:v2
@@ -28,14 +29,14 @@ jobs:
     - name: Get Composer Cache Directory
       id: composer-cache-dir
       run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
+        echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
     - name: Cache PHP Dependencies
       id: composer-cache
-      uses: actions/cache@v2
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
-        path: ${{ steps.composer-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-composer-7.4-${{ hashFiles('composer.lock') }}
+        path: ${{ steps.composer-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-composer-8.2-${{ hashFiles('composer.lock') }}
 
     - name: Install PHP Dependencies
       run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
@@ -43,16 +44,16 @@ jobs:
     - name: Get npm cache directory
       id: npm-cache-dir
       run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-        echo "::set-output name=npm-version::$(npm -v)"
-        echo "::set-output name=node-version::$(node -v)"
+        echo "DIR=$(npm config get cache)" >> $GITHUB_OUTPUT
+        echo "NPM_VERSION=$(npm -v)" >> $GITHUB_OUTPUT
+        echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
 
     - name: Cache JS Dependencies
       id: npm-cache
-      uses: actions/cache@v2
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
       with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
-        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.node-version }}-${{ steps.npm-cache-dir.outputs.npm-version }}-${{ hashFiles('package-lock.json') }}
+        path: ${{ steps.npm-cache-dir.outputs.DIR }}
+        key: ${{ runner.os }}-npm-${{ steps.npm-cache-dir.outputs.NODE_VERSION }}-${{ steps.npm-cache-dir.outputs.NPM_VERSION }}-${{ hashFiles('package-lock.json') }}
 
     - name: Install JS Dependencies
       run: npm install --legacy-peer-deps
@@ -70,7 +71,6 @@ jobs:
         git config user.email github-actions@github.com
         git checkout -b "release-$VERSION"
         git add -f build/*
-        git add -f lib/*
         git commit -m "Release $VERSION"
         git tag "$VERSION"
         git push --tags

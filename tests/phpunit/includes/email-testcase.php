@@ -20,13 +20,13 @@ abstract class EmailTestCase extends TestCase {
 	 */
 	protected $mailer = null;
 
-	public function setUp() : void {
+	public function setUp(): void {
 		parent::setUp();
 		reset_phpmailer_instance();
 		$this->mailer = tests_retrieve_phpmailer_instance();
 	}
 
-	public function tearDown() : void {
+	public function tearDown(): void {
 		$this->mailer = null;
 		reset_phpmailer_instance();
 		parent::tearDown();

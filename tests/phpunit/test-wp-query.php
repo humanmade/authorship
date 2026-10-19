@@ -9,12 +9,12 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
-use const Authorship\POSTS_PARAM;
-
 use WP_Query;
 
+use const Authorship\POSTS_PARAM;
+
 class TestWPQuery extends TestCase {
-	public function testQueryForAuthorReturnsPostsAttributedToAuthor() : void {
+	public function testQueryForAuthorReturnsPostsAttributedToAuthor(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -97,7 +97,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueriedObjectIsRetainedAfterQueryingForAuthor() : void {
+	public function testQueriedObjectIsRetainedAfterQueryingForAuthor(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -141,7 +141,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryForInvalidAuthorReturnsNoResults() : void {
+	public function testQueryForInvalidAuthorReturnsNoResults(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
@@ -177,14 +177,15 @@ class TestWPQuery extends TestCase {
 				$posts,
 				"Post count for {$test_key} query is incorrect."
 			);
-			$this->assertFalse(
+			// WordPress 7.1+ returns null rather than false for an invalid author.
+			$this->assertEmpty(
 				$query->get_queried_object(),
 				"Queried object for {$test_key} query is incorrect."
 			);
 		}
 	}
 
-	public function testQueryOverridesDoNotAffectPostTypesThatDoNotSupportAuthor() : void {
+	public function testQueryOverridesDoNotAffectPostTypesThatDoNotSupportAuthor(): void {
 		$factory = self::factory()->post;
 
 		register_post_type( 'testing', [
@@ -231,7 +232,7 @@ class TestWPQuery extends TestCase {
 		}
 	}
 
-	public function testQueryVarsRemainUnaffectedAfterQuery() : void {
+	public function testQueryVarsRemainUnaffectedAfterQuery(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor.
@@ -282,7 +283,7 @@ class TestWPQuery extends TestCase {
 		$this->assertSame( [ self::$users['author']->ID ], $query->get( 'author__not_in' ) );
 	}
 
-	public function testSubsequentQueriesAreUnaffected() : void {
+	public function testSubsequentQueriesAreUnaffected(): void {
 		$factory = self::factory()->post;
 
 		// Attributed to Editor.

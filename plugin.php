@@ -9,7 +9,7 @@
  *
  * Plugin Name:  Authorship
  * Description:  Authorship plugin for WordPress.
- * Version:      0.2.16
+ * Version:      0.3.1
  * Plugin URI:   https://github.com/humanmade/authorship
  * Author:       Human Made, initially funded by Siemens.
  * Author URI:   https://humanmade.com/
@@ -35,14 +35,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Only load asset-loader if it's not loaded already.
-if ( ! defined( 'Asset_Loader\\LOADED' ) ) {
-	require_once __DIR__ . '/lib/asset-loader/asset-loader.php';
-}
-
 require_once __DIR__ . '/inc/namespace.php';
 require_once __DIR__ . '/inc/taxonomy.php';
 require_once __DIR__ . '/inc/class-users-controller.php';
+require_once __DIR__ . '/inc/class-insert-post-handler.php';
 require_once __DIR__ . '/inc/template.php';
 
 if ( is_admin() ) {

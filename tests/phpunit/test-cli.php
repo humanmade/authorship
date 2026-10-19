@@ -21,37 +21,58 @@ class TestCLI extends TestCase {
 		CLI\bootstrap();
 	}
 
-	public function testMigrateWpAuthorsPagination() : void {
+	public function testMigratePostTypePost(): void {
 		$factory = self::factory()->post;
-		$posts = [];
 
-		for ( $i = 0; $i < 200; $i++ ) {
-			$posts[] = $factory->create_and_get( [
-				'post_author' => self::$users['admin']->ID,
-				POSTS_PARAM   => [
-					self::$users['editor']->ID,
-				],
-			] );
-		}
-
-		$paged_post = $posts[100]; // Any post from second page of results.
-		$authorship_authors = \Authorship\get_authors( $paged_post );
-
-		// Asset initial authorship authors set correctly.
-		$this->assertCount( 1, $authorship_authors );
-		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
-
-		// Migrate, overwriting authorship data with WP Author data.
-		$command = new CLI\Migrate_Command;
-		$command->wp_authors( [], [
-			'dry-run' => false,
-			'overwrite' => true,
-			'post-type' => 'post', // Must set default value manually.
+		// Post. Owned by editor, attributed to nobody.
+		$post1 = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
 		] );
 
-		// Verify author data migrated correctly.
-		$authorship_authors = \Authorship\get_authors( $paged_post->ID );
+		// Unset author data.
+		wp_set_post_terms( $post1->ID, [], TAXONOMY );
+
+		// Check initial authorship data unset.
+		$authorship_authors = \Authorship\get_authors( $post1 );
+		$this->assertCount( 0, $authorship_authors );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'post-type' => 'post', // Note, have to set default values manually.
+		] );
+
+		// Check migration command has correctly set the author.
+		$authorship_authors = \Authorship\get_authors( $post1 );
 		$this->assertCount( 1, $authorship_authors );
-		$this->assertSame( self::$users['admin']->ID, $authorship_authors[0]->ID );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
+	}
+
+	public function testMigratePostTypePage(): void {
+		$factory = self::factory()->post;
+
+		// Page. Owned by editor, attributed to nobody.
+		$page1 = $factory->create_and_get( [
+			'post_author' => self::$users['editor']->ID,
+			'post_type' => 'page',
+		] );
+
+		// Unset author data.
+		wp_set_post_terms( $page1->ID, [], TAXONOMY );
+
+		// Check initial authorship data unset.
+		$authorship_authors = \Authorship\get_authors( $page1 );
+		$this->assertCount( 0, $authorship_authors );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'post-type' => 'post,page',
+		] );
+
+		// Check migration command has correctly set the author.
+		$authorship_authors = \Authorship\get_authors( $page1 );
+		$this->assertCount( 1, $authorship_authors );
+		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
 }
