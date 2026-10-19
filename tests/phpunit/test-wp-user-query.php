@@ -143,4 +143,20 @@ class TestWPUserQuery extends TestCase {
 
 		$this->assertNotContains( $subscriber_id, self::get_user_ids( [ 'post' ] ) );
 	}
+
+	public function testAuthorTermNamesAreIgnored(): void {
+		$editor_id = self::$users['editor']->ID;
+		$subscriber_id = self::$users['subscriber']->ID;
+
+		// Author term names follow the display name, which can look like another user's ID.
+		wp_update_user( [
+			'ID'           => $editor_id,
+			'display_name' => (string) $subscriber_id,
+		] );
+
+		$user_ids = self::get_user_ids( [ 'post' ] );
+
+		$this->assertContains( $editor_id, $user_ids );
+		$this->assertNotContains( $subscriber_id, $user_ids );
+	}
 }
