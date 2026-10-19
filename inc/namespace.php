@@ -21,6 +21,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 use WP_Session_Tokens;
+use WP_Term;
 use WP_User;
 
 const GUEST_ROLE = 'guest-author';
@@ -47,6 +48,7 @@ function bootstrap(): void {
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
 	add_action( 'set_user_role', __NAMESPACE__ . '\\action_set_user_role', 10, 2 );
+	add_action( 'profile_update', __NAMESPACE__ . '\\update_author_term_name' );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -57,10 +59,76 @@ function bootstrap(): void {
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
+	add_filter( 'wp_send_new_user_notification_to_user', __NAMESPACE__ . '\\filter_wp_send_new_user_notification_to_user', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
 	add_filter( 'wp_authenticate_user', __NAMESPACE__ . '\\filter_wp_authenticate_user' );
 	add_filter( 'wp_is_application_passwords_available_for_user', __NAMESPACE__ . '\\filter_application_passwords_available_for_user', 10, 2 );
 	add_filter( 'allow_password_reset', __NAMESPACE__ . '\\filter_allow_password_reset', 10, 2 );
+	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\filter_wp_insert_term_data', 10, 3 );
+}
+
+/**
+ * Set term name to user display name on term creation.
+ *
+ * @param array{'name': string, 'slug': string, 'term_group': int}                        $data Term data.
+ * @param string                                                                          $taxonomy Taxonomy.
+ * @param array{'alias_of': string, 'description': string, 'parent': int, 'slug': string} $args Term args
+ *
+ * @return array{'name': string, 'slug': string, 'term_group': int}
+ */
+function filter_wp_insert_term_data( array $data, string $taxonomy, array $args ): array {
+	if ( $taxonomy !== TAXONOMY ) {
+		return $data;
+	}
+
+	// Author term slugs are user IDs.
+	if ( ! ctype_digit( $data['slug'] ) ) {
+		return $data;
+	}
+
+	$user_id = (int) $data['slug'];
+
+	$user = get_userdata( $user_id );
+	if ( ! $user instanceof WP_User ) {
+		return $data;
+	}
+
+	$data['name'] = $user->display_name;
+	return $data;
+}
+
+/**
+ * Sync author term name with user display name.
+ *
+ * Uses the saved display name rather than the raw user data passed to the hook, which may
+ * be missing the display name or contain unsanitized input.
+ *
+ * @param int $user_id User ID.
+ * @return void
+ */
+function update_author_term_name( int $user_id ): void {
+	$term = get_term_by( 'slug', (string) $user_id, TAXONOMY );
+
+	// User doesn't exist in authorship taxonomy.
+	if ( ! $term instanceof WP_Term ) {
+		return;
+	}
+
+	$user = get_userdata( $user_id );
+
+	if ( ! $user instanceof WP_User || $user->display_name === '' ) {
+		return;
+	}
+
+	// User display name hasn't changed.
+	if ( $term->name === $user->display_name ) {
+		return;
+	}
+
+	// `wp_update_term()` expects slashed data.
+	wp_update_term( $term->term_id, TAXONOMY, [
+		'name' => wp_slash( $user->display_name ),
+	] );
 }
 
 /**
@@ -840,4 +908,22 @@ function hide_quickedit_authors( array $options ): array {
 	$options['hide_if_only_one_author'] = true;
 	$options['include'] = [ 0 ];
 	return $options;
+}
+
+/**
+ * Prevents the new user notification from being sent to a user without an email address.
+ *
+ * Guest authors can be added without an email address. Bailing early also avoids generating
+ * an unused password reset key.
+ *
+ * @param mixed   $send Whether to send the email. Not type hinted, as other filters may return a non-boolean value.
+ * @param WP_User $user The new user.
+ * @return mixed Whether to send the email.
+ */
+function filter_wp_send_new_user_notification_to_user( $send, WP_User $user ) {
+	if ( $user->user_email === '' ) {
+		return false;
+	}
+
+	return $send;
 }
