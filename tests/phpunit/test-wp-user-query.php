@@ -1,6 +1,6 @@
 <?php
 /**
- * WP_Query tests.
+ * WP_User_Query tests.
  *
  * @package authorship
  */
@@ -9,17 +9,19 @@ declare( strict_types=1 );
 
 namespace Authorship\Tests;
 
+use WP_User_Query;
+
 use const Authorship\GUEST_ROLE;
 use const Authorship\POSTS_PARAM;
 
-use WP_User_Query;
-
 class TestWPUserQuery extends TestCase {
-	public function testQueryForAuthorWithPublishedPostsReturnsAttributedAuthors() : void {
+	public function setUp(): void {
+		parent::setUp();
+
 		$factory = self::factory()->post;
 
 		// Attributed to Editor, owned by Admin.
-		$factory->create_and_get( [
+		$factory->create( [
 			'post_author' => self::$users['admin']->ID,
 			'post_status' => 'publish',
 			POSTS_PARAM   => [
@@ -28,7 +30,7 @@ class TestWPUserQuery extends TestCase {
 		] );
 
 		// Attributed to Editor, owned by nobody.
-		$factory->create_and_get( [
+		$factory->create( [
 			'post_status' => 'publish',
 			POSTS_PARAM   => [
 				self::$users['editor']->ID,
@@ -36,7 +38,7 @@ class TestWPUserQuery extends TestCase {
 		] );
 
 		// Attributed to Guest, owned by Author.
-		$factory->create_and_get( [
+		$factory->create( [
 			'post_author' => self::$users['author']->ID,
 			'post_status' => 'publish',
 			POSTS_PARAM   => [
@@ -44,102 +46,101 @@ class TestWPUserQuery extends TestCase {
 			],
 		] );
 
-		// Attributed to Guest, owned by Admin.
-		$factory->create_and_get( [
+		// Attributed to Contributor, but not published.
+		$factory->create( [
 			'post_author' => self::$users['admin']->ID,
-			'post_status' => 'publish',
+			'post_status' => 'draft',
 			POSTS_PARAM   => [
-				self::$users[ GUEST_ROLE ]->ID,
+				self::$users['contributor']->ID,
 			],
 		] );
 
-		// Owned by Author.
-		$factory->create_and_get( [
+		// Owned by Author, in a post type that Authorship doesn't support.
+		$factory->create( [
 			'post_author' => self::$users['author']->ID,
 			'post_status' => 'publish',
 			'post_type'   => 'test_cpt_no_author',
 		] );
 
-		// Owned by Admin.
-		$factory->create_and_get( [
+		// Owned by Admin, in a post type that Authorship doesn't support.
+		$factory->create( [
 			'post_author' => self::$users['admin']->ID,
 			'post_status' => 'publish',
 			'post_type'   => 'test_cpt_no_author',
 		] );
-
-		$common_args = [
-			'fields'  => 'ID',
-			'orderby' => 'ID',
-			'order'   => 'ASC',
-		];
-
-		// Queries for attributed published post types.
-		$test_args = [
-			'has_published_posts' => [ 'post' ],
-		];
-
-		foreach ( $test_args as $test_key => $test_value ) {
-			$args = array_merge( $common_args, [
-				$test_key => $test_value,
-			] );
-
-			$query = new WP_User_Query( $args );
-			$users = (array) $query->get_results();
-			$users = array_map( 'absint', $users );
-
-			$this->assertSame(
-				[ self::$users['editor']->ID, self::$users[ GUEST_ROLE ]->ID ],
-				$users,
-				"User IDs for attributed {$test_key} query are incorrect."
-			);
-		}
-
-		// Queries for non attributed published post types.
-		$test_args = [
-			'has_published_posts' => [ 'test_cpt_no_author' ],
-		];
-
-		foreach ( $test_args as $test_key => $test_value ) {
-			$args = array_merge( $common_args, [
-				$test_key => $test_value,
-			] );
-
-			$query = new WP_User_Query( $args );
-			$users = (array) $query->get_results();
-			$users = array_map( 'absint', $users );
-
-			$this->assertSame(
-				[ self::$users['admin']->ID, self::$users['author']->ID ],
-				$users,
-				"User IDs for non attributed {$test_key} query are incorrect."
-			);
-		}
-
-		// Queries for non attributed published post types.
-		$test_args = [
-			'has_published_posts' => [ 'post', 'test_cpt_no_author' ],
-		];
-
-		foreach ( $test_args as $test_key => $test_value ) {
-			$args = array_merge( $common_args, [
-				$test_key => $test_value,
-			] );
-
-			$query = new WP_User_Query( $args );
-			$users = (array) $query->get_results();
-			$users = array_map( 'absint', $users );
-
-			$this->assertSame(
-				[
-					self::$users['admin']->ID,
-					self::$users['editor']->ID,
-					self::$users['author']->ID,
-					self::$users[ GUEST_ROLE ]->ID,
-				],
-				$users,
-				"User IDs for combined attributed and non-attributed {$test_key} query are incorrect."
-			);
-		}
 	}
 
+	/**
+	 * @param bool|string[] $has_published_posts
+	 * @return int[]
+	 */
+	private static function get_user_ids( $has_published_posts ): array {
+		$query = new WP_User_Query( [
+			'fields'              => 'ID',
+			'orderby'             => 'ID',
+			'order'               => 'ASC',
+			'has_published_posts' => $has_published_posts,
+		] );
+
+		return array_map( 'intval', $query->get_results() );
+	}
+
+	public function testQueryForSupportedPostTypeReturnsAttributedAuthors(): void {
+		$this->assertSame(
+			[
+				self::$users['editor']->ID,
+				self::$users[ GUEST_ROLE ]->ID,
+			],
+			self::get_user_ids( [ 'post' ] )
+		);
+	}
+
+	public function testQueryForUnsupportedPostTypeReturnsPostAuthors(): void {
+		$this->assertSame(
+			[
+				self::$users['admin']->ID,
+				self::$users['author']->ID,
+			],
+			self::get_user_ids( [ 'test_cpt_no_author' ] )
+		);
+	}
+
+	public function testQueryForMixedPostTypesReturnsBoth(): void {
+		$this->assertSame(
+			[
+				self::$users['admin']->ID,
+				self::$users['editor']->ID,
+				self::$users['author']->ID,
+				self::$users[ GUEST_ROLE ]->ID,
+			],
+			self::get_user_ids( [ 'post', 'test_cpt_no_author' ] )
+		);
+	}
+
+	public function testQueryForAllPublicPostTypesReturnsBoth(): void {
+		$this->assertSame(
+			[
+				self::$users['admin']->ID,
+				self::$users['editor']->ID,
+				self::$users['author']->ID,
+				self::$users[ GUEST_ROLE ]->ID,
+			],
+			self::get_user_ids( true )
+		);
+	}
+
+	public function testTermsFromOtherTaxonomiesAreIgnored(): void {
+		$subscriber_id = self::$users['subscriber']->ID;
+
+		// A tag whose slug matches a user ID.
+		self::factory()->post->create( [
+			'post_status' => 'publish',
+			'tags_input'  => [ (string) $subscriber_id ],
+			POSTS_PARAM   => [
+				self::$users['editor']->ID,
+			],
+		] );
+
+		$this->assertNotContains( $subscriber_id, self::get_user_ids( [ 'post' ] ) );
+	}
 }
