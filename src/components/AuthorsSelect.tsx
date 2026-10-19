@@ -145,10 +145,15 @@ const AuthorsSelect = ( props: AuthorsSelectProps ): ReactElement => {
 			setSelected( options );
 			// eslint-disable-next-line @typescript-eslint/no-shadow
 			onUpdate( options.map( option => option.value ) );
-		} ).catch( ( errorResponse: Response ) => {
-			errorResponse.json().then( response => {
-				onError( response.message );
-			} );
+		} ).catch( ( error: WP_REST_API_Error | Response ) => {
+			if ( error instanceof Response ) {
+				error.json().then( ( response: WP_REST_API_Error ) => {
+					onError( response.message );
+				} );
+				return;
+			}
+
+			onError( error.message );
 		} );
 	};
 
