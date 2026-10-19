@@ -32,6 +32,18 @@ class TestNewUserNotification extends EmailTestCase {
 	}
 
 	public function testNotificationIsSentToUserWithEmail(): void {
+		$user_id = self::factory()->user->create( [
+			'role' => 'author',
+			'user_email' => 'author.notified@example.org',
+		] );
+
+		wp_new_user_notification( $user_id, null, 'user' );
+
+		$this->assertCount( 1, $this->mailer->mock_sent );
+		$this->assertSame( 'author.notified@example.org', $this->mailer->get_recipient( 'to', 0 )->address );
+	}
+
+	public function testNotificationIsNotSentToGuestAuthorWithEmail(): void {
 		$guest_id = self::factory()->user->create( [
 			'role' => GUEST_ROLE,
 			'user_email' => 'guest.notified@example.org',
@@ -39,7 +51,7 @@ class TestNewUserNotification extends EmailTestCase {
 
 		wp_new_user_notification( $guest_id, null, 'user' );
 
-		$this->assertCount( 1, $this->mailer->mock_sent );
-		$this->assertSame( 'guest.notified@example.org', $this->mailer->get_recipient( 'to', 0 )->address );
+		// Guest authors can't reset their password, so there's no link to send them.
+		$this->assertCount( 0, $this->mailer->mock_sent );
 	}
 }
