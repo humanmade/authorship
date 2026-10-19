@@ -75,4 +75,81 @@ class TestCLI extends TestCase {
 		$this->assertCount( 1, $authorship_authors );
 		$this->assertSame( self::$users['editor']->ID, $authorship_authors[0]->ID );
 	}
+
+	/**
+	 * Creates more posts than the command processes in one batch, all owned by Admin.
+	 *
+	 * @param int[] $authors Authorship authors to attribute each post to, or an empty array for none.
+	 * @return int[] Post IDs.
+	 */
+	private static function create_batch_of_posts( array $authors ): array {
+		$post_ids = self::factory()->post->create_many( 150, [
+			'post_author' => self::$users['admin']->ID,
+		] );
+
+		foreach ( $post_ids as $post_id ) {
+			wp_set_post_terms( $post_id, array_map( 'strval', $authors ), TAXONOMY );
+		}
+
+		return $post_ids;
+	}
+
+	/**
+	 * @param int[] $post_ids
+	 * @return int[][] Authorship author IDs for each post.
+	 */
+	private static function get_author_ids_for_posts( array $post_ids ): array {
+		return array_map( function ( int $post_id ): array {
+			return \Authorship\get_author_ids( get_post( $post_id ) );
+		}, $post_ids );
+	}
+
+	public function testMigrateWpAuthorsDryRunProcessesEveryBatchWithoutChanges(): void {
+		$post_ids = self::create_batch_of_posts( [] );
+
+		$this->expectOutputRegex( '/Processed 150 posts/' );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => true,
+			'post-type' => 'post',
+		] );
+
+		$this->assertSame( array_fill( 0, 150, [] ), self::get_author_ids_for_posts( $post_ids ) );
+	}
+
+	public function testMigrateWpAuthorsMigratesEveryBatch(): void {
+		$post_ids = self::create_batch_of_posts( [] );
+
+		$this->expectOutputRegex( '/Processed 150 posts/' );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'post-type' => 'post',
+		] );
+
+		$this->assertSame(
+			array_fill( 0, 150, [ self::$users['admin']->ID ] ),
+			self::get_author_ids_for_posts( $post_ids )
+		);
+	}
+
+	public function testMigrateWpAuthorsOverwritesEveryBatch(): void {
+		$post_ids = self::create_batch_of_posts( [ self::$users['editor']->ID ] );
+
+		$this->expectOutputRegex( '/Processed 150 posts/' );
+
+		$command = new CLI\Migrate_Command();
+		$command->wp_authors( [], [
+			'dry-run' => false,
+			'overwrite-authors' => true,
+			'post-type' => 'post',
+		] );
+
+		$this->assertSame(
+			array_fill( 0, 150, [ self::$users['admin']->ID ] ),
+			self::get_author_ids_for_posts( $post_ids )
+		);
+	}
 }

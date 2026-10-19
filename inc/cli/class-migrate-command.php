@@ -138,7 +138,11 @@ class Migrate_Command extends WP_CLI_Command {
 			WP_CLI::line( sprintf( 'Processed %d posts, pausing for a breath...', $count ) );
 			sleep( 2 );
 
-			++$paged;
+			// Migrated posts drop out of the NOT EXISTS tax query, so the next batch is always on the first page.
+			// Dry runs and overwrites don't change which posts match, so they need to move to the next page.
+			if ( $dry_run || $overwrite ) {
+				++$paged;
+			}
 		} while ( count( $posts ) );
 
 		if ( true === $dry_run ) {
