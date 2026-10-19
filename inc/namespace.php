@@ -20,10 +20,10 @@ use WP_Query;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Session_Tokens;
+use WP_Term;
 use WP_User;
 use WP_User_Query;
-
-use function Asset_Loader\enqueue_asset;
 
 const GUEST_ROLE = 'guest-author';
 const POSTS_PARAM = 'authorship';
@@ -37,7 +37,7 @@ const STYLE_HANDLE = 'authorship-css';
 /**
  * Bootstraps the main actions and filters.
  */
-function bootstrap() : void {
+function bootstrap(): void {
 	$insert_post_handler = new InsertPostHandler();
 
 	// Actions.
@@ -49,6 +49,8 @@ function bootstrap() : void {
 	add_action( 'pre_user_query', __NAMESPACE__ . '\\action_reference_pre_user_query', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
+	add_action( 'set_user_role', __NAMESPACE__ . '\\action_set_user_role', 10, 2 );
+	add_action( 'profile_update', __NAMESPACE__ . '\\update_author_term_name' );
 
 	// Filters.
 	add_filter( 'wp_insert_post_data', [ $insert_post_handler, 'filter_wp_insert_post_data' ], 10, 3 );
@@ -59,7 +61,76 @@ function bootstrap() : void {
 	add_filter( 'the_author', __NAMESPACE__ . '\\filter_the_author_for_rss' );
 	add_filter( 'comment_moderation_recipients', __NAMESPACE__ . '\\filter_comment_moderation_recipients', 10, 2 );
 	add_filter( 'comment_notification_recipients', __NAMESPACE__ . '\\filter_comment_notification_recipients', 10, 2 );
+	add_filter( 'wp_send_new_user_notification_to_user', __NAMESPACE__ . '\\filter_wp_send_new_user_notification_to_user', 10, 2 );
 	add_filter( 'quick_edit_dropdown_authors_args', __NAMESPACE__ . '\\hide_quickedit_authors' );
+	add_filter( 'wp_authenticate_user', __NAMESPACE__ . '\\filter_wp_authenticate_user' );
+	add_filter( 'wp_is_application_passwords_available_for_user', __NAMESPACE__ . '\\filter_application_passwords_available_for_user', 10, 2 );
+	add_filter( 'allow_password_reset', __NAMESPACE__ . '\\filter_allow_password_reset', 10, 2 );
+	add_filter( 'wp_insert_term_data', __NAMESPACE__ . '\\filter_wp_insert_term_data', 10, 3 );
+}
+
+/**
+ * Set term name to user display name on term creation.
+ *
+ * @param array{'name': string, 'slug': string, 'term_group': int}                        $data Term data.
+ * @param string                                                                          $taxonomy Taxonomy.
+ * @param array{'alias_of': string, 'description': string, 'parent': int, 'slug': string} $args Term args
+ *
+ * @return array{'name': string, 'slug': string, 'term_group': int}
+ */
+function filter_wp_insert_term_data( array $data, string $taxonomy, array $args ): array {
+	if ( $taxonomy !== TAXONOMY ) {
+		return $data;
+	}
+
+	// Author term slugs are user IDs.
+	if ( ! ctype_digit( $data['slug'] ) ) {
+		return $data;
+	}
+
+	$user_id = (int) $data['slug'];
+
+	$user = get_userdata( $user_id );
+	if ( ! $user instanceof WP_User ) {
+		return $data;
+	}
+
+	$data['name'] = $user->display_name;
+	return $data;
+}
+
+/**
+ * Sync author term name with user display name.
+ *
+ * Uses the saved display name rather than the raw user data passed to the hook, which may
+ * be missing the display name or contain unsanitized input.
+ *
+ * @param int $user_id User ID.
+ * @return void
+ */
+function update_author_term_name( int $user_id ): void {
+	$term = get_term_by( 'slug', (string) $user_id, TAXONOMY );
+
+	// User doesn't exist in authorship taxonomy.
+	if ( ! $term instanceof WP_Term ) {
+		return;
+	}
+
+	$user = get_userdata( $user_id );
+
+	if ( ! $user instanceof WP_User || $user->display_name === '' ) {
+		return;
+	}
+
+	// User display name hasn't changed.
+	if ( $term->name === $user->display_name ) {
+		return;
+	}
+
+	// `wp_update_term()` expects slashed data.
+	wp_update_term( $term->term_id, TAXONOMY, [
+		'name' => wp_slash( $user->display_name ),
+	] );
 }
 
 /**
@@ -67,7 +138,7 @@ function bootstrap() : void {
  *
  * @return string[] List of post types to support.
  */
-function get_supported_post_types() : array {
+function get_supported_post_types(): array {
 	$post_types = get_post_types_by_support( 'author' );
 
 	/**
@@ -84,7 +155,7 @@ function get_supported_post_types() : array {
  * @param string $post_type Post type to check.
  * @return boolean
  */
-function is_post_type_supported( string $post_type ) : bool {
+function is_post_type_supported( string $post_type ): bool {
 	return in_array( $post_type, get_supported_post_types(), true );
 }
 
@@ -94,7 +165,7 @@ function is_post_type_supported( string $post_type ) : bool {
  * @param string|null $display_name The author's display name.
  * @return string|null The author's display name.
  */
-function filter_the_author_for_rss( ?string $display_name ) : ?string {
+function filter_the_author_for_rss( ?string $display_name ): ?string {
 	if ( ! is_feed( 'rss2' ) ) {
 		return $display_name;
 	}
@@ -117,7 +188,7 @@ function filter_the_author_for_rss( ?string $display_name ) : ?string {
  * @param mixed[]  $args    The context for the cap, typically with the object ID as the first element.
  * @return string[] Array of the user's capabilities.
  */
-function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id, array $args ) : array {
+function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id, array $args ): array {
 	$concerns = [
 		'delete_post',
 		'delete_page',
@@ -239,7 +310,7 @@ function filter_map_meta_cap_for_editing( array $caps, string $cap, int $user_id
  * @param WP_User  $user          Concerned user object.
  * @return bool[] Array of concerned user's capabilities.
  */
-function filter_user_has_cap( array $user_caps, array $required_caps, array $args, WP_User $user ) : array {
+function filter_user_has_cap( array $user_caps, array $required_caps, array $args, WP_User $user ): array {
 	$cap = $args[0];
 
 	switch ( $cap ) {
@@ -287,7 +358,7 @@ function filter_user_has_cap( array $user_caps, array $required_caps, array $arg
  *
  * @param WP $wp Current WordPress environment instance.
  */
-function action_wp( WP $wp ) : void {
+function action_wp( WP $wp ): void {
 	if ( is_author() ) {
 		$GLOBALS['authordata'] = get_userdata( get_query_var( 'author' ) );
 	}
@@ -296,8 +367,62 @@ function action_wp( WP $wp ) : void {
 /**
  * Fires after WordPress has finished loading but before any headers are sent.
  */
-function register_roles_and_caps() : void {
+function register_roles_and_caps(): void {
 	add_role( GUEST_ROLE, __( 'Guest Author', 'authorship' ), [] );
+}
+
+/**
+ * Prevents guest authors from logging in.
+ *
+ * @param WP_User|WP_Error $user The user being authenticated, or an error.
+ * @return WP_User|WP_Error The user, or an error if they are a guest author.
+ */
+function filter_wp_authenticate_user( $user ) {
+	if ( $user instanceof WP_User && in_array( GUEST_ROLE, $user->roles, true ) ) {
+		return new WP_Error( 'authorship_guest_author_login', __( 'Guest authors cannot log in.', 'authorship' ) );
+	}
+
+	return $user;
+}
+
+/**
+ * Prevents guest authors from using application passwords.
+ *
+ * @param bool    $available Whether application passwords are available to the user.
+ * @param WP_User $user      The user.
+ * @return bool Whether application passwords are available to the user.
+ */
+function filter_application_passwords_available_for_user( bool $available, WP_User $user ): bool {
+	return $available && ! in_array( GUEST_ROLE, $user->roles, true );
+}
+
+/**
+ * Prevents guest authors from resetting their password.
+ *
+ * @param bool|WP_Error $allow   Whether the user can reset their password, or an error.
+ * @param int           $user_id The user ID.
+ * @return bool|WP_Error Whether the user can reset their password, or an error.
+ */
+function filter_allow_password_reset( $allow, int $user_id ) {
+	$user = get_userdata( $user_id );
+
+	if ( $user && in_array( GUEST_ROLE, $user->roles, true ) ) {
+		return false;
+	}
+
+	return $allow;
+}
+
+/**
+ * Logs a user out everywhere when they become a guest author.
+ *
+ * @param int    $user_id The user ID.
+ * @param string $role    The new role.
+ */
+function action_set_user_role( int $user_id, string $role ): void {
+	if ( GUEST_ROLE === $role ) {
+		WP_Session_Tokens::get_instance( $user_id )->destroy_all();
+	}
 }
 
 /**
@@ -341,12 +466,12 @@ function filter_rest_request_after_callbacks( $result, array $handler, WP_REST_R
  *
  * @param WP_REST_Server $server Server object.
  */
-function register_rest_api_fields( WP_REST_Server $server ) : void {
+function register_rest_api_fields( WP_REST_Server $server ): void {
 	$post_types = get_supported_post_types();
 
 	array_walk( $post_types, __NAMESPACE__ . '\\register_rest_api_field' );
 
-	$users_controller = new Users_Controller;
+	$users_controller = new Users_Controller();
 	$users_controller->register_routes();
 }
 
@@ -359,7 +484,7 @@ function register_rest_api_fields( WP_REST_Server $server ) : void {
  * @param string          $post_type The post type name.
  * @return WP_Error|null Null if the validation passes, `WP_Error` instance otherwise.
  */
-function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ) :? WP_Error {
+function validate_authors( $authors, WP_REST_Request $request, string $param, string $post_type ): ?WP_Error {
 	$schema_validation = rest_validate_request_arg( $authors, $request, $param );
 
 	if ( is_wp_error( $schema_validation ) ) {
@@ -404,24 +529,24 @@ function validate_authors( $authors, WP_REST_Request $request, string $param, st
  *
  * @param string $post_type The post type name.
  */
-function register_rest_api_field( string $post_type ) : void {
-	$validate_callback = function( $authors, WP_REST_Request $request, string $param ) use ( $post_type ) :? WP_Error {
+function register_rest_api_field( string $post_type ): void {
+	$validate_callback = function ( $authors, WP_REST_Request $request, string $param ) use ( $post_type ): ?WP_Error {
 		return validate_authors( $authors, $request, $param, $post_type );
 	};
 
 	register_rest_field( $post_type, REST_PARAM, [
-		'get_callback' => function( array $post ) : array {
+		'get_callback' => function ( array $post ): array {
 			$post = get_post( $post['id'] );
 
 			if ( ! $post ) {
 				return [];
 			}
 
-			return array_map( function( WP_User $user ) : int {
+			return array_map( function ( WP_User $user ): int {
 				return $user->ID;
 			}, get_authors( $post ) );
 		},
-		'update_callback' => function( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ) :? WP_Error {
+		'update_callback' => function ( $value, WP_Post $post, string $field, WP_REST_Request $request, string $post_type ): ?WP_Error {
 			try {
 				set_authors( $post, wp_parse_id_list( $value ) );
 			} catch ( Exception $e ) {
@@ -460,7 +585,7 @@ function register_rest_api_field( string $post_type ) : void {
  * @param WP_REST_Request  $request  Request object.
  * @return WP_REST_Response The response object.
  */
-function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) : WP_REST_Response {
+function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ): WP_REST_Response {
 	$links = $response->get_links();
 
 	if ( isset( $links['https://api.w.org/action-assign-author'] ) ) {
@@ -474,10 +599,10 @@ function rest_prepare_post( WP_REST_Response $response, WP_Post $post, WP_REST_R
 /**
  * Filters extra CURIEs available on REST API responses.
  *
- * @param array[] $additional Additional CURIEs to register with the API.
- * @return array[] Additional CURIEs to register with the API.
+ * @param array<int, array<string, mixed>> $additional Additional CURIEs to register with the API.
+ * @return array<int, array<string, mixed>> Additional CURIEs to register with the API.
  */
-function filter_rest_response_link_curies( array $additional ) : array {
+function filter_rest_response_link_curies( array $additional ): array {
 	$additional[] = [
 		'name'      => REST_PARAM,
 		'href'      => REST_CURIE_TEMPLATE,
@@ -490,7 +615,7 @@ function filter_rest_response_link_curies( array $additional ) : array {
 /**
  * Fires after block assets have been enqueued for the editing interface.
  */
-function enqueue_assets() : void {
+function enqueue_assets(): void {
 	/** @var WP_Post|null */
 	$post = get_post();
 
@@ -505,33 +630,49 @@ function enqueue_assets() : void {
 /**
  * Enqueues the JS and CSS assets for the author selection control.
  */
-function enqueue_assets_for_post() : void {
-	$manifest = plugin_dir_path( __DIR__ ) . 'build/asset-manifest.json';
+function enqueue_assets_for_post(): void {
+	$editor_asset = include plugin_dir_path( __DIR__ ) . 'build/index.asset.php';
+	if ( empty( $editor_asset ) ) {
+		trigger_error( 'Asset file missing, rebuild plugin asset bundles', E_USER_WARNING );
+		return;
+	}
 
-	enqueue_asset(
-		$manifest,
-		'main.js',
+	// Hot-reloading support.
+	if ( in_array( 'wp-react-refresh-runtime', $editor_asset['dependencies'] ?? [], true ) ) {
+		$runtime_asset_file = plugin_dir_path( __DIR__ ) . 'build/runtime.asset.php';
+		if ( is_readable( $runtime_asset_file ) ) {
+			$runtime_asset = include $runtime_asset_file;
+			if ( ! empty( $runtime_asset ) ) {
+				wp_register_script(
+					'authorship-hmr-runtime',
+					plugins_url( 'build/runtime.js', __DIR__ ),
+					$runtime_asset['dependencies'],
+					$runtime_asset['version'],
+					[
+						'in_footer' => true,
+					]
+				);
+				$editor_asset['dependencies'][] = 'authorship-hmr-runtime';
+			}
+		}
+	}
+
+	wp_enqueue_script(
+		SCRIPT_HANDLE,
+		plugins_url( 'build/index.js', __DIR__ ),
+		$editor_asset['dependencies'],
+		$editor_asset['version'],
 		[
-			'handle'       => SCRIPT_HANDLE,
-			// @TODO check:
-			'dependencies' => [
-				'react',
-				'wp-block-editor',
-				'wp-blocks',
-				'wp-components',
-				'wp-element',
-				'wp-i18n',
-				'wp-polyfill',
-			],
+			'strategy' => 'defer',
+			'in_footer' => true,
 		]
 	);
 
-	enqueue_asset(
-		$manifest,
-		'style.css',
-		[
-			'handle' => STYLE_HANDLE,
-		]
+	wp_enqueue_style(
+		STYLE_HANDLE,
+		plugins_url( 'build/index.css', __DIR__ ),
+		[],
+		$editor_asset['version']
 	);
 }
 
@@ -540,7 +681,7 @@ function enqueue_assets_for_post() : void {
  *
  * @param WP_Post $post The post being edited.
  */
-function preload_author_data( WP_Post $post ) : void {
+function preload_author_data( WP_Post $post ): void {
 	$authors = get_authors( $post );
 
 	if ( empty( $authors ) ) {
@@ -549,7 +690,7 @@ function preload_author_data( WP_Post $post ) : void {
 		];
 	}
 
-	$authors = array_map( function( WP_User $user ) {
+	$authors = array_map( function ( WP_User $user ) {
 		$avatar = get_avatar_url( $user->ID );
 
 		return [
@@ -576,7 +717,7 @@ function preload_author_data( WP_Post $post ) : void {
  *
  * @param WP_Query $query The WP_Query instance.
  */
-function action_pre_get_posts( WP_Query $query ) : void {
+function action_pre_get_posts( WP_Query $query ): void {
 	$post_type = $query->get( 'post_type' );
 
 	if ( empty( $post_type ) ) {
@@ -634,7 +775,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	} elseif ( ! empty( $stored_values['author__in'] ) ) {
 		$user_ids = array_map( 'intval', $stored_values['author__in'] );
 	} elseif ( ! empty( $stored_values['author__not_in'] ) ) {
-		$user_ids = array_map( function( int $id ) : int {
+		$user_ids = array_map( function ( int $id ): int {
 			return $id * -1;
 		}, array_map( 'intval', $stored_values['author__not_in'] ) );
 	}
@@ -667,7 +808,7 @@ function action_pre_get_posts( WP_Query $query ) : void {
 	 * @param WP_Post[]|null $posts Array of post objects. Passed by reference.
 	 * @param WP_Query       $query The WP_Query instance.
 	 */
-	add_filter( 'posts_pre_query', function( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_ids ) : ?array {
+	add_filter( 'posts_pre_query', function ( ?array $posts, WP_Query $query ) use ( &$stored_values, $user_ids ): ?array {
 		if ( empty( $stored_values ) ) {
 			return $posts;
 		}
@@ -762,7 +903,7 @@ function action_reference_pre_user_query( WP_User_Query $query ) : void {
  * @param int      $comment_id Comment ID.
  * @return string[] List of email addresses to notify for comment moderation.
  */
-function filter_comment_moderation_recipients( array $emails, int $comment_id ) : array {
+function filter_comment_moderation_recipients( array $emails, int $comment_id ): array {
 	/** @var \WP_Comment */
 	$comment = get_comment( $comment_id );
 	$post_id = (int) $comment->comment_post_ID;
@@ -779,11 +920,11 @@ function filter_comment_moderation_recipients( array $emails, int $comment_id ) 
 
 	$authors = get_authors( $post );
 
-	$moderators = array_filter( $authors, function( WP_User $user ) use ( $comment ) : bool {
+	$moderators = array_filter( $authors, function ( WP_User $user ) use ( $comment ): bool {
 		return user_can( $user->ID, 'edit_comment', $comment->comment_ID );
 	} );
 
-	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
+	$additional_emails = array_filter( array_map( function ( WP_User $user ): string {
 		return $user->user_email;
 	}, $moderators ) );
 
@@ -797,7 +938,7 @@ function filter_comment_moderation_recipients( array $emails, int $comment_id ) 
  * @param int      $comment_id The comment ID.
  * @return string[] An array of email addresses to receive a comment notification.
  */
-function filter_comment_notification_recipients( array $emails, int $comment_id ) : array {
+function filter_comment_notification_recipients( array $emails, int $comment_id ): array {
 	/** @var \WP_Comment */
 	$comment = get_comment( $comment_id );
 	$post_id = (int) $comment->comment_post_ID;
@@ -815,7 +956,7 @@ function filter_comment_notification_recipients( array $emails, int $comment_id 
 	$authors = get_authors( $post );
 
 	/** @var string[] */
-	$additional_emails = array_filter( array_map( function( WP_User $user ) : string {
+	$additional_emails = array_filter( array_map( function ( WP_User $user ): string {
 		return $user->user_email;
 	}, $authors ) );
 
@@ -831,8 +972,26 @@ function filter_comment_notification_recipients( array $emails, int $comment_id 
  * @param array<string, mixed> $options Options.
  * @return array<string, mixed> Filtered options.
  */
-function hide_quickedit_authors( array $options ) : array {
+function hide_quickedit_authors( array $options ): array {
 	$options['hide_if_only_one_author'] = true;
 	$options['include'] = [ 0 ];
 	return $options;
+}
+
+/**
+ * Prevents the new user notification from being sent to a user without an email address.
+ *
+ * Guest authors can be added without an email address. Bailing early also avoids generating
+ * an unused password reset key.
+ *
+ * @param mixed   $send Whether to send the email. Not type hinted, as other filters may return a non-boolean value.
+ * @param WP_User $user The new user.
+ * @return mixed Whether to send the email.
+ */
+function filter_wp_send_new_user_notification_to_user( $send, WP_User $user ) {
+	if ( $user->user_email === '' ) {
+		return false;
+	}
+
+	return $send;
 }

@@ -1,11 +1,11 @@
 # Authorship
 
-Stable tag: 0.2.17  
+Stable tag: 0.3.1  
 Requires at least: 5.4  
-Tested up to: 6.2  
-Requires PHP: 7.2  
+Tested up to: 6.9  
+Requires PHP: 8.2  
 License: GPL v3 or later  
-Contributors: johnbillion, humanmade  
+Contributors: johnbillion, humanmade
 
 A modern approach to author attribution in WordPress.
 
@@ -61,7 +61,7 @@ _Features without a checkmark are still work in progress._
 ### For development use
 
 * Clone this repo into your plugins directory
-* Ensure you have Composer v2 and Node v16 installed
+* Ensure you have Composer v2 and Node v24 installed
 * Install the dependencies:
   `composer install && npm install`
 * Start the dev server:
@@ -214,6 +214,7 @@ Great care has been taken to ensure Authorship makes no changes to the user capa
 * Grant users who are attributed to a post the ability to edit that post if their capabilities allow it
 * Grant users the ability to create and assign guest authors to a post
 * Allow this behaviour to be changed at a granular level with custom capabilities
+* Prevent guest authors from logging in, using application passwords, or resetting their password, and log users out when they become a guest author
 
 ### Assigning Attribution
 
@@ -261,7 +262,7 @@ The following custom user capabilities are used by Authorship. These can be gran
 
 ## Contributing
 
-Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](https://github.com/humanmade/authorship/blob/master/CONTRIBUTING.md) for more details.
+Code contributions, feedback, and feature suggestions are very welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ## Team
 

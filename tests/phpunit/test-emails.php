@@ -13,7 +13,7 @@ use const Authorship\GUEST_ROLE;
 use const Authorship\POSTS_PARAM;
 
 class TestEmails extends EmailTestCase {
-	public function testCommentModerationEmailIsSentToUsersWhoCanModerateIt() : void {
+	public function testCommentModerationEmailIsSentToUsersWhoCanModerateIt(): void {
 		// Attributed to one user of each role:
 		$post_id = self::factory()->post->create( [
 			'post_author' => self::$users['editor']->ID,
@@ -43,7 +43,7 @@ class TestEmails extends EmailTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	public function testCommentModerationEmailDoesNotDuplicateRecipients() : void {
+	public function testCommentModerationEmailDoesNotDuplicateRecipients(): void {
 		// Attributed to the site admin:
 		$post_id = self::factory()->post->create( [
 			'post_author' => 1,
@@ -72,7 +72,7 @@ class TestEmails extends EmailTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
-	public function testCommentNotificationEmailIsSentToAllAttributedAuthors() : void {
+	public function testCommentNotificationEmailIsSentToAllAttributedAuthors(): void {
 		// Attributed to one user of each role:
 		$post_id = self::factory()->post->create( [
 			'post_author' => self::$users['editor']->ID,
@@ -104,5 +104,4 @@ class TestEmails extends EmailTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
-
 }

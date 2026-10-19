@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Authorship;
 
 use Exception;
+use WP_Error;
 use WP_Post;
 use WP_Term;
 use WP_User;
@@ -20,7 +21,7 @@ use WP_User;
  * @param WP_Post $post The post object.
  * @return int[] Array of user IDs.
  */
-function get_author_ids( WP_Post $post ) : array {
+function get_author_ids( WP_Post $post ): array {
 	if ( ! is_post_type_supported( $post->post_type ) ) {
 		if ( post_type_supports( $post->post_type, 'author' ) ) {
 			return [ intval( $post->post_author ) ];
@@ -34,7 +35,7 @@ function get_author_ids( WP_Post $post ) : array {
 		return [];
 	}
 
-	return array_map( function ( WP_Term $term ) : int {
+	return array_map( function ( WP_Term $term ): int {
 		return intval( $term->slug );
 	}, $authors );
 }
@@ -45,7 +46,7 @@ function get_author_ids( WP_Post $post ) : array {
  * @param WP_Post $post The post object.
  * @return WP_User[] Array of user objects.
  */
-function get_authors( WP_Post $post ) : array {
+function get_authors( WP_Post $post ): array {
 	$author_ids = get_author_ids( $post );
 	if ( empty( $author_ids ) ) {
 		return [];
@@ -72,7 +73,7 @@ function get_authors( WP_Post $post ) : array {
  * @param WP_Post $post The post object.
  * @return string List of the names of the authors.
  */
-function get_author_names( WP_Post $post ) : string {
+function get_author_names( WP_Post $post ): string {
 	$authors = get_authors( $post );
 
 	return implode( ', ', array_column( $authors, 'display_name' ) );
@@ -89,7 +90,7 @@ function get_author_names( WP_Post $post ) : string {
  * @param WP_Post $post The post object.
  * @return string List of the names of the authors.
  */
-function get_author_names_sentence( WP_Post $post ) : string {
+function get_author_names_sentence( WP_Post $post ): string {
 	$authors = get_authors( $post );
 
 	if ( empty( $authors ) ) {
@@ -116,14 +117,14 @@ function get_author_names_sentence( WP_Post $post ) : string {
  * @param WP_Post $post The post object.
  * @return string List of the names of the authors.
  */
-function get_author_names_list( WP_Post $post ) : string {
+function get_author_names_list( WP_Post $post ): string {
 	$authors = get_authors( $post );
 
 	if ( empty( $authors ) ) {
 		return '';
 	}
 
-	$list = array_reduce( $authors, function( string $carry, WP_User $author ) {
+	$list = array_reduce( $authors, function ( string $carry, WP_User $author ) {
 		return "{$carry}\n\t" . sprintf(
 			'<li><a href="%1$s">%2$s</a></li>',
 			esc_url( get_author_posts_url( $author->ID ) ),
@@ -147,7 +148,7 @@ HTML;
  * @throws Exception If any of the users do not exist.
  * @return WP_User[] Array of user objects.
  */
-function set_authors( WP_Post $post, array $authors ) : array {
+function set_authors( WP_Post $post, array $authors ): array {
 	if ( ! is_post_type_supported( $post->post_type ) ) {
 		throw new Exception( __( 'This post type does not support authorship.', 'authorship' ) );
 	}
@@ -167,8 +168,19 @@ function set_authors( WP_Post $post, array $authors ) : array {
 		throw new Exception( __( 'One or more user IDs are not valid for this site.', 'authorship' ) );
 	}
 
-	// Author IDs must be mapped to strings before passing to `wp_set_post_terms()`.
-	$terms = wp_set_post_terms( $post->ID, array_map( 'strval', $authors ), TAXONOMY );
+	$term_ids = [];
+
+	foreach ( $authors as $author ) {
+		$term_id = get_author_term_id( $author );
+
+		if ( is_wp_error( $term_id ) ) {
+			throw new Exception( $term_id->get_error_message() );
+		}
+
+		$term_ids[] = $term_id;
+	}
+
+	$terms = wp_set_post_terms( $post->ID, $term_ids, TAXONOMY );
 
 	if ( is_wp_error( $terms ) ) {
 		throw new Exception( $terms->get_error_message() );
@@ -178,13 +190,45 @@ function set_authors( WP_Post $post, array $authors ) : array {
 }
 
 /**
+ * Gets the ID of the author term for the given user, creating the term if it doesn't exist.
+ *
+ * Terms are looked up strictly by slug. Passing user IDs as strings to `wp_set_post_terms()`
+ * would make core fall back to a lookup by name, which could match another author whose
+ * display name is that user ID.
+ *
+ * @param int $user_id The user ID.
+ * @return int|WP_Error The term ID, or an error if the term cannot be created.
+ */
+function get_author_term_id( int $user_id ) {
+	$slug = (string) $user_id;
+	$term = get_term_by( 'slug', $slug, TAXONOMY );
+
+	if ( $term instanceof WP_Term ) {
+		// Terms created before names were synced are named after the user ID.
+		update_author_term_name( $user_id );
+
+		return $term->term_id;
+	}
+
+	$term = wp_insert_term( $slug, TAXONOMY, [
+		'slug' => $slug,
+	] );
+
+	if ( is_wp_error( $term ) ) {
+		return $term;
+	}
+
+	return (int) $term['term_id'];
+}
+
+/**
  * Determines if the given user is an attributed author of the given post.
  *
  * @param WP_User $user The user object.
  * @param WP_Post $post The post object.
  * @return bool Whether the user is an attributed author of the post.
  */
-function user_is_author( WP_User $user, WP_Post $post ) : bool {
+function user_is_author( WP_User $user, WP_Post $post ): bool {
 	if ( ! is_post_type_supported( $post->post_type ) ) {
 		return ( intval( $post->post_author ) === $user->ID );
 	}
