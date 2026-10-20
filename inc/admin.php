@@ -28,6 +28,48 @@ function bootstrap(): void {
 	// Actions.
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
 	add_action( 'user_profile_update_errors', __NAMESPACE__ . '\\remove_required_fields_errors', 10, 3 );
+	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_user_new_script' );
+}
+
+/**
+ * Makes the email field optional on the Add New User screen when the guest author role is selected.
+ *
+ * The form is validated client-side by `wp-ajax-response`, which rejects empty `.form-required`
+ * fields before the server-side validation in `remove_required_fields_errors()` is reached.
+ *
+ * @param string $hook_suffix The current admin page.
+ */
+function enqueue_user_new_script( string $hook_suffix ): void {
+	if ( 'user-new.php' !== $hook_suffix ) {
+		return;
+	}
+
+	$script = <<<'JS'
+jQuery( function( $ ) {
+	var $role = $( '#createuser #role' );
+	var $row = $( '#createuser #email' ).closest( 'tr' );
+
+	if ( ! $role.length || ! $row.length ) {
+		return;
+	}
+
+	function toggleEmailRequired() {
+		var isGuest = $role.val() === %s;
+
+		$row.toggleClass( 'form-required', ! isGuest );
+		$row.find( 'th .description' ).toggle( ! isGuest );
+
+		if ( isGuest ) {
+			$row.removeClass( 'form-invalid' );
+		}
+	}
+
+	$role.on( 'change', toggleEmailRequired );
+	toggleEmailRequired();
+} );
+JS;
+
+	wp_add_inline_script( 'wp-ajax-response', sprintf( $script, wp_json_encode( GUEST_ROLE ) ) );
 }
 
 /**
