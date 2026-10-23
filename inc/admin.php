@@ -45,28 +45,43 @@ function enqueue_user_new_script( string $hook_suffix ): void {
 	}
 
 	$script = <<<'JS'
-jQuery( function( $ ) {
-	var $role = $( '#createuser #role' );
-	var $row = $( '#createuser #email' ).closest( 'tr' );
+( function() {
+	function init() {
+		var role = document.querySelector( '#createuser #role' );
+		var email = document.querySelector( '#createuser #email' );
+		var row = email && email.closest( 'tr' );
 
-	if ( ! $role.length || ! $row.length ) {
-		return;
-	}
-
-	function toggleEmailRequired() {
-		var isGuest = $role.val() === %s;
-
-		$row.toggleClass( 'form-required', ! isGuest );
-		$row.find( 'th .description' ).toggle( ! isGuest );
-
-		if ( isGuest ) {
-			$row.removeClass( 'form-invalid' );
+		if ( ! role || ! row ) {
+			return;
 		}
+
+		var description = row.querySelector( 'th .description' );
+
+		function toggleEmailRequired() {
+			var isGuest = role.value === %s;
+
+			row.classList.toggle( 'form-required', ! isGuest );
+
+			if ( description ) {
+				description.style.display = isGuest ? 'none' : '';
+			}
+
+			if ( isGuest ) {
+				row.classList.remove( 'form-invalid' );
+			}
+		}
+
+		role.addEventListener( 'change', toggleEmailRequired );
+		toggleEmailRequired();
 	}
 
-	$role.on( 'change', toggleEmailRequired );
-	toggleEmailRequired();
-} );
+	// The script may run after DOMContentLoaded if scripts are deferred or delayed.
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', init );
+	} else {
+		init();
+	}
+} )();
 JS;
 
 	wp_add_inline_script( 'wp-ajax-response', sprintf( $script, wp_json_encode( GUEST_ROLE ) ) );
