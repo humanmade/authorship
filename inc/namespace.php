@@ -23,6 +23,7 @@ use WP_REST_Server;
 use WP_Session_Tokens;
 use WP_Term;
 use WP_User;
+use WP_User_Query;
 
 const GUEST_ROLE = 'guest-author';
 const POSTS_PARAM = 'authorship';
@@ -45,6 +46,7 @@ function bootstrap(): void {
 	add_action( 'rest_api_init', __NAMESPACE__ . '\\register_rest_api_fields' );
 	add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\\enqueue_assets' );
 	add_action( 'pre_get_posts', __NAMESPACE__ . '\\action_pre_get_posts', 9999 );
+	add_action( 'pre_user_query', __NAMESPACE__ . '\\action_pre_user_query', 9999 );
 	add_action( 'wp', __NAMESPACE__ . '\\action_wp' );
 	add_action( 'wp_insert_post', [ $insert_post_handler, 'action_wp_insert_post' ], 10, 3 );
 	add_action( 'set_user_role', __NAMESPACE__ . '\\action_set_user_role', 10, 2 );
@@ -826,6 +828,77 @@ function action_pre_get_posts( WP_Query $query ): void {
 
 		return $posts;
 	}, 999, 2 );
+}
+
+/**
+ * Makes the has_published_posts arg of WP_User_Query use attributed authors for supported post types.
+ *
+ * Replaces the clause core adds, which only checks the post_author field.
+ *
+ * @param WP_User_Query $query The user query.
+ */
+function action_pre_user_query( WP_User_Query $query ): void {
+	global $wpdb;
+
+	$has_published_posts = $query->get( 'has_published_posts' );
+	$blog_id = absint( $query->get( 'blog_id' ) );
+
+	// Core skips the clause in both of these cases.
+	if ( ! $has_published_posts || ! $blog_id ) {
+		return;
+	}
+
+	if ( true === $has_published_posts ) {
+		$post_types = get_post_types( [
+			'public' => true,
+		] );
+	} else {
+		$post_types = (array) $has_published_posts;
+	}
+
+	$supported_post_types = array_intersect( $post_types, get_supported_post_types() );
+	$unsupported_post_types = array_diff( $post_types, $supported_post_types );
+
+	$prepare_in = function ( array $values ) use ( $wpdb ): string {
+		return implode( ', ', array_map( function ( $value ) use ( $wpdb ): string {
+			return $wpdb->prepare( '%s', $value );
+		}, $values ) );
+	};
+
+	$prefix = $wpdb->get_blog_prefix( $blog_id );
+	$posts_table = $prefix . 'posts';
+	$term_relationships_table = $prefix . 'term_relationships';
+	$term_taxonomy_table = $prefix . 'term_taxonomy';
+	$terms_table = $prefix . 'terms';
+
+	// The clause added by core, which must match exactly.
+	$core_sql = " $wpdb->users.ID IN ( SELECT DISTINCT $posts_table.post_author FROM $posts_table WHERE $posts_table.post_status = 'publish' AND $posts_table.post_type IN ( " . $prepare_in( $post_types ) . ' ) )';
+
+	// Post types that Authorship doesn't handle still use the post_author field.
+	$unsupported_sql = empty( $unsupported_post_types )
+		? '1=0'
+		: " $wpdb->users.ID IN ( SELECT DISTINCT $posts_table.post_author FROM $posts_table WHERE $posts_table.post_status = 'publish' AND $posts_table.post_type IN ( " . $prepare_in( $unsupported_post_types ) . ' ) )';
+
+	// Author term slugs are user IDs.
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+	$supported_sql = empty( $supported_post_types )
+		? '1=0'
+		: $wpdb->prepare(
+			" $wpdb->users.ID IN (
+				SELECT DISTINCT CAST( t.slug AS UNSIGNED )
+				FROM {$posts_table} p
+					INNER JOIN {$term_relationships_table} tr ON p.ID = tr.object_id
+					INNER JOIN {$term_taxonomy_table} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+					INNER JOIN {$terms_table} t ON tt.term_id = t.term_id
+				WHERE tt.taxonomy = %s
+					AND p.post_status = 'publish'
+					AND p.post_type IN ( " . $prepare_in( $supported_post_types ) . ' )
+			)',
+			TAXONOMY
+		);
+	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+
+	$query->query_where = str_replace( $core_sql, " ( ( $unsupported_sql ) OR ( $supported_sql ) )", $query->query_where );
 }
 
 /**
