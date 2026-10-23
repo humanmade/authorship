@@ -28,6 +28,63 @@ function bootstrap(): void {
 	// Actions.
 	add_action( 'admin_init', __NAMESPACE__ . '\\init_admin_cols', 99 );
 	add_action( 'user_profile_update_errors', __NAMESPACE__ . '\\remove_required_fields_errors', 10, 3 );
+	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_user_new_script' );
+}
+
+/**
+ * Makes the email field optional on the Add New User screen when the guest author role is selected.
+ *
+ * The form is validated client-side by `wp-ajax-response`, which rejects empty `.form-required`
+ * fields before the server-side validation in `remove_required_fields_errors()` is reached.
+ *
+ * @param string $hook_suffix The current admin page.
+ */
+function enqueue_user_new_script( string $hook_suffix ): void {
+	if ( 'user-new.php' !== $hook_suffix ) {
+		return;
+	}
+
+	$script = <<<'JS'
+( function() {
+	function init() {
+		var role = document.querySelector( '#createuser #role' );
+		var email = document.querySelector( '#createuser #email' );
+		var row = email && email.closest( 'tr' );
+
+		if ( ! role || ! row ) {
+			return;
+		}
+
+		var description = row.querySelector( 'th .description' );
+
+		function toggleEmailRequired() {
+			var isGuest = role.value === %s;
+
+			row.classList.toggle( 'form-required', ! isGuest );
+
+			if ( description ) {
+				description.style.display = isGuest ? 'none' : '';
+			}
+
+			if ( isGuest ) {
+				row.classList.remove( 'form-invalid' );
+			}
+		}
+
+		role.addEventListener( 'change', toggleEmailRequired );
+		toggleEmailRequired();
+	}
+
+	// The script may run after DOMContentLoaded if scripts are deferred or delayed.
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', init );
+	} else {
+		init();
+	}
+} )();
+JS;
+
+	wp_add_inline_script( 'wp-ajax-response', sprintf( $script, wp_json_encode( GUEST_ROLE ) ) );
 }
 
 /**
